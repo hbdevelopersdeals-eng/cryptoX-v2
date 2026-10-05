@@ -10,6 +10,7 @@ import { useChainHeads } from '../lib/chainHead.js';
 import { Reconciler } from '../lib/backpressure.js';
 import { fmtPrice, fmtCompact, timeAgo, cls } from '../lib/format.js';
 import { CoinImg, Card } from '../components/ui.jsx';
+import SourceRegistryPanel from '../components/SourceRegistryPanel.jsx';
 
 const AUTO_MS = 60000;
 
@@ -550,12 +551,14 @@ export default function DataSourcesPage() {
         </div>
       </Card>
 
+      <SourceRegistryPanel />
+
       <div className="flex items-start gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
         <Info size={14} className="mt-0.5 shrink-0 text-primary" />
         <span>
           Public venue endpoints only — no API keys, no fabricated prices: a venue that blocks browser access shows as
           <b> down</b> with its error. Licensed institutional feeds (CMC enterprise, CME), DEX subgraphs and blockchain
-          indexers need commercial agreements and are part of the enterprise blueprint, not this build.
+          indexers need commercial agreements we do not hold — see the registry above.
         </span>
       </div>
     </div>

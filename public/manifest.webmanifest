@@ -1,0 +1,34 @@
+{
+  "name": "CryptoX — Market Intelligence & Trading Terminal",
+  "short_name": "CryptoX",
+  "description": "Real-time crypto markets, professional charting, paper exchange, derivatives lab and one-click strategy engine.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#09090C",
+  "theme_color": "#09090C",
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Markets", "url": "./#/" },
+    { "name": "RSI Scanner", "url": "./#/rsi-scanner" },
+    { "name": "Pro Charting", "url": "./#/charting" },
+    { "name": "Paper Exchange", "url": "./#/exchange" }
+  ]
+}

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  verify:
+    name: Test, build and audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies (locked)
+        run: npm ci
+
+      - name: Unit + component tests with coverage
+        run: npm run test:coverage
+
+      - name: Production build
+        run: npm run build
+
+      - name: Static configuration checks
+        run: node scripts/check-config.mjs
+
+      - name: Bundle size budget
+        run: node scripts/check-bundle.mjs
+
+      - name: Dependency audit (production, report only)
+        run: npm audit --omit=dev || true
+
+      - name: Block critical production advisories
+        run: npm audit --omit=dev --audit-level=critical
+
+      - name: Upload coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: coverage/coverage-summary.json
+          if-no-files-found: ignore

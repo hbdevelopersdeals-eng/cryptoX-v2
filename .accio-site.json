@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "siteId": "qgf0t5pnidogy3fw",
+  "name": "cryptox-app",
+  "kind": "react-vite",
+  "devCommand": "vite",
+  "buildCommand": "vite build",
+  "outputDir": "dist",
+  "entry": "index.html",
+  "createdBy": "accio-site-builder",
+  "createdAt": "2026-09-13T06:11:05.679Z",
+  "siteIdSyncStatus": "synced",
+  "installedAt": "2026-09-13T06:13:25.066Z",
+  "databaseUrl": "https://supabase.com/dashboard/project/bvyiqinyakxlefaeomoj",
+  "integrations": {
+    "supabase": {
+      "projectUrl": "https://bvyiqinyakxlefaeomoj.supabase.co",
+      "projectRef": "bvyiqinyakxlefaeomoj",
+      "connectedAt": "2026-09-13T06:25:33.090Z"
+    }
+  },
+  "subdomain": "cryptox-v2",
+  "publishedUrl": "https://cryptox-v2.site.accio.ai",
+  "publishedAt": "2026-10-01T18:58:02.594Z",
+  "deployId": "dep_1790881077911_316fc32a"
+}

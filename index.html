@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#09090C" />
+    <meta name="description" content="CryptoX — a real-time cryptocurrency dashboard with live market data, candlestick charts, one-click trading strategies and a paper-trading simulator. Educational demo; not investment advice." />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Content Security Policy. NOTE: frame-ancestors / HSTS / Permissions-Policy must be
+         set as real HTTP headers by the host — see public/_headers and SECURITY.md. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.binance.com https://data-api.binance.vision https://api.alternative.me wss://stream.binance.com:9443 wss://data-stream.binance.vision; worker-src 'self' blob:; frame-src 'none'"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>CryptoX — Real-time Crypto Market Dashboard</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="font-family: system-ui, sans-serif; color: #F0F2F5; background: #09090C; padding: 24px">
+        <h1>CryptoX needs JavaScript</h1>
+        <p>This dashboard uses live market data streams and interactive charts. Please enable JavaScript to continue.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+# Security header contract for header-capable static hosts (Netlify/Cloudflare Pages style).
+# The current Accio static host may not apply this file — verify with:
+#   curl -I https://<your-site>/
+# Anything listed here that the host cannot set is documented as a residual risk in SECURITY.md.
+
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.binance.com https://data-api.binance.vision https://api.alternative.me wss://stream.binance.com:9443 wss://data-stream.binance.vision; worker-src 'self' blob:; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin

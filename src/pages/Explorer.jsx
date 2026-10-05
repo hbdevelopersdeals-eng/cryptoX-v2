@@ -13,6 +13,7 @@ import {
 } from '../lib/explorer.js';
 import { LABEL_KINDS } from '../lib/labels.js';
 import { Card } from '../components/ui.jsx';
+import NftChecker from '../components/NftChecker.jsx';
 
 const TABS = [
   { id: 'blocks', label: 'Blocks', icon: Boxes },
@@ -756,6 +757,8 @@ export default function ExplorerPage() {
           ) : null}
         </>
       ) : null}
+
+      <NftChecker />
     </div>
   );
 }

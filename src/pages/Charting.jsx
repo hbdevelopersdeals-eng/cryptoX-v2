@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LineChart, Loader2, RefreshCw, Eraser, Info, Layers } from 'lucide-react';
 import { useMarket } from '../lib/market.jsx';
 import ProChart from '../components/ProChart.jsx';
+import AltChart from '../components/AltChart.jsx';
+import IndicatorMarketplace from '../components/IndicatorMarketplace.jsx';
 import { renko, rangeBars } from '../lib/chartTypes.js';
 import { fmtPrice, timeAgo } from '../lib/format.js';
 import { Card } from '../components/ui.jsx';
@@ -11,8 +13,12 @@ const INTERVALS = ['1m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '1d'
 const TYPES = [
   ['candles', 'Candlestick'], ['hollow', 'Hollow candles'], ['heikin', 'Heikin Ashi'],
   ['line', 'Line'], ['area', 'Area'], ['baseline', 'Baseline'],
-  ['renko', 'Renko'], ['range', 'Range bars']
+  ['renko', 'Renko'], ['range', 'Range bars'],
+  ['kagi', 'Kagi'], ['pnf', 'Point & Figure'], ['mprofile', 'Market profile']
 ];
+/* These emit pivots, boxes or a histogram rather than OHLC bars, so they use AltChart. */
+const ALT_TYPES = ['kagi', 'pnf', 'mprofile'];
+
 const SCALES = [['linear', 'Linear'], ['log', 'Log'], ['percent', 'Percent']];
 const OVERLAY_OPTIONS = [
   ['sma20', 'SMA 20'], ['sma50', 'SMA 50'], ['ema21', 'EMA 21'], ['wma14', 'WMA 14'],
@@ -215,7 +221,9 @@ export default function ChartingPage() {
               {livePrice && idx === 0 ? <span className="num text-xs text-muted-foreground">{fmtPrice(livePrice)}</span> : null}
               {paneCount > 1 ? <span className="ml-auto text-[11px] text-muted-foreground">pane {idx + 1} · {pane.subpanel}</span> : null}
             </div>
-            {display?.length ? (
+            {display?.length ? (ALT_TYPES.includes(type) ? (
+              <AltChart type={type} candles={display} interval={interval} height={pane.height} />
+            ) : (
               <ProChart
                 candles={display}
                 symbol={symbol}
@@ -236,7 +244,7 @@ export default function ChartingPage() {
                 onHover={(h) => { if (idx === 0) setHover(h); }}
                 label={`${symbol} ${interval} chart`}
               />
-            ) : (
+            )) : (
               <div role="status" className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
                 {loading ? <><Loader2 size={18} className="mr-2 animate-spin" /> Loading candles…</> : 'No chart data'}
               </div>
@@ -245,12 +253,14 @@ export default function ChartingPage() {
         ))}
       </div>
 
+      <IndicatorMarketplace candles={display || []} />
+
       <div className="flex items-start gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
         <Info size={14} className="mt-0.5 shrink-0 text-primary" />
         <span>
           Indicators: SMA, EMA, WMA, Bollinger, Ichimoku, Supertrend, VWAP + studies RSI, MACD, ATR, ADX, OBV, Stochastic.
-          Kagi and Point &amp; Figure transforms are implemented in the library; their dedicated renderers and the indicator
-          marketplace (needs a backend registry) are not exposed in the UI yet. {feed.simulated ? 'Feed degraded — signals paused.' : ''}
+          Kagi, Point &amp; Figure and market profile have dedicated renderers; the indicator marketplace and
+          user-created indicators live below. {feed.simulated ? 'Feed degraded — signals paused.' : ''}
         </span>
       </div>
     </div>

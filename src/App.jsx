@@ -33,6 +33,7 @@ const WalletLabPage = lazy(() => import('./pages/WalletLab.jsx'));
 const ExplorerPage = lazy(() => import('./pages/Explorer.jsx'));
 const BotsPage = lazy(() => import('./pages/Bots.jsx'));
 const DeFiNftPage = lazy(() => import('./pages/DeFiNft.jsx'));
+const AssistantPage = lazy(() => import('./pages/Assistant.jsx'));
 const ChartingPage = lazy(() => import('./pages/Charting.jsx'));
 const DerivativesPage = lazy(() => import('./pages/Derivatives.jsx'));
 const CoinDetailPage = lazy(() => import('./pages/CoinDetail.jsx'));
@@ -101,6 +102,7 @@ export default function App() {
                     <Route path="/explorer" element={<ExplorerPage />} />
                     <Route path="/bots" element={<BotsPage />} />
                     <Route path="/defi" element={<DeFiNftPage />} />
+                    <Route path="/assistant" element={<AssistantPage />} />
                     <Route path="/rsi-scanner" element={<RsiScannerPage />} />
                     <Route path="/market-intel" element={<MarketIntelPage />} />
                     <Route path="/data-sources" element={<DataSourcesPage />} />

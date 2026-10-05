@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutGrid, TrendingUp, CircleDollarSign, Smile, Star, Wallet, BellRing,
   Zap, Play, Calculator, Newspaper, Search, Menu, X, LogOut, Radio, Database,
-  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark
+  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
@@ -33,6 +33,7 @@ const NAV = [
   {
     group: 'Trading',
     items: [
+      { to: '/assistant', label: 'CryptoX AI', icon: Sparkles, hot: true },
       { to: '/derivatives', label: 'Derivatives (Paper)', icon: Activity, hot: true },
       { to: '/charting', label: 'Pro Charting', icon: LineChart },
       { to: '/exchange', label: 'Exchange (Paper)', icon: CandlestickChart },
@@ -68,6 +69,7 @@ const TITLES = {
   '/aggregator': ['Exchange Aggregator', 'Best buy and sell venue per asset, cross-venue price gaps and a venue leaderboard — gross figures, not tradeable profit'],
   '/wallet-lab': ['Wallet Lab', 'Read-only address verification, checksum and scam checks, derivation paths, live gas and transaction simulation — no keys, no signing'],
   '/explorer': ['Blockchain Explorer', 'Blocks, transactions, addresses, tokens, contracts, interfaces, transfers, mempool, gas and validators from public keyless endpoints'],
+  '/assistant': ['CryptoX AI', 'Natural-language analysis computed from live data — no language model, with confirmation required before any action'],
   '/defi': ['DeFi & NFT', 'Protocol TVL, pool yields, stablecoin peg health, NFT collections and floor-price portfolio valuation'],
   '/bots': ['Trading Bots', 'DCA, Grid, TWAP, VWAP, arbitrage, rebalancing, market making, momentum, mean reversion, breakout, copy and custom strategies — paper only, with live risk controls'],
   '/market-intel': ['Market Intelligence', 'Rankings, movers, sectors, supply, ATH and multi-period performance'],

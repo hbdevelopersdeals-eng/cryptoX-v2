@@ -6,6 +6,7 @@ import {
   contractBySymbol, positionView, liquidate, applyFunding, adlQueue, InsuranceFund,
   nextFundingTime, FUNDING_INTERVAL_MS, initialMargin, maintenanceRequirement
 } from '../lib/derivativesEngine.js';
+import DerivativesExtras from '../components/DerivativesExtras.jsx';
 import { bsPrice, bsGreeks, impliedVol, yearsFromDays } from '../lib/options.js';
 import { bucketLiquidations, clusterLevels, estimateHeatmap, heatColor } from '../lib/liquidationHeatmap.js';
 import { fmtPrice, fmtCompact, fmtUsd, cls, timeAgo } from '../lib/format.js';
@@ -331,6 +332,8 @@ export default function DerivativesPage() {
           </p>
         </Card>
       </div>
+
+      <DerivativesExtras />
 
       <div className="flex items-start gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
         <Info size={14} className="mt-0.5 shrink-0 text-primary" />

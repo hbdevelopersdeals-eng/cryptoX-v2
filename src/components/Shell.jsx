@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutGrid, TrendingUp, CircleDollarSign, Smile, Star, Wallet, BellRing,
   Zap, Play, Calculator, Newspaper, Search, Menu, X, LogOut, Radio, Database,
-  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes
+  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
@@ -39,6 +39,7 @@ const NAV = [
       { to: '/aggregator', label: 'Exchange Aggregator', icon: Layers },
       { to: '/wallet-lab', label: 'Wallet Lab', icon: ShieldCheck },
       { to: '/explorer', label: 'Block Explorer', icon: Boxes },
+      { to: '/bots', label: 'Trading Bots', icon: Bot, hot: true },
       { to: '/market-intel', label: 'Market Intelligence', icon: BarChart3 },
       { to: '/data-sources', label: 'Data Sources', icon: Database },
       { to: '/rsi-scanner', label: 'RSI Scanner', icon: Activity, hot: true },
@@ -66,6 +67,7 @@ const TITLES = {
   '/aggregator': ['Exchange Aggregator', 'Best buy and sell venue per asset, cross-venue price gaps and a venue leaderboard — gross figures, not tradeable profit'],
   '/wallet-lab': ['Wallet Lab', 'Read-only address verification, checksum and scam checks, derivation paths, live gas and transaction simulation — no keys, no signing'],
   '/explorer': ['Blockchain Explorer', 'Blocks, transactions, addresses, tokens, contracts, interfaces, transfers, mempool, gas and validators from public keyless endpoints'],
+  '/bots': ['Trading Bots', 'DCA, Grid, TWAP, VWAP, arbitrage, rebalancing, market making, momentum, mean reversion, breakout, copy and custom strategies — paper only, with live risk controls'],
   '/market-intel': ['Market Intelligence', 'Rankings, movers, sectors, supply, ATH and multi-period performance'],
   '/data-sources': ['Market Data', 'Multi-venue ingestion, consensus pricing, data quality and the real-time engine'],
   '/rsi-scanner': ['RSI Scanner', 'Live oversold (<30) and overbought (>70) coins with buy/sell calls'],

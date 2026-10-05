@@ -181,3 +181,18 @@ export function useSim() {
 export function cryptoId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
+
+/* ---------- Paper trading bots (never touch a real exchange) ---------- */
+const BOTS_KEY = 'cx_bots';
+export function useBots() {
+  const [bots, setBots] = useLsState(BOTS_KEY, []);
+  const add = (b) => setBots((cur) => [...cur, { id: cryptoId(), running: false, log: [], state: {}, at: Date.now(), ...b }]);
+  const remove = (id) => setBots((cur) => cur.filter((x) => x.id !== id));
+  const patch = (id, p) => setBots((cur) => cur.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const appendLog = (id, entries) => setBots((cur) => cur.map((x) => (
+    x.id === id ? { ...x, log: [...entries, ...x.log].slice(0, 200) } : x
+  )));
+  const clearLog = (id) => setBots((cur) => cur.map((x) => (x.id === id ? { ...x, log: [] } : x)));
+  const clearAll = () => setBots([]);
+  return [bots, { add, remove, patch, appendLog, clearLog, clearAll }];
+}

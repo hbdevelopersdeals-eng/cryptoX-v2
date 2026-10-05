@@ -21,7 +21,18 @@ export const WS_HOSTS = [
 
 export const REST_HOSTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
 
-export const DEFAULT_STREAMS = ['btcusdt@aggTrade', 'btcusdt@depth20@100ms', 'btcusdt@kline_1m', 'ethusdt@aggTrade'];
+// @ticker and @markPrice@1s are included deliberately: they arrive about once a
+// second, which is what makes the silence watchdog a usable heartbeat. Without a
+// fast stream, an idle book would look identical to a dead socket.
+export const DEFAULT_STREAMS = [
+  'btcusdt@aggTrade',
+  'btcusdt@depth20@100ms',
+  'btcusdt@kline_1m',
+  'btcusdt@ticker',
+  'btcusdt@markPrice@1s',
+  'ethusdt@aggTrade',
+  'ethusdt@ticker'
+];
 
 export const SILENCE_TIMEOUT_MS = 30000;
 export const MAX_REPLAY_EVENTS = 200;

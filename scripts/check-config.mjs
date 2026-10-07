@@ -24,6 +24,14 @@ function walk(dir, out = []) {
 
 const files = walk(ROOT);
 
+/* Comments are stripped before the code-pattern checks. Without this, a file
+ * that merely *documents* a forbidden API (e.g. "we never call eval()") is
+ * reported as using it — a false positive that trains people to ignore the
+ * guard. Only the real code is inspected. */
+const stripComments = (src) => src
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')
+  .replace(/^\s*\/\/.*$/gm, '');
+
 /* 1. No external font/CDN hosts (policy: system font stack only) */
 const BANNED_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'use.typekit.net'];
 for (const file of files) {
@@ -35,7 +43,7 @@ for (const file of files) {
 
 /* 2. No raw HTML injection sinks */
 for (const file of files) {
-  const src = readFileSync(file, 'utf8');
+  const src = stripComments(readFileSync(file, 'utf8'));
   if (/dangerouslySetInnerHTML/.test(src)) failures.push(`${file.replace(ROOT, '.')} uses dangerouslySetInnerHTML`);
   if (/\beval\s*\(/.test(src)) failures.push(`${file.replace(ROOT, '.')} uses eval()`);
 }
@@ -65,7 +73,7 @@ if (!/rel="noopener noreferrer"/.test(readFileSync(join(ROOT, 'src', 'pages', 'N
 
 /* 5. Known shadowing footgun: a state setter named setInterval/setTimeout */
 for (const file of files) {
-  const src = readFileSync(file, 'utf8');
+  const src = stripComments(readFileSync(file, 'utf8'));
   if (/useState[^\n]*\bsetInterval\b/.test(src)) {
     failures.push(`${file.replace(ROOT, '.')} shadows the global setInterval with a state setter`);
   }

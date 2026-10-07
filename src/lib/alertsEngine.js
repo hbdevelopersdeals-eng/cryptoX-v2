@@ -5,6 +5,8 @@
  * notification, email/webhook) are handled by the caller.
  */
 
+import { EXTRA_RULE_TYPES, evaluateExtraRule, parseFormula } from './alertExtras.js';
+
 /** Sentinel "symbol" for rules evaluated against the whole portfolio. */
 export const PORTFOLIO_SYMBOL = 'PORTFOLIO';
 
@@ -21,7 +23,8 @@ export const RULE_TYPES = [
   'macd_cross',
   'breakout',
   'portfolio_value_above',
-  'portfolio_value_below'
+  'portfolio_value_below',
+  ...EXTRA_RULE_TYPES
 ];
 
 export const RULE_LABELS = {
@@ -35,7 +38,12 @@ export const RULE_LABELS = {
   macd_cross: 'MACD cross',
   breakout: 'Breakout of range',
   portfolio_value_above: 'Portfolio value above',
-  portfolio_value_below: 'Portfolio value below'
+  portfolio_value_below: 'Portfolio value below',
+  funding_above: 'Funding rate above',
+  funding_below: 'Funding rate below',
+  oi_change: 'Open interest change',
+  liquidation_spike: 'Liquidation spike',
+  formula: 'Custom formula'
 };
 
 export function describeRule(rule) {
@@ -52,7 +60,12 @@ export function describeRule(rule) {
     case 'macd_cross': return `${rule.symbol} MACD crosses signal`;
     case 'breakout': return `${rule.symbol} breaks ${rule.periods?.[0] ?? 20}-bar range`;
     case 'portfolio_value_above': return `Portfolio value above $${v}`;
-    case 'portfolio_value_below': return `Portfolio value below $${v}`;
+    case 'portfolio_value_below': return `Portfolio value below ${v}`;
+    case 'funding_above': return `${rule.symbol} funding above ${v}%`;
+    case 'funding_below': return `${rule.symbol} funding below ${v}%`;
+    case 'oi_change': return `${rule.symbol} open interest moves ${v}%`;
+    case 'liquidation_spike': return `${rule.symbol} liquidations within ${v}m`;
+    case 'formula': return `Formula: ${rule.formula}`;
     default: return label;
   }
 }
@@ -144,6 +157,11 @@ export function evaluateRule(rule, ctx = {}) {
       return { triggered: crossed, detail: `portfolio $${value.toFixed(2)} vs $${v}` };
     }
     default:
+      // Funding / open-interest / liquidation / formula rules live in
+      // alertExtras so their data-source caveats stay in one place. Without
+      // this delegation they could be created and saved but never fire —
+      // a rule that is silently dead is worse than one that is absent.
+      if (EXTRA_RULE_TYPES.includes(rule.type)) return evaluateExtraRule(rule, ctx);
       return { triggered: false };
   }
 }
@@ -218,7 +236,7 @@ export function validateRule(rule) {
     if (!Number.isFinite(pv) || pv <= 0) errors.push('portfolio threshold must be a positive number');
     return { ok: errors.length === 0, errors };
   }
-  if (['price_above', 'price_below', 'pct_change', 'volume_spike', 'rsi_above', 'rsi_below'].includes(rule?.type)) {
+  if (['price_above', 'price_below', 'pct_change', 'volume_spike', 'rsi_above', 'rsi_below', 'funding_above', 'funding_below', 'oi_change', 'liquidation_spike'].includes(rule?.type)) {
     const v = Number(rule?.value);
     if (!Number.isFinite(v)) errors.push('value must be a number');
     else if (rule.type.startsWith('rsi') && (v < 0 || v > 100)) errors.push('RSI threshold must be between 0 and 100');
@@ -226,6 +244,11 @@ export function validateRule(rule) {
   if (rule?.type === 'ma_cross') {
     const [f, s] = rule.periods || [];
     if (!(f > 0) || !(s > 0) || f >= s) errors.push('MA periods must be increasing (fast < slow)');
+  }
+  if (rule?.type === 'formula') {
+    const parsed = parseFormula(rule.formula || '');
+    if (!parsed.ok) errors.push(parsed.error);
+    else if (parsed.unknown.length) errors.push(`Unknown variable(s): ${parsed.unknown.join(', ')}`);
   }
   return { ok: errors.length === 0, errors };
 }

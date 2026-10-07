@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
-  buildContext, contextReadout, needsCandles, symbolsNeedingCandles, CANDLE_RULES
+  buildContext, contextReadout, needsCandles, symbolsNeedingCandles, CANDLE_RULES,
+  DERIVATIVE_RULES, needsDerivatives, symbolsNeedingDerivatives
 } from './alertContext.js';
 import {
   normaliseAlert, applyCooldown, DEFAULT_COOLDOWN_MS, evaluateRule, validateRule,
-  RULE_LABELS, PORTFOLIO_SYMBOL, PORTFOLIO_RULES
+  RULE_LABELS, RULE_TYPES, PORTFOLIO_SYMBOL, PORTFOLIO_RULES
 } from './alertsEngine.js';
 
 /** Deterministic candle series: strictly rising closes. */
@@ -177,5 +178,108 @@ describe('per-rule cooldown windows', () => {
 
     const second = applyCooldown(hits, first.lastFired, cd, 8000);
     expect(second.fired.map((h) => h.ruleId)).toEqual(['r1']); // r2 still cooling down
+  });
+});
+
+describe('derivative inputs for the funding / OI / liquidation rules', () => {
+  const row = { symbol: 'BTC', price: 101, pct24: 2 };
+
+  it('knows which rules need the derivatives feed', () => {
+    expect(needsDerivatives([{ type: 'price_above' }])).toBe(false);
+    expect(needsDerivatives([{ type: 'funding_above' }])).toBe(true);
+    expect(needsDerivatives([{ type: 'liquidation_spike', enabled: false }])).toBe(false);
+    expect(symbolsNeedingDerivatives([{ type: 'oi_change', symbol: 'BTC' }, { type: 'oi_change', symbol: 'BTC' }]))
+      .toEqual(['BTC']);
+    expect(DERIVATIVE_RULES.has('funding_below')).toBe(true);
+  });
+
+  it('merges feed values into the context when they are known', () => {
+    const ctx = buildContext(row, null, null, [], {
+      funding: 0.0123, openInterest: 110, prevOpenInterest: 100, liqVolume: 250000
+    });
+    expect(ctx.funding).toBe(0.0123);
+    expect(ctx.openInterest).toBe(110);
+    expect(ctx.prevOpenInterest).toBe(100);
+    expect(ctx.liqVolume).toBe(250000);
+  });
+
+  it('leaves the keys absent when the feed has not answered', () => {
+    // Absent keys are what make the rule report "unavailable" instead of firing
+    // against an invented zero — the whole point of the optional argument.
+    const ctx = buildContext(row, null, null, [], { funding: null, liqVolume: undefined });
+    expect('funding' in ctx).toBe(false);
+    expect('liqVolume' in ctx).toBe(false);
+    expect(evaluateRule({ type: 'funding_above', symbol: 'BTC', value: 0.01 }, ctx).triggered).toBe(false);
+  });
+
+  it('reads out a live value for each new rule type', () => {
+    expect(contextReadout({ type: 'funding_above' }, { funding: 0.05 })).toBe('Funding 0.0500%');
+    expect(contextReadout({ type: 'funding_below' }, {})).toBe('Funding unavailable');
+    expect(contextReadout({ type: 'oi_change' }, { openInterest: 110, prevOpenInterest: 100 })).toBe('OI 10.00%');
+    expect(contextReadout({ type: 'oi_change' }, { openInterest: 110 })).toBe('Open interest building…');
+    expect(contextReadout({ type: 'liquidation_spike' }, {})).toBe('No liquidation stream data');
+  });
+});
+
+describe('no rule type is dead', () => {
+  /* The failure mode this guards against is a rule a user can create, save and
+   * toggle on that can never fire. Every registered type must reach a trigger
+   * given the inputs it asks for. */
+  const RULES = {
+    price_above: { type: 'price_above', symbol: 'BTC', value: 100 },
+    price_below: { type: 'price_below', symbol: 'BTC', value: 90 },
+    pct_change: { type: 'pct_change', symbol: 'BTC', value: 5 },
+    volume_spike: { type: 'volume_spike', symbol: 'BTC', value: 2 },
+    rsi_above: { type: 'rsi_above', symbol: 'BTC', value: 70 },
+    rsi_below: { type: 'rsi_below', symbol: 'BTC', value: 30 },
+    ma_cross: { type: 'ma_cross', symbol: 'BTC', periods: [9, 21] },
+    macd_cross: { type: 'macd_cross', symbol: 'BTC' },
+    breakout: { type: 'breakout', symbol: 'BTC', periods: [20] },
+    portfolio_value_above: { type: 'portfolio_value_above', symbol: PORTFOLIO_SYMBOL, value: 10000 },
+    portfolio_value_below: { type: 'portfolio_value_below', symbol: PORTFOLIO_SYMBOL, value: 10000 },
+    funding_above: { type: 'funding_above', symbol: 'BTC', value: 0.01 },
+    funding_below: { type: 'funding_below', symbol: 'BTC', value: 0 },
+    oi_change: { type: 'oi_change', symbol: 'BTC', value: 5 },
+    liquidation_spike: { type: 'liquidation_spike', symbol: 'BTC', value: 5 },
+    formula: { type: 'formula', symbol: 'BTC', formula: 'rsi < 30 && pct24 < -5' }
+  };
+
+  const CONTEXTS = {
+    price_above: { price: 101, prevPrice: 99 },
+    price_below: { price: 89, prevPrice: 91 },
+    pct_change: { pct24: -8 },
+    volume_spike: { volume: 300, volumeAvg: 100 },
+    rsi_above: { rsi: 75, prevRsi: 60 },
+    rsi_below: { rsi: 20, prevRsi: 35 },
+    ma_cross: { maFast: 2, maSlow: 1, prevMaFast: 1, prevMaSlow: 2 },
+    macd_cross: { macd: 1, macdSignal: 0, prevMacd: 0, prevMacdSignal: 1 },
+    breakout: { price: 101, high: 100, low: 90 },
+    portfolio_value_above: { portfolioValue: 12000, prevPortfolioValue: 9000 },
+    portfolio_value_below: { portfolioValue: 8000, prevPortfolioValue: 11000 },
+    funding_above: { funding: 0.05 },
+    funding_below: { funding: -0.05 },
+    oi_change: { openInterest: 110, prevOpenInterest: 100 },
+    liquidation_spike: { liqVolume: 250000 },
+    formula: { rsi: 20, pct24: -9 }
+  };
+
+  it('covers every registered type in this test', () => {
+    // Adding a rule type without teaching the engine to fire it fails here.
+    expect(Object.keys(RULES).sort()).toEqual([...RULE_TYPES].sort());
+    RULE_TYPES.forEach((t) => expect(RULE_LABELS[t], t).toBeTruthy());
+  });
+
+  it('fires each type given its inputs', () => {
+    RULE_TYPES.forEach((t) => {
+      const res = evaluateRule(RULES[t], CONTEXTS[t]);
+      expect(res.triggered, `${t} can never fire`).toBe(true);
+    });
+  });
+
+  it('accepts each type through validation', () => {
+    RULE_TYPES.forEach((t) => {
+      const res = validateRule(RULES[t]);
+      expect(res.errors, `${t}: ${res.errors.join(', ')}`).toEqual([]);
+    });
   });
 });

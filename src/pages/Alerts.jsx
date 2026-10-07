@@ -11,7 +11,15 @@ import {
   RULE_TYPES, RULE_LABELS, describeRule, evaluateAll, applyCooldown, normaliseAlert, validateRule,
   PORTFOLIO_SYMBOL, PORTFOLIO_RULES
 } from '../lib/alertsEngine.js';
-import { buildContext, contextReadout, symbolsNeedingCandles } from '../lib/alertContext.js';
+import {
+  buildContext, contextReadout, symbolsNeedingCandles, symbolsNeedingDerivatives
+} from '../lib/alertContext.js';
+import {
+  fetchFunding, fetchOpenInterest, useLiquidations, OI_POLL_MS, FUNDING_POLL_MS
+} from '../lib/derivatives.js';
+import {
+  EXTRA_RULES, CHANNELS, UNAVAILABLE_RULES, FORMULA_VARS, channelCoverage
+} from '../lib/alertExtras.js';
 import { fmtPrice, fmtUsd, timeAgo } from '../lib/format.js';
 import { CoinImg, Card, EmptyState } from '../components/ui.jsx';
 
@@ -34,13 +42,27 @@ const FIELDS = {
   macd_cross: {},
   breakout: { period: true },
   portfolio_value_above: { value: 'Threshold (USD)', placeholder: '10000' },
-  portfolio_value_below: { value: 'Threshold (USD)', placeholder: '10000' }
+  portfolio_value_below: { value: 'Threshold (USD)', placeholder: '10000' },
+  funding_above: { value: 'Funding rate above (%)', placeholder: '0.01' },
+  funding_below: { value: 'Funding rate below (%)', placeholder: '0' },
+  oi_change: { value: 'Open-interest move (%)', placeholder: '5' },
+  liquidation_spike: { value: 'Window (minutes)', placeholder: '5' },
+  formula: { formula: true }
+};
+
+/* Delivery-channel registry styling (Section 16). */
+const STATUS_LABEL = { live: 'LIVE', 'needs-setup': 'SETUP', unavailable: 'UNAVAILABLE' };
+const STATUS_CLASS = {
+  live: 'bg-emerald-500/15 text-emerald-400',
+  'needs-setup': 'bg-amber-400/15 text-amber-300',
+  unavailable: 'bg-muted text-muted-foreground'
 };
 
 const DEFAULT_FORM = {
   coinId: '',
   type: 'price_above',
   value: '',
+  formula: '',
   fast: 9,
   slow: 21,
   period: 20,
@@ -93,6 +115,20 @@ export default function AlertsPage() {
 
   const prevRef = useRef({});
   const candleRef = useRef({}); // symbol -> { candles, source, at }
+
+  /* Derivatives inputs for the funding / open-interest / liquidation rules.
+   * Refreshed on a slow timer and read synchronously by the 1s loop, so a slow
+   * feed can never stall alert evaluation. */
+  const derivRef = useRef({}); // symbol -> { funding, openInterest, prevOpenInterest, at* }
+
+  /* The liquidation socket is only opened when a rule actually needs it. */
+  const usesLiquidations = useMemo(
+    () => normalised.some((a) => a.enabled !== false && a.rule?.type === 'liquidation_spike'),
+    [normalised]
+  );
+  const liqState = useLiquidations({ enabled: usesLiquidations, limit: 200 });
+  const liqRef = useRef(liqState);
+  useEffect(() => { liqRef.current = liqState; }, [liqState]);
   const [readouts, setReadouts] = useState({}); // alertId -> live readout string
 
   /* The 1s loop reads the newest state through refs. If `tick` depended on live
@@ -132,6 +168,36 @@ export default function AlertsPage() {
       }
     }
 
+    /* ---- Derivatives inputs: funding + open interest, on a slow timer ----
+     * Fire-and-forget: the promise fills a cache the loop reads synchronously,
+     * so evaluation never waits on the network. A failure leaves the value
+     * absent, which makes the rule report "unavailable" instead of firing. */
+    symbolsNeedingDerivatives(list).forEach((symbol) => {
+      const key = `${symbol}USDT`;
+      const entry = derivRef.current[symbol] || (derivRef.current[symbol] = {});
+
+      if (!entry.atOi || now - entry.atOi > OI_POLL_MS) {
+        // Claim the slot before awaiting so overlapping ticks do not stampede.
+        entry.atOi = now;
+        fetchOpenInterest(key)
+          .then((oi) => {
+            if (oi?.openInterest == null) return;
+            // Keep the previous reading: oi_change needs something to compare against.
+            if (entry.openInterest != null) entry.prevOpenInterest = entry.openInterest;
+            entry.openInterest = oi.openInterest;
+          })
+          .catch(() => { /* stays absent → rule reports unavailable */ });
+      }
+
+      if (!entry.atFunding || now - entry.atFunding > FUNDING_POLL_MS) {
+        entry.atFunding = now;
+        fetchFunding(key)
+          // Binance publishes the rate as a decimal; the rule is expressed in %.
+          .then((f) => { if (f?.fundingRate != null) entry.funding = f.fundingRate * 100; })
+          .catch(() => { /* stays absent → rule reports unavailable */ });
+      }
+    });
+
     /* ---- Build the context map ---- */
     const ctxBySymbol = {};
     const nextReadouts = {};
@@ -142,10 +208,33 @@ export default function AlertsPage() {
       (bySymbolRules[s] = bySymbolRules[s] || []).push(a.rule);
     });
 
+    const liqStatus = liqRef.current?.status;
+    const liqEvents = liqRef.current?.events || [];
+
+    /* Sum liquidations for one symbol inside the window the rule asks for. With
+     * no live socket we return null so the rule reports "no stream data" rather
+     * than reading as a reassuring zero. */
+    const liqVolumeFor = (symbol) => {
+      if (liqStatus !== 'live') return null;
+      const rule = list.find((a) => a.rule?.type === 'liquidation_spike' && a.rule?.symbol === symbol);
+      if (!rule) return null;
+      const mins = Number(rule.rule.value) || 5;
+      const since = now - mins * 60000;
+      return liqEvents
+        .filter((e) => e.symbol === `${symbol}USDT` && (e.at || 0) >= since)
+        .reduce((sum, e) => sum + (e.notional || 0), 0);
+    };
+
     Object.keys(bySymbolRules).forEach((symbol) => {
       const row = idx[symbol];
       const entry = candleRef.current[symbol];
-      ctxBySymbol[symbol] = buildContext(row, prevRef.current[symbol], entry?.candles, bySymbolRules[symbol]);
+      const d = derivRef.current[symbol];
+      ctxBySymbol[symbol] = buildContext(row, prevRef.current[symbol], entry?.candles, bySymbolRules[symbol], {
+        funding: d?.funding,
+        openInterest: d?.openInterest,
+        prevOpenInterest: d?.prevOpenInterest,
+        liqVolume: liqVolumeFor(symbol)
+      });
     });
 
     // Portfolio rules read the live total rather than a coin context.
@@ -237,11 +326,15 @@ export default function AlertsPage() {
     if (!r) { setFormErr('Choose a coin first.'); return; }
 
     const rule = { type: form.type, symbol: r.symbol };
-    if (['price_above', 'price_below', 'pct_change', 'volume_spike', 'rsi_above', 'rsi_below'].includes(form.type)) {
+    if ([
+      'price_above', 'price_below', 'pct_change', 'volume_spike', 'rsi_above', 'rsi_below',
+      'funding_above', 'funding_below', 'oi_change', 'liquidation_spike'
+    ].includes(form.type)) {
       rule.value = parseFloat(form.value);
     }
     if (form.type === 'ma_cross') rule.periods = [Number(form.fast) || 0, Number(form.slow) || 0];
     if (form.type === 'breakout') rule.periods = [Number(form.period) || 0];
+    if (form.type === 'formula') rule.formula = (form.formula || '').trim();
 
     const check = validateRule(rule);
     if (!check.ok) { setFormErr(check.errors.join(' · ')); return; }
@@ -426,6 +519,12 @@ export default function AlertsPage() {
                 </select>
               </div>
 
+              {EXTRA_RULES[form.type]?.hint ? (
+                <p className="rounded-lg border border-border bg-muted/40 p-2.5 text-[11px] text-muted-foreground">
+                  {EXTRA_RULES[form.type].hint}
+                </p>
+              ) : null}
+
               {fields.value ? (
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">{fields.value}</p>
@@ -457,6 +556,26 @@ export default function AlertsPage() {
                       </button>
                     ) : null}
                   </div>
+                </div>
+              ) : null}
+
+              {fields.formula ? (
+                <div>
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">Formula</p>
+                  <input
+                    type="text"
+                    value={form.formula}
+                    onChange={(e) => setForm({ ...form, formula: e.target.value })}
+                    placeholder="rsi < 30 && pct24 < -5"
+                    className="input-dark !h-10 font-mono !text-[12px]"
+                  />
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    Variables: <span className="font-mono">{FORMULA_VARS.map((v) => v.name).join(' · ')}</span>
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Parsed by a built-in evaluator — never executed as code. A variable with no live value stays
+                    silent rather than counting as zero.
+                  </p>
                 </div>
               ) : null}
 
@@ -527,6 +646,54 @@ export default function AlertsPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Delivery channels (Section 16): what this build can genuinely send on. */}
+      <Card className="!p-0">
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            <Bell size={15} className="text-primary" /> Delivery Channels
+            <span className="text-xs font-normal text-muted-foreground">
+              {channelCoverage().live} live of {CHANNELS.length}
+            </span>
+          </p>
+        </div>
+        <div className="divide-y divide-border/60">
+          {CHANNELS.map((c) => (
+            <div key={c.id} className="flex items-start gap-3 px-4 py-3">
+              <span className={`mt-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_CLASS[c.status]}`}>
+                {STATUS_LABEL[c.status]}
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs font-medium">{c.label}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{c.note}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
+          Alerts are evaluated in this tab and delivered with the browser Notification API. The other channels need a
+          server-side secret, which cannot be shipped in a public bundle.
+        </p>
+      </Card>
+
+      {/* Rule types the checklist names that this build cannot evaluate, listed
+          rather than hidden so nobody builds a rule that can never fire. */}
+      <Card className="!p-0">
+        <div className="border-b border-border px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            <AlertTriangle size={15} className="text-amber-400" /> Not Available In This Build
+            <span className="text-xs font-normal text-muted-foreground">({UNAVAILABLE_RULES.length})</span>
+          </p>
+        </div>
+        <div className="divide-y divide-border/60">
+          {UNAVAILABLE_RULES.map((x) => (
+            <div key={x.id} className="px-4 py-3">
+              <p className="text-xs font-medium">{x.label}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{x.reason}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }

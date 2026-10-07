@@ -25,6 +25,22 @@ export const CANDLE_RULES = new Set([
   'rsi_above', 'rsi_below', 'ma_cross', 'macd_cross', 'breakout', 'volume_spike'
 ]);
 
+/** Rule types that read the derivatives feed rather than the spot ticker. */
+export const DERIVATIVE_RULES = new Set([
+  'funding_above', 'funding_below', 'oi_change', 'liquidation_spike'
+]);
+
+export const needsDerivatives = (rules = []) =>
+  (rules || []).some((r) => r?.enabled !== false && DERIVATIVE_RULES.has(r?.type));
+
+/** Distinct symbols whose derivative inputs (funding / OI) must be fetched. */
+export function symbolsNeedingDerivatives(rules = []) {
+  return [...new Set((rules || [])
+    .filter((r) => r?.enabled !== false && DERIVATIVE_RULES.has(r?.type))
+    .map((r) => r?.symbol)
+    .filter(Boolean))];
+}
+
 export function needsCandles(rules = []) {
   return (rules || []).some((r) => r?.enabled !== false && CANDLE_RULES.has(r?.type));
 }
@@ -44,11 +60,28 @@ function series(candles, key) {
 /**
  * @param row      live ticker row for the symbol (price / pct24)
  * @param prevRow  previous ticker snapshot, used for crossover detection
- * @param candles  historical candles, or null/[] when unavailable
- * @param rules    the rules configured for THIS symbol
+ * @param candles      historical candles, or null/[] when unavailable
+ * @param rules        the rules configured for THIS symbol
+ * @param derivatives  funding / open interest / liquidation window, when known
+ *
+ * `derivatives` is optional on purpose: when the feed has not answered yet the
+ * keys are simply absent, so funding and open-interest rules report
+ * "unavailable" rather than firing against an invented zero. A rule that fires
+ * on missing data is worse than one that stays quiet.
  */
-export function buildContext(row, prevRow, candles, rules = []) {
+export function buildContext(row, prevRow, candles, rules = [], derivatives = null) {
   const ctx = {};
+
+  if (derivatives) {
+    const fund = clean(derivatives.funding);
+    if (fund != null) ctx.funding = fund;
+    const oi = clean(derivatives.openInterest);
+    if (oi != null) ctx.openInterest = oi;
+    const prevOi = clean(derivatives.prevOpenInterest);
+    if (prevOi != null) ctx.prevOpenInterest = prevOi;
+    const liq = clean(derivatives.liqVolume);
+    if (liq != null) ctx.liqVolume = liq;
+  }
 
   const price = clean(row?.price);
   if (price != null) ctx.price = price;
@@ -150,6 +183,19 @@ export function contextReadout(rule, ctx = {}) {
     case 'portfolio_value_above':
     case 'portfolio_value_below':
       return ctx.portfolioValue == null ? 'Portfolio value unavailable' : `Portfolio $${ctx.portfolioValue.toFixed(2)}`;
+    case 'funding_above':
+    case 'funding_below':
+      return ctx.funding == null ? 'Funding unavailable' : `Funding ${ctx.funding.toFixed(4)}%`;
+    case 'oi_change':
+      return ctx.openInterest == null || ctx.prevOpenInterest == null
+        ? 'Open interest building…'
+        : `OI ${(((ctx.openInterest - ctx.prevOpenInterest) / ctx.prevOpenInterest) * 100).toFixed(2)}%`;
+    case 'liquidation_spike':
+      return ctx.liqVolume == null
+        ? 'No liquidation stream data'
+        : `$${Math.round(ctx.liqVolume).toLocaleString('en-US')} liquidated`;
+    case 'formula':
+      return ctx.price == null ? '—' : `Price ${ctx.price}`;
     default:
       return ctx.price == null ? '—' : `Price ${ctx.price}`;
   }

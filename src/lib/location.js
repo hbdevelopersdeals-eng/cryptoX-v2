@@ -509,9 +509,20 @@ export function validateLocation(location = {}) {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-/** A single-line label for a place, most specific first. */
+/**
+ * A single-line label for a place, most specific first.
+ *
+ * Falls back to `name` because the geocoders disagree on the field: Open-Meteo
+ * returns the primary label as `name`, Nominatim as `city`. Reading only `city`
+ * made an Open-Meteo result render as "Sindh, Pakistan" with its city missing.
+ */
 export function formatPlace(place = {}) {
-  return [place.district, place.city, place.state, place.countryName || countryByCode(place.country)?.name]
+  return [
+    place.district,
+    place.city || place.name,
+    place.state,
+    place.countryName || countryByCode(place.country)?.name
+  ]
     .filter(Boolean)
     .join(', ');
 }

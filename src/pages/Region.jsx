@@ -3,6 +3,7 @@ import { AlertTriangle, Check, Globe2, Languages, MapPin, Phone, Ruler, Search }
 import { Card } from '../components/ui.jsx';
 import { CountrySelect, PhoneField } from '../components/GlobalFields.jsx';
 import { CurrencyPanel, TimePanel, LocationPanel } from '../components/GlobalPanels.jsx';
+import SchedulerPanel from '../components/SchedulerPanel.jsx';
 import { useI18n } from '../lib/i18n.jsx';
 import { LANGUAGES, NUMBERING_SYSTEMS, languageByCode } from '../lib/locales.js';
 import { coverage } from '../lib/translate.js';
@@ -403,6 +404,7 @@ export default function Region() {
       {/* Sections 3–5: currency, time zone and location infrastructure. */}
       <CurrencyPanel />
       <TimePanel />
+      <SchedulerPanel />
       <LocationPanel />
     </div>
   );

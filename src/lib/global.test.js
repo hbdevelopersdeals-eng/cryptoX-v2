@@ -620,6 +620,12 @@ describe('time — recurrence, reminders and calendar', () => {
     expect(plan.eventUtc).toBe('2026-10-07T04:00:00.000Z');
     expect(plan.reminderUtc).toBe('2026-10-07T03:45:00.000Z');
     expect(plan.ambiguity).toBe('unique');
+    // The Date itself, not only its serialized form. Returning the strings alone
+    // meant a caller reading `.instant` got undefined and silently produced an
+    // empty schedule instead of an error.
+    expect(plan.instant).toBeInstanceOf(Date);
+    expect(plan.instant.toISOString()).toBe('2026-10-07T04:00:00.000Z');
+    expect(plan.fireAt.toISOString()).toBe('2026-10-07T03:45:00.000Z');
 
     const bad = planReminder({ wall: { year: 2026, month: 3, day: 8, hour: 2, minute: 30 }, zone: 'America/New_York' });
     expect(bad.ok).toBe(false);

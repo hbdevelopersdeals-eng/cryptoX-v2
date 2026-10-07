@@ -126,3 +126,119 @@ describe('Region & Language page', () => {
     await waitFor(() => expect(screen.getByText(/does not look like a valid phone number/i)).toBeTruthy());
   });
 });
+
+describe('scheduler, settlement currency and location retention', () => {
+  it('shows the three-zone precedence and which one won', async () => {
+    localStorage.setItem('cx_security', JSON.stringify({
+      organizations: [{ id: 'org_a', name: 'Acme', timezone: 'Europe/London', currency: 'GBP' }],
+      activeOrgId: 'org_a',
+      memberships: []
+    }));
+    wrap(<Region />);
+
+    // The organization zone is visible alongside the user zone.
+    expect(await screen.findByText('Organization')).toBeTruthy();
+    // The org zone appears both as a select option and in the precedence list.
+    expect(screen.getAllByText('Europe/London').length).toBeGreaterThan(0);
+    expect(screen.getByText('Applied')).toBeTruthy();
+  });
+
+  it('refuses a wall time that does not exist and explains why', async () => {
+    wrap(<Region />);
+    // New York springs forward on 2026-03-08, so 02:30 never happens.
+    fireEvent.change(screen.getByLabelText('Event time zone'), { target: { value: 'America/New_York' } });
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-03-08' } });
+    fireEvent.change(screen.getByLabelText('Time'), { target: { value: '02:30' } });
+
+    // Shown in the occurrence box and again when the save is refused.
+    await waitFor(() => expect(screen.getAllByText(/never happens/i).length).toBeGreaterThan(0));
+    fireEvent.click(screen.getByRole('button', { name: /Save reminder/i }));
+    await waitFor(() => expect(screen.getByText(/clock jumps past it/i)).toBeTruthy());
+    expect(localStorage.getItem('cx_reminders')).toBeNull();
+  });
+
+  it('expands a daily recurrence and saves it in UTC', async () => {
+    wrap(<Region />);
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-10-07' } });
+    fireEvent.change(screen.getByLabelText('Time'), { target: { value: '09:00' } });
+    fireEvent.change(screen.getByLabelText('Repeats'), { target: { value: 'daily' } });
+
+    // Four occurrences, each rendered with its UTC instant. If the fallback
+    // message is present instead, the scheduler failed to resolve the wall time.
+    await waitFor(() => expect(screen.getAllByTestId('occurrence')).toHaveLength(4));
+    expect(screen.queryByText(/Set a valid date and time/)).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /Save reminder/i }));
+    await waitFor(() => expect(localStorage.getItem('cx_reminders')).toBeTruthy());
+    const saved = JSON.parse(localStorage.getItem('cx_reminders'));
+    expect(saved).toHaveLength(1);
+    expect(saved[0].eventUtc).toMatch(/Z$/);
+    expect(saved[0].recurrence.frequency).toBe('daily');
+  });
+
+  it('warns when a naive +24h schedule would drift across a DST change', async () => {
+    wrap(<Region />);
+    fireEvent.change(screen.getByLabelText('Event time zone'), { target: { value: 'America/New_York' } });
+    // Two days before the March transition.
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-03-06' } });
+    fireEvent.change(screen.getByLabelText('Time'), { target: { value: '09:00' } });
+    fireEvent.change(screen.getByLabelText('Repeats'), { target: { value: 'daily' } });
+
+    await waitFor(() => expect(screen.getByText(/drifts by/i)).toBeTruthy());
+    expect(screen.getByText(/anchored to the local wall time/i)).toBeTruthy();
+  });
+
+  it('offers a Google Calendar link and an .ics export', async () => {
+    wrap(<Region />);
+    const link = await screen.findByRole('link', { name: /Google Calendar/i });
+    // The link carries the UTC instant, not a local string.
+    expect(link.getAttribute('href')).toContain('calendar.google.com');
+    expect(link.getAttribute('href')).toMatch(/dates=\d{8}T\d{6}Z/);
+  });
+
+  it('lets the settlement currency differ from the display currency', async () => {
+    localStorage.setItem('cx_security', JSON.stringify({
+      organizations: [{ id: 'org_a', name: 'Acme', timezone: 'UTC', currency: 'GBP' }],
+      activeOrgId: 'org_a',
+      memberships: []
+    }));
+    wrap(<Region />);
+    const select = await screen.findByLabelText('Settlement currency');
+    expect(select.value).toBe('GBP');
+    // Both currencies appear in the price book.
+    await waitFor(() => expect(screen.getAllByText(/settlement · you display/i).length).toBeGreaterThan(0));
+  });
+
+  it('saves a location, flags expiry and deletes it', async () => {
+    // Let the geocoder answer so a place can be chosen.
+    vi.stubGlobal('fetch', vi.fn(async (url) => {
+      if (String(url).includes('geocoding-api')) {
+        return { ok: true, status: 200, json: async () => ({ results: [{ id: 1, name: 'Karachi', latitude: 24.86, longitude: 67.01, country_code: 'PK', country: 'Pakistan', admin1: 'Sindh', timezone: 'Asia/Karachi' }] }) };
+      }
+      return { ok: true, status: 200, json: async () => ({}) };
+    }));
+
+    wrap(<Region />);
+    fireEvent.change(screen.getByLabelText('Search a place'), { target: { value: 'Karachi' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Search$/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Karachi/ }));
+
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() => expect(screen.getByText('Saved locations (1)')).toBeTruthy());
+    expect(screen.getByText('active')).toBeTruthy();
+
+    // A session-only policy is expired the moment it is stored.
+    fireEvent.change(screen.getByLabelText('Retention'), { target: { value: 'session' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/ }));
+    await waitFor(() => expect(screen.getByText('Saved locations (2)')).toBeTruthy());
+
+    fireEvent.click(screen.getByRole('button', { name: /Purge expired/i }));
+    await waitFor(() => expect(screen.getByText(/Purged 1 expired record/)).toBeTruthy());
+    expect(screen.getByText('Saved locations (1)')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: /Delete everything/i }));
+    await waitFor(() => expect(screen.getByText(/All saved location data deleted/)).toBeTruthy());
+    // The heading always renders; the count drops to zero.
+    expect(screen.getByText('Saved locations (0)')).toBeTruthy();
+  });
+});

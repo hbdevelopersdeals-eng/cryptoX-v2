@@ -486,6 +486,13 @@ export function planReminder({ wall, zone = UTC, leadMinutes = 0 } = {}) {
     wall,
     ambiguity: resolved.kind,
     alternatives: resolved.alternatives,
+    /*
+     * The Date itself as well as its serialized form. Returning only the ISO
+     * strings meant a caller reaching for `.instant` got undefined and produced
+     * an empty result with no error at all — the failure mode was silence.
+     */
+    instant: resolved.instant,
+    fireAt,
     localTime: fromUTC(resolved.instant, zone, { dateStyle: 'medium', timeStyle: 'short' }),
     eventUtc: toStorage(resolved.instant),
     reminderUtc: toStorage(fireAt),

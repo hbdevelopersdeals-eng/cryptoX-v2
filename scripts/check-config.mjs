@@ -22,7 +22,13 @@ function walk(dir, out = []) {
   return out;
 }
 
-const files = walk(ROOT);
+/*
+ * Test files are excluded. They deliberately contain the exact strings this
+ * guard forbids — a banned plain-HTTP endpoint, a renamed executable — because
+ * asserting that those are REJECTED requires writing them down. The guard
+ * protects what ships, and tests do not ship.
+ */
+const files = walk(ROOT).filter((f) => !/\.test\.(js|jsx)$/.test(f));
 
 /* Comments are stripped before the code-pattern checks. Without this, a file
  * that merely *documents* a forbidden API (e.g. "we never call eval()") is

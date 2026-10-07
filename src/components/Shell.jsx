@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutGrid, TrendingUp, CircleDollarSign, Smile, Star, Wallet, BellRing,
   Zap, Play, Calculator, Newspaper, Search, Menu, X, LogOut, Radio, Database,
-  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles
+  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
@@ -52,7 +52,10 @@ const NAV = [
   },
   {
     group: 'Insights',
-    items: [{ to: '/news', label: 'News', icon: Newspaper }]
+    items: [
+      { to: '/news', label: 'News', icon: Newspaper },
+      { to: '/region', label: 'Region & Language', icon: Globe2 }
+    ]
   }
 ];
 
@@ -78,7 +81,8 @@ const TITLES = {
   '/strategies': ['Strategy Engine', 'Ready-made trading strategies — one click'],
   '/paper-trading': ['Paper Trader', 'Test strategies with virtual money'],
   '/calculator': ['Calculator', 'Calculate P&L, fees, breakeven and liquidation price'],
-  '/news': ['News & Market Pulse', 'Latest cryptocurrency news and market updates']
+  '/news': ['News & Market Pulse', 'Latest cryptocurrency news and market updates'],
+  '/region': ['Region & Language', 'Country and territory selection, 25 languages with RTL support, address and postal formats, E.164 phone numbers, localized dates, numbers and measurements']
 };
 
 export default function Shell() {

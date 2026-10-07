@@ -1,113 +1,180 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext, useCallback, useContext, useEffect, useMemo, useState
+} from 'react';
 import { lsGet, lsSet } from './storage.js';
+import {
+  LANGUAGES, languageByCode, isRtl, dirFor, negotiate, detectLocaleSettings,
+  measurementFor, CATALOG_STATUS, SOURCE_LANGUAGE, NUMBERING_SYSTEMS, matchLanguage
+} from './locales.js';
+import { translate as coreTranslate, coverage } from './translate.js';
+import { applySeo } from './seo.js';
+import {
+  formatNumber, formatCurrency, formatDate, formatTime, formatDateTime, formatMeasure
+} from './localeFormat.js';
+import { countryByCode } from './countries.js';
+import en from '../locales/en.js';
 
-/* Multi-language layer.
- * English is the source of truth; missing keys fall back to English, then to the
- * key itself, so a partially translated build never renders blanks. */
+/* Re-exported for existing consumers (Shell renders the language picker). */
+export { LANGUAGES, languageByCode, isRtl, dirFor, NUMBERING_SYSTEMS };
 
-export const LANGUAGES = [
-  { code: 'en', label: 'English', dir: 'ltr' },
-  { code: 'ur', label: 'اردو', dir: 'rtl' }
-];
+/*
+ * English is bundled eagerly so the first paint never waits on a network chunk.
+ * Every other catalog is a lazily-imported module, so a Ukrainian visitor does
+ * not download 24 unused translation files.
+ */
+const EAGER = { en };
+const LOADERS = import.meta.glob('../locales/*.js');
 
-export const TRANSLATIONS = {
-  en: {
-    'app.tagline': 'Real-time crypto markets, charting and trading lab',
-    'nav.markets': 'Markets',
-    'nav.marketIntel': 'Market Intelligence',
-    'nav.dataSources': 'Data Sources',
-    'nav.rsi': 'RSI Scanner',
-    'nav.portfolio': 'Portfolio',
-    'nav.watchlist': 'Watchlist',
-    'nav.alerts': 'Alerts',
-    'nav.tools': 'Trading & Tools',
-    'nav.charting': 'Pro Charting',
-    'nav.exchange': 'Exchange (Paper)',
-    'nav.derivatives': 'Derivatives (Paper)',
-    'nav.strategies': 'Strategy Engine',
-    'nav.paper': 'Paper Trader',
-    'nav.calculator': 'Calculator',
-    'nav.news': 'Market Pulse',
-    'nav.status': 'System Status',
-    'common.signOut': 'Sign out',
-    'common.search': 'Search coins',
-    'common.language': 'Language',
-    'common.currency': 'Currency',
-    'common.live': 'Live',
-    'common.loading': 'Loading…'
-  },
-  ur: {
-    'app.tagline': 'ریئل ٹائم کریپٹو مارکیٹ، چارٹنگ اور ٹریڈنگ لیب',
-    'nav.markets': 'مارکیٹس',
-    'nav.marketIntel': 'مارکیٹ انٹیلیجنس',
-    'nav.dataSources': 'ڈیٹا ذرائع',
-    'nav.rsi': 'آر ایس آئی اسکینر',
-    'nav.portfolio': 'پورٹ فولیو',
-    'nav.watchlist': 'واچ لسٹ',
-    'nav.alerts': 'الرٹس',
-    'nav.tools': 'ٹریڈنگ اور ٹولز',
-    'nav.charting': 'پروفیشنل چارٹنگ',
-    'nav.exchange': 'ایکسچینج (پیپر)',
-    'nav.derivatives': 'ڈیریویٹوز (پیپر)',
-    'nav.strategies': 'اسٹریٹجی انجن',
-    'nav.paper': 'پیپر ٹریڈر',
-    'nav.calculator': 'کیلکولیٹر',
-    'nav.news': 'مارکیٹ پلس',
-    'nav.status': 'سسٹم اسٹیٹس',
-    'common.signOut': 'سائن آؤٹ',
-    'common.search': 'کوائن تلاش کریں',
-    'common.language': 'زبان',
-    'common.currency': 'کرنسی',
-    'common.live': 'لائیو',
-    'common.loading': 'لوڈ ہو رہا ہے…'
-  }
+const codeFromPath = (path) => {
+  const file = path.split('/').pop().replace(/\.js$/, '');
+  const hit = LANGUAGES.find((l) => l.code === file);
+  return hit ? hit.code : file;
 };
 
-export const languageByCode = (code) => LANGUAGES.find((l) => l.code === code) || LANGUAGES[0];
-
-/** Translate a key with optional {placeholders}; falls back en → key. */
-export function translate(lang, key, vars) {
-  const table = TRANSLATIONS[lang] || {};
-  let value = table[key];
-  if (value == null) value = TRANSLATIONS.en[key];
-  if (value == null) return key;
-  if (vars) {
-    Object.keys(vars).forEach((k) => {
-      value = value.replace(new RegExp(`\\{${k}\\}`, 'g'), String(vars[k]));
-    });
-  }
-  return value;
-}
+const LOADER_BY_CODE = Object.keys(LOADERS).reduce((acc, path) => {
+  acc[codeFromPath(path)] = LOADERS[path];
+  return acc;
+}, {});
 
 const I18nContext = createContext(null);
 export const useI18n = () => useContext(I18nContext);
 
-export function I18nProvider({ children }) {
-  const [lang, setLangState] = useState(() => {
-    const stored = lsGet('cx_lang', 'en');
-    return LANGUAGES.some((l) => l.code === stored) ? stored : 'en';
-  });
-  const dir = languageByCode(lang).dir;
+/** Country from an explicit choice, else the detected value. */
+const resolveRegion = (stored, detected) => (stored && countryByCode(stored) ? stored : detected);
 
+export function I18nProvider({ children }) {
+  /* Detection runs once, and only as the default when nothing is stored. */
+  const detected = useMemo(() => detectLocaleSettings(), []);
+
+  const [lang, setLangState] = useState(() => {
+    const stored = lsGet('cx_lang', null);
+    if (stored && languageByCode(stored)) return stored;
+    if (stored) {
+      const matched = matchLanguage(stored);
+      if (matched) return matched;
+    }
+    return detected.lang;
+  });
+
+  const [region, setRegionState] = useState(() =>
+    resolveRegion(lsGet('cx_region', null), detected.region || 'US'));
+
+  const [numbering, setNumberingState] = useState(() => {
+    const stored = lsGet('cx_numbering', null);
+    if (stored) return stored;
+    return languageByCode(detected.lang)?.numbering || 'latn';
+  });
+
+  const [measurement, setMeasurementState] = useState(() => {
+    const stored = lsGet('cx_measurement', null);
+    if (stored) return stored;
+    return measurementFor(resolveRegion(null, detected.region || 'US'));
+  });
+
+  const [timeZone, setTimeZone] = useState(detected.timeZone || undefined);
+  const [tables, setTables] = useState(EAGER);
+  const [loading, setLoading] = useState(false);
+
+  const dir = dirFor(lang);
+
+  /* Load a catalog on demand. English is already in memory. */
+  useEffect(() => {
+    if (tables[lang]) return undefined;
+    const load = LOADER_BY_CODE[lang];
+    if (!load) return undefined;
+    let alive = true;
+    setLoading(true);
+    load()
+      .then((mod) => {
+        if (!alive) return;
+        setTables((prev) => ({ ...prev, [lang]: mod.default || mod }));
+      })
+      .catch(() => { /* leave the fallback chain to cover this language */ })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [lang, tables]);
+
+  /* Direction and language must be on <html> for CSS logical properties. */
   useEffect(() => {
     if (typeof document === 'undefined') return;
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [lang, dir]);
 
-  const value = useMemo(
-    () => ({
+  /* Localized metadata + hreflang, refreshed whenever language or route changes. */
+  const t = useCallback((key, vars) => coreTranslate(tables, lang, key, vars), [tables, lang]);
+
+  useEffect(() => {
+    const description = coreTranslate(tables, lang, 'seo.description');
+    const title = coreTranslate(tables, lang, 'seo.title');
+    applySeo({
       lang,
       dir,
-      setLang: (next) => {
-        if (!LANGUAGES.some((l) => l.code === next)) return;
-        setLangState(next);
-        lsSet('cx_lang', next);
-      },
-      t: (key, vars) => translate(lang, key, vars)
-    }),
-    [lang, dir]
-  );
+      title,
+      description,
+      languages: LANGUAGES.map((l) => l.code),
+      path: typeof location === 'undefined' ? '/' : (location.hash.replace(/^#/, '') || '/')
+    });
+  }, [tables, lang, dir]);
+
+  const stats = useMemo(() => coverage(tables, lang), [tables, lang]);
+
+  const value = useMemo(() => ({
+    lang,
+    dir,
+    rtl: isRtl(lang),
+    loading,
+    t,
+    tables,
+    stats,
+    catalogStatus: CATALOG_STATUS[lang] || null,
+    sourceLanguage: SOURCE_LANGUAGE,
+
+    /* Settings */
+    region,
+    measurement,
+    numbering,
+    timeZone,
+    detected,
+
+    setLang: (next) => {
+      const matched = languageByCode(next) ? next : matchLanguage(next);
+      if (!matched) return;
+      setLangState(matched);
+      lsSet('cx_lang', matched);
+    },
+    setRegion: (next) => {
+      if (!countryByCode(next)) return;
+      setRegionState(next);
+      lsSet('cx_region', next);
+      // Measurement follows the country unless it was explicitly chosen.
+      setMeasurementState(measurementFor(next));
+      lsSet('cx_measurement', measurementFor(next));
+    },
+    setNumbering: (next) => {
+      if (!NUMBERING_SYSTEMS.some((n) => n.id === next)) return;
+      setNumberingState(next);
+      lsSet('cx_numbering', next);
+    },
+    setMeasurement: (next) => {
+      if (!['metric', 'imperial'].includes(next)) return;
+      setMeasurementState(next);
+      lsSet('cx_measurement', next);
+    },
+    setTimeZone,
+
+    /* Locale-bound formatters, so callers never pass the language by hand. */
+    fmtNumber: (v, o) => formatNumber(v, { lang, numbering, ...(o || {}) }),
+    fmtCurrency: (v, o) => formatCurrency(v, { lang, numbering, ...(o || {}) }),
+    fmtDate: (v, o) => formatDate(v, { lang, timeZone, ...(o || {}) }),
+    fmtTime: (v, o) => formatTime(v, { lang, timeZone, ...(o || {}) }),
+    fmtDateTime: (v, o) => formatDateTime(v, { lang, timeZone, ...(o || {}) }),
+    fmtMeasure: (v, from, o) => formatMeasure(v, from, { lang, system: measurement, ...(o || {}) })
+  }), [lang, dir, loading, t, tables, stats, region, measurement, numbering, timeZone, detected]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
+
+/** Standalone translate for non-React callers (tests, transactional render). */
+export const translateWith = (lang, key, vars, tables = EAGER) => coreTranslate(tables, lang, key, vars);
+export const TRANSLATIONS = EAGER;

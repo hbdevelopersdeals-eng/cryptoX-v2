@@ -1,38 +1,40 @@
 import { describe, it, expect } from 'vitest';
-import { translate, TRANSLATIONS, LANGUAGES, languageByCode } from './i18n.jsx';
+import { translate } from './translate.js';
+import { LANGUAGES, languageByCode, dirFor } from './locales.js';
+import en from '../locales/en.js';
+import ur from '../locales/ur.js';
 import { CURRENCIES, FALLBACK_RATES, convertValue, formatMoney, currencyByCode } from './currency.jsx';
+
+/* The language layer is exercised in depth by locale.test.js; these are the
+ * baseline behaviours the old two-language implementation also guaranteed. */
+const tables = { en, ur };
 
 describe('i18n', () => {
   it('translates known keys in both languages', () => {
-    expect(translate('en', 'nav.markets')).toBe('Markets');
-    expect(translate('ur', 'nav.markets')).toBe('مارکیٹس');
+    expect(translate(tables, 'en', 'nav.markets')).toBe('Markets');
+    expect(translate(tables, 'ur', 'nav.markets')).toBe(ur['nav.markets']);
+    expect(translate(tables, 'ur', 'nav.markets')).not.toBe('Markets');
   });
 
   it('falls back to English, then to the key itself', () => {
-    expect(translate('ur', 'common.loading')).toBe('لوڈ ہو رہا ہے…');
-    expect(translate('fr', 'nav.markets')).toBe('Markets'); // unknown lang → en
-    expect(translate('en', 'does.not.exist')).toBe('does.not.exist');
+    expect(translate(tables, 'ur', 'common.loading')).toBe(ur['common.loading']);
+    expect(translate(tables, 'zz', 'nav.markets')).toBe('Markets'); // unknown lang → en
+    expect(translate(tables, 'en', 'does.not.exist')).toBe('does.not.exist');
   });
 
   it('interpolates placeholders', () => {
-    expect(translate('en', 'greeting', { name: 'Ali' })).toBe('greeting'); // key missing → key
-    TRANSLATIONS.en.greeting = 'Hello {name}';
-    expect(translate('en', 'greeting', { name: 'Ali' })).toBe('Hello Ali');
-    delete TRANSLATIONS.en.greeting;
+    expect(translate(tables, 'en', 'greeting', { name: 'Ali' })).toBe('greeting'); // key missing → key
+    tables.en.greeting = 'Hello {name}';
+    expect(translate(tables, 'en', 'greeting', { name: 'Ali' })).toBe('Hello Ali');
+    delete tables.en.greeting;
   });
 
   it('keeps language metadata consistent', () => {
-    expect(LANGUAGES.map((l) => l.code)).toEqual(['en', 'ur']);
-    expect(languageByCode('ur').dir).toBe('rtl');
-    expect(languageByCode('zz').code).toBe('en'); // safe default
-  });
-
-  it('has no empty strings in either table', () => {
-    Object.entries(TRANSLATIONS).forEach(([lang, table]) => {
-      Object.entries(table).forEach(([key, value]) => {
-        expect(value, `${lang}:${key}`).toBeTruthy();
-      });
-    });
+    expect(LANGUAGES.length).toBeGreaterThanOrEqual(25);
+    expect(LANGUAGES.map((l) => l.code)).toContain('en');
+    expect(dirFor('ur')).toBe('rtl');
+    expect(dirFor('en')).toBe('ltr');
+    expect(languageByCode('zz')).toBeNull(); // callers must handle an unknown code
   });
 });
 

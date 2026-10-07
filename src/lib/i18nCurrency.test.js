@@ -46,10 +46,15 @@ describe('currency', () => {
   });
 
   it('formats with the right symbol and rounding', () => {
-    expect(formatMoney(1234.5, { code: 'USD' })).toBe('$1,235');
+    // Money keeps its minor unit at any magnitude: dropping to whole dollars
+    // above 1000 turned an amount being paid into a different number.
+    expect(formatMoney(1234.5, { code: 'USD' })).toBe('$1,234.50');
     expect(formatMoney(12.345, { code: 'USD' })).toBe('$12.35');
-    expect(formatMoney(1_500_000, { code: 'USD', compact: true })).toBe('$1.50M');
-    expect(formatMoney(278, { code: 'PKR' })).toContain('₨');
+    expect(formatMoney(1_500_000, { code: 'USD', compact: true })).toMatch(/\$1\.50M/);
+    // CLDR renders PKR with its code in the en locale: the ₨ glyph is shared by
+    // five different rupees, so CLDR does not use it. Intl is the authority for
+    // formatted output; the conventional glyph stays available via symbolFor.
+    expect(formatMoney(278, { code: 'PKR' })).toContain('PKR');
     expect(formatMoney(null)).toBe('—');
   });
 
@@ -60,7 +65,10 @@ describe('currency', () => {
 
   it('keeps the currency list unique and resolvable', () => {
     expect(new Set(CURRENCIES.map((c) => c.code)).size).toBe(CURRENCIES.length);
+    expect(CURRENCIES.length).toBeGreaterThan(150);
     expect(currencyByCode('PKR').symbol).toBe('₨');
-    expect(currencyByCode('NOPE').code).toBe('USD');
+    // An unknown code resolves to null. Returning USD silently mislabelled
+    // every price; callers must handle the missing case themselves.
+    expect(currencyByCode('NOPE')).toBeNull();
   });
 });

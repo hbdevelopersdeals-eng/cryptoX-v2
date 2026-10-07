@@ -1,12 +1,21 @@
 import React from 'react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from '../lib/i18n.jsx';
+import { CurrencyProvider } from '../lib/currency.jsx';
 import { SEO_LIMITATION } from '../lib/seo.js';
 import Region from './Region.jsx';
 
-const wrap = (ui) => render(<MemoryRouter><I18nProvider>{ui}</I18nProvider></MemoryRouter>);
+/* The page mounts the currency panel, which needs CurrencyProvider — the same
+ * nesting App.jsx uses. Without it useCurrency() returns null. */
+const wrap = (ui) => render(
+  <MemoryRouter>
+    <I18nProvider>
+      <CurrencyProvider>{ui}</CurrencyProvider>
+    </I18nProvider>
+  </MemoryRouter>
+);
 
 /*
  * Open the country combobox, filter, and choose the match.
@@ -18,7 +27,10 @@ const pickCountry = async (name) => {
   fireEvent.change(screen.getByPlaceholderText('Search by name, code or dialling prefix'), {
     target: { value: name }
   });
-  const option = await screen.findByRole('option', { name: new RegExp(name) });
+  // Scoped to the country listbox: the currency picker also renders <option>
+  // elements, and AED's CLDR name is "United Arab Emirates Dirham".
+  const list = document.getElementById('country-select-list');
+  const option = await within(list).findByRole('option', { name: new RegExp(name) });
   fireEvent.click(within(option).getByRole('button'));
 };
 
@@ -26,6 +38,16 @@ beforeEach(() => {
   localStorage.clear();
   document.documentElement.dir = 'ltr';
   document.documentElement.lang = 'en';
+  /*
+   * Force the rate provider to fail so the currency panel falls back to its
+   * static table. Without this the suite would attempt a real network call to
+   * the exchange-rate provider, which is slow and flaky.
+   */
+  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('offline in tests'))));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('Region & Language page', () => {

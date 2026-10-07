@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AlertTriangle, Check, Globe2, Languages, MapPin, Phone, Ruler, Search } from 'lucide-react';
 import { Card } from '../components/ui.jsx';
 import { CountrySelect, PhoneField } from '../components/GlobalFields.jsx';
+import { CurrencyPanel, TimePanel, LocationPanel } from '../components/GlobalPanels.jsx';
 import { useI18n } from '../lib/i18n.jsx';
 import { LANGUAGES, NUMBERING_SYSTEMS, languageByCode } from '../lib/locales.js';
 import { coverage } from '../lib/translate.js';
@@ -12,6 +13,7 @@ import { countryByCode, COUNTRIES, REGIONS } from '../lib/countries.js';
 import { separators, datePattern, formatCurrency } from '../lib/localeFormat.js';
 import { SEO_LIMITATION, hreflangLinks, SITE_URL } from '../lib/seo.js';
 import { DELIVERY_CHANNELS, renderAll } from '../lib/transactional.js';
+import { UNAVAILABLE_RULES } from '../lib/alertExtras.js';
 
 const Field = ({ label, children }) => (
   <div>
@@ -328,11 +330,6 @@ export default function Region() {
             </div>
           </div>
         </div>
-
-        <p className="text-[11px] text-muted-foreground">
-          {t('region.timeZone')}: <span className="font-mono">{timeZone || '—'}</span>
-          {' · '}{t('lang.direction')}: <span className="font-mono">{dir}</span>
-        </p>
       </Card>
 
       {/* Localized SEO */}
@@ -383,6 +380,30 @@ export default function Region() {
         </div>
         <p className="text-[11px] text-muted-foreground">{t('notify.deliveryNote')}</p>
       </Card>
+
+      {/* Rule types the checklist names that this build cannot evaluate, listed
+          rather than hidden so nobody builds a rule that can never fire. */}
+      <Card className="!p-0">
+        <div className="border-b border-border px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            <AlertTriangle size={15} className="text-amber-400" /> Not Available In This Build
+            <span className="text-xs font-normal text-muted-foreground">({UNAVAILABLE_RULES.length})</span>
+          </p>
+        </div>
+        <div className="divide-y divide-border/60">
+          {UNAVAILABLE_RULES.map((x) => (
+            <div key={x.id} className="px-4 py-3">
+              <p className="text-xs font-medium">{x.label}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{x.reason}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Sections 3–5: currency, time zone and location infrastructure. */}
+      <CurrencyPanel />
+      <TimePanel />
+      <LocationPanel />
     </div>
   );
 }

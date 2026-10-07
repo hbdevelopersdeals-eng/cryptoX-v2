@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutGrid, TrendingUp, CircleDollarSign, Smile, Star, Wallet, BellRing,
   Zap, Play, Calculator, Newspaper, Search, Menu, X, LogOut, Radio, Database,
-  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2
+  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2, Building2
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
@@ -54,7 +54,9 @@ const NAV = [
     group: 'Insights',
     items: [
       { to: '/news', label: 'News', icon: Newspaper },
-      { to: '/region', label: 'Region & Language', icon: Globe2 }
+      { to: '/region', label: 'Region & Language', icon: Globe2 },
+      { to: '/account', label: 'Account & Security', icon: ShieldCheck },
+      { to: '/organization', label: 'Organization', icon: Building2 }
     ]
   }
 ];
@@ -82,7 +84,9 @@ const TITLES = {
   '/paper-trading': ['Paper Trader', 'Test strategies with virtual money'],
   '/calculator': ['Calculator', 'Calculate P&L, fees, breakeven and liquidation price'],
   '/news': ['News & Market Pulse', 'Latest cryptocurrency news and market updates'],
-  '/region': ['Region & Language', 'Country and territory selection, 25 languages with RTL support, address and postal formats, E.164 phone numbers, localized dates, numbers and measurements']
+  '/region': ['Region & Language', 'Country and territory selection, 25 languages with RTL support, address and postal formats, E.164 phone numbers, localized dates, numbers and measurements'],
+  '/account': ['Account & Security', 'Profile, password, two-factor authentication, sessions and devices, login history and data requests'],
+  '/organization': ['Organization', 'Members, roles and permissions, invitations, enterprise policies and the audit log']
 };
 
 export default function Shell() {

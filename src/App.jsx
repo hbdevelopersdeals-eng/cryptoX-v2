@@ -41,6 +41,8 @@ const StatusPage = lazy(() => import('./pages/Status.jsx'));
 const LegalPage = lazy(() => import('./pages/Legal.jsx'));
 const NotFoundPage = lazy(() => import('./pages/NotFound.jsx'));
 const RegionPage = lazy(() => import('./pages/Region.jsx'));
+const AccountPage = lazy(() => import('./pages/Account.jsx'));
+const OrganizationPage = lazy(() => import('./pages/Organization.jsx'));
 
 export function PageFallback() {
   return (
@@ -113,6 +115,8 @@ export default function App() {
                     <Route path="/news" element={<NewsPage />} />
                     <Route path="/status" element={<StatusPage />} />
                     <Route path="/region" element={<RegionPage />} />
+                    <Route path="/account" element={<AccountPage />} />
+                    <Route path="/organization" element={<OrganizationPage />} />
                     <Route path="/coin/:id" element={<CoinDetailPage />} />
                     <Route path="/404" element={<NotFoundPage />} />
                     <Route path="*" element={<Navigate to="/404" replace />} />

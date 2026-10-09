@@ -98,7 +98,7 @@ export function CountrySelect({
               onKeyDown={onKeyDown}
               placeholder={t('region.searchCountry')}
               aria-label={t('region.searchCountry')}
-              className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+              className="w-full bg-transparent text-xs outline-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-primary placeholder:text-muted-foreground"
             />
             {query ? (
               <button type="button" onClick={() => setQuery('')} aria-label={t('common.reset')}>

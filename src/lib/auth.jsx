@@ -543,7 +543,7 @@ export function RequireAuth({ children }) {
   const loc = useLocation();
   if (!authReady) {
     return (
-      <div role="status" className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+      <div role="status" className="flex min-h-dvh items-center justify-center text-sm text-muted-foreground">
         Checking your session…
       </div>
     );
@@ -556,7 +556,7 @@ export function GuestOnly({ children }) {
   const { session, authReady } = useAuth();
   if (!authReady) {
     return (
-      <div role="status" className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+      <div role="status" className="flex min-h-dvh items-center justify-center text-sm text-muted-foreground">
         Checking your session…
       </div>
     );

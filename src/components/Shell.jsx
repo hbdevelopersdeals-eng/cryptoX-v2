@@ -197,7 +197,7 @@ export default function Shell() {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-dvh overflow-hidden bg-background">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
@@ -212,7 +212,7 @@ export default function Shell() {
       {/* Mobile drawer */}
       {open ? (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+          <div aria-hidden="true" className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
           <aside className="absolute inset-y-0 left-0 w-[280px] border-r border-sidebar-border bg-sidebar-bg shadow-xl">
             <button aria-label="Close navigation menu" className="absolute right-3 top-4 rounded-lg p-1.5 text-muted-foreground hover:bg-sidebar-hover" onClick={() => setOpen(false)}>
               <X size={18} />

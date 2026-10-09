@@ -15,7 +15,8 @@
     "check:bundle": "node scripts/check-bundle.mjs",
     "check:locales": "node scripts/check-locales.mjs --strict",
     "check:i18n": "node scripts/check-i18n-usage.mjs",
-    "check": "npm run check:config && npm run check:locales && npm run check:i18n && npm run build && npm run check:bundle",
+    "check:frontend": "node scripts/check-frontend.mjs",
+    "check": "npm run check:config && npm run check:locales && npm run check:i18n && npm run check:frontend && npm run build && npm run check:bundle",
     "verify": "npm run test && npm run check"
   },
   "dependencies": {

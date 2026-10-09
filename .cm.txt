@@ -1,0 +1,65 @@
+Sections 18+19+20: performance measurement, infrastructure posture, schema hardening
+
+Performance (18)
+- webVitals.js collects LCP, INP, CLS and TTFB from PerformanceObserver plus a
+  fetch wrapper for API latency and error rate. Thresholds are the published
+  Core Web Vitals values held as data. Percentiles default to p75 because that
+  is the field figure; p95 is reported alongside it because that is the tail
+  users complain about.
+- CLS uses the session-window algorithm. Summing every shift over a session
+  over-reports badly: a long session with small shifts adds up to "poor" even
+  though no single window was bad. These are different numbers and the naive
+  one is wrong.
+- The collector reports unsupported rather than fabricating samples when
+  PerformanceObserver is absent, and the module says plainly that it reports
+  nowhere, because there is no endpoint.
+
+Measured defects on the live deployment (evidence, not claims)
+- Assets are served UNCOMPRESSED: content-encoding is absent and the received
+  byte count equals the raw 311 KB. No gzip or brotli.
+- Content-hashed assets carry NO cache-control, so they may be revalidated on
+  every visit when they could be immutable for a year.
+- No HSTS, CSP or X-Content-Type-Options response headers. The CSP exists as a
+  meta tag, which applies later and covers less.
+- Verified working: CDN cache HITs, CDN-to-origin auth, and
+  Timing-Allow-Origin: * so real-user measurement is possible.
+
+Infrastructure (19)
+- Declared with an owner per item: repo, cdn, provider or not-applicable. WAF,
+  multi-region, regional failover, replication, read replicas, backups and
+  disaster recovery are provider work and are marked as such. Disaster recovery
+  is "unavailable" with the reason that no RTO/RPO is defined and an untested
+  restore is not a recovery plan.
+- Server-side concerns a static application cannot have (background jobs, queue
+  architecture, connection pooling, image optimisation) are marked not-applicable
+  rather than quietly counted as done.
+
+Database (20)
+- identifiers.js: ULID per spec, with monotonic increment within a millisecond.
+  Two ULIDs from one millisecond must still sort in creation order, or the whole
+  reason for choosing ULID over a random id is lost. UUID for records where a
+  creation timestamp is itself a disclosure.
+- supabase/migrations/0002: unique constraints on natural keys, soft deletion
+  with partial indexes so deleted rows leave the hot path, an append-only audit
+  table with rules blocking UPDATE and DELETE (absence of a policy is not
+  prevention), composite indexes, and server-side CHECK constraints mirroring
+  the client validators, because the brief is explicit that frontend validation
+  alone is not acceptable.
+- scripts/check-schema.mjs verifies RLS on every table, an index for every
+  user_id, soft-delete pairing, and the required constructs. RLS matters most:
+  in a client-only app the anon key is public, so a table without it is readable
+  by anyone.
+
+Bugs found
+- The migration attached updated_at triggers to five tables, four of which never
+  had the column. The trigger would have failed at runtime, on the customer's
+  first edit rather than on the migration. Caught by the schema guard.
+- rate() returned "good" for a null sample, because Number(null) is 0. A missing
+  measurement read as a perfect score. This is the second time this exact class
+  appeared in this codebase.
+- stats() spread a null summary when every sample was aborted, yielding
+  undefined fields instead of a zero error rate.
+- The schema guard read columns only from CREATE TABLE, so a column added by a
+  later migration was invisible to it.
+
+Tests 1168 -> 1201. Six guards now run in npm run check.

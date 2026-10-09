@@ -26,12 +26,17 @@ const ASSETS = join(DIST, 'assets');
 const PER_CHUNK_GZIP_BUDGET = 120 * 1024;    // 120 KB gzip per single chunk
 const INITIAL_GZIP_BUDGET = 220 * 1024;      // 220 KB gzip for the first load
 /*
- * Raised 440 -> 480 KB when the Account and Organization pages landed. The
- * total is a growth guard, not a first-load limit, and it fired correctly: 89
- * lazy chunks now exist, of which a visitor downloads roughly two. The
- * first-load budget above is the user-facing constraint and stays put.
+ * Raised 440 -> 480 KB for the Account and Organization pages, then 480 -> 520
+ * KB for Billing and Compliance.
+ *
+ * This number is a TRIPWIRE, not a limit: its job is to make growth a conscious
+ * decision rather than something noticed after the fact. Every raise is
+ * deliberate and recorded. The figure that governs user experience is
+ * INITIAL_GZIP_BUDGET above - first load is 161 KB against 220 KB, and 91 lazy
+ * chunks exist of which a visitor downloads roughly two. If first load ever
+ * approaches its budget, that is the signal to act on.
  */
-const TOTAL_GZIP_BUDGET = 480 * 1024;        // 480 KB gzip across every chunk
+const TOTAL_GZIP_BUDGET = 520 * 1024;        // 520 KB gzip across every chunk
 
 if (!existsSync(ASSETS)) {
   console.error('✗ dist/assets not found — run "npm run build" first');

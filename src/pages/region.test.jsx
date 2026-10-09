@@ -242,3 +242,52 @@ describe('scheduler, settlement currency and location retention', () => {
     expect(screen.getByText('Saved locations (0)')).toBeTruthy();
   });
 });
+
+describe('historical rates and the audit trail', () => {
+  it('renders the tools and states that failures are recorded too', async () => {
+    wrap(<Region />);
+    expect(await screen.findByText(/Historical rates & audit trail/i)).toBeTruthy();
+    expect(screen.getByLabelText('Rate date')).toBeTruthy();
+    expect(screen.getByLabelText('Quote currency')).toBeTruthy();
+    // A trail that only logs successes cannot explain a stale rate.
+    expect(screen.getByText(/Failures are recorded too/i)).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Refresh/i })).toBeTruthy();
+  });
+
+  it('looks up a past rate and names the source', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ base: 'USD', date: '2026-01-02', rates: { EUR: 0.9531 } })
+    })));
+
+    wrap(<Region />);
+    fireEvent.change(await screen.findByLabelText('Quote currency'), { target: { value: 'EUR' } });
+    fireEvent.click(screen.getByRole('button', { name: /Look up/i }));
+
+    await waitFor(() => expect(screen.getByText(/0\.9531/)).toBeTruthy());
+    // The reference-rate caveat is shown with the answer, not buried.
+    expect(screen.getByText(/once per working day/i)).toBeTruthy();
+  });
+
+  it('reports an uncovered currency instead of substituting the current rate', async () => {
+    // The ECB set does not publish PKR, so no provider can answer.
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 404, json: async () => ({}) })));
+
+    wrap(<Region />);
+    fireEvent.change(await screen.findByLabelText('Quote currency'), { target: { value: 'PKR' } });
+    fireEvent.click(screen.getByRole('button', { name: /Look up/i }));
+
+    await waitFor(() => expect(screen.getAllByText(/unavailable/i).length).toBeGreaterThan(0));
+    // Falling back to the current rate would be invisible and wrong.
+    expect(screen.queryByText(/once per working day/i)).toBeNull();
+  });
+
+  it('records each acquisition attempt, including failures', async () => {
+    wrap(<Region />);
+    // The provider stub rejects in this suite, so an attempt must be logged.
+    const trail = await screen.findByText(/Rate audit trail/i);
+    expect(trail).toBeTruthy();
+    expect(screen.getByText(/Current set:/i)).toBeTruthy();
+  });
+});

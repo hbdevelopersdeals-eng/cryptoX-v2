@@ -205,7 +205,11 @@ describe('database contract: migrations are internally consistent', () => {
     for (const table of CX_TABLES) {
       const cols = COLUMNS.get(table);
       expect([...cols].some((c) => creationCols.includes(c)), `${table} has no creation timestamp`).toBe(true);
-      if (table === 'cx_audit_log') continue; // actor_id is nulled when a user is deleted
+      // Internal ledgers have no owner and must not be required to have one:
+      // the audit log's actor_id is nulled when a user is deleted, and the
+      // webhook-event ledger exists to de-duplicate provider deliveries, not
+      // to belong to a user.
+      if (table === 'cx_audit_log' || table === 'cx_webhook_events') continue;
       expect(cols.has('user_id'), `${table} has no user_id`).toBe(true);
     }
   });

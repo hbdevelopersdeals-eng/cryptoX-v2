@@ -198,16 +198,25 @@ export async function handleRequest({
   if (method === 'OPTIONS') return { status: 204, headers: JSON_HEADERS, body: null };
   if (method !== 'POST') return respond(405, { error: 'method-not-allowed' });
 
+  // Authentication is checked BEFORE configuration, deliberately.
+  //
+  // The publishable key is in the client bundle, so anyone can present a
+  // syntactically valid token; the gateway passes it through and this check is
+  // what stops them. Checking configuration first would answer an anonymous
+  // caller with which secrets are missing — revealing the deployment's state to
+  // somebody with no business asking, and turning the endpoint into a
+  // configuration oracle. Refuse the caller, then worry about ourselves.
+  //
+  // The user id comes from the verified token. Without it there is nobody to
+  // attribute a purchase to, so there is no checkout to create.
+  if (!userId) return respond(401, { error: 'unauthenticated' });
+
   const secrets = checkSecrets(env);
   if (!secrets.ok) {
     // 503: the service cannot serve a working checkout, and says so rather
     // than returning a URL that would fail at the provider.
     return respond(503, { error: 'not-configured', missing: secrets.missing });
   }
-
-  // The user id comes from the verified token. Without it there is nobody to
-  // attribute a purchase to, so there is no checkout to create.
-  if (!userId) return respond(401, { error: 'unauthenticated' });
 
   const intent = readIntent(body);
   if (!intent.ok) return respond(400, { error: intent.reason, detail: intent.detail ?? null });

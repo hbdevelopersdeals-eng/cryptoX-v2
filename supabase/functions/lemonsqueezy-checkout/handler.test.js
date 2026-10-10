@@ -72,6 +72,19 @@ describe('checkout: the caller must be authenticated', () => {
   it('refuses an empty-string user id', async () => {
     expect((await run({ userId: '' })).status).toBe(401);
   });
+
+  it('refuses an unauthenticated caller with 401 even when the service is unconfigured', async () => {
+    // Auth is checked before configuration on purpose: answering an anonymous
+    // caller with which secrets are missing would make this endpoint a
+    // configuration oracle, and the publishable key needed to reach it is
+    // public. Behave identically whatever our own state is.
+    const store = makeStore();
+    const res = await run({ userId: null, env: {}, store });
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ error: 'unauthenticated' });
+    expect(JSON.stringify(res.body)).not.toMatch(/LEMONSQUEEZY_API_KEY|missing/);
+    expect(store.calls.nonces).toEqual([]);
+  });
 });
 
 describe('checkout: the request body can choose nothing but a plan and a cycle', () => {

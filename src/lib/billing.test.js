@@ -38,7 +38,7 @@ describe('plans and entitlements', () => {
   });
 
   it('names the limits a downgrade would reduce', () => {
-    const gap = entitlementGap('team', 'pro', 'alerts');
+    const gap = entitlementGap('business', 'pro', 'alerts');
     expect(gap.shrinking).toBe(true);
     expect(gap.note).toMatch(/Downgrade/);
     expect(entitlementGap('free', 'enterprise', 'alerts').unlimited).toBe(true);
@@ -102,30 +102,35 @@ describe('trials', () => {
 
 describe('proration on a mid-cycle change', () => {
   it('credits unused time and charges the remainder', () => {
-    const p = prorate({ fromPlanId: 'pro', toPlanId: 'team', cycle: 'monthly', subscriptionStart: '2026-01-01T00:00:00Z', at: '2026-01-21T00:00:00Z' });
+    const p = prorate({ fromPlanId: 'pro', toPlanId: 'business', cycle: 'monthly', subscriptionStart: '2026-01-01T00:00:00Z', at: '2026-01-21T00:00:00Z' });
     expect(p.ok).toBe(true);
     expect(p.direction).toBe('upgrade');
     // 11 of 31 days remain.
     expect(p.fraction).toBeCloseTo(11 / 31, 6);
-    expect(p.credit).toBeCloseTo((29 * 11) / 31, 2);
-    expect(p.charge).toBeCloseTo((99 * 11) / 31, 2);
-    expect(p.net).toBeCloseTo(((99 - 29) * 11) / 31, 2);
+    expect(p.credit).toBeCloseTo((9.99 * 11) / 31, 2);
+    expect(p.charge).toBeCloseTo((24.99 * 11) / 31, 2);
+    expect(p.net).toBeCloseTo(((24.99 - 9.99) * 11) / 31, 2);
     expect(p.dueNow).toBeCloseTo(p.net, 2);
     expect(p.accountCredit).toBe(0);
   });
 
   it('returns a credit rather than zero when the net is negative', () => {
-    const p = prorate({ fromPlanId: 'team', toPlanId: 'pro', cycle: 'monthly', subscriptionStart: '2026-01-01T00:00:00Z', at: '2026-01-21T00:00:00Z' });
+    const p = prorate({ fromPlanId: 'business', toPlanId: 'pro', cycle: 'monthly', subscriptionStart: '2026-01-01T00:00:00Z', at: '2026-01-21T00:00:00Z' });
     expect(p.net).toBeLessThan(0);
     expect(p.dueNow).toBe(0);
     expect(p.accountCredit).toBeGreaterThan(0);
     expect(p.note).toMatch(/owed/);
   });
 
-  it('refuses a contact-sales plan, which has no list price to prorate', () => {
+  it('prorates Enterprise now that it has a published list price', () => {
+    // Enterprise is purchasable now, so the mid-cycle maths must run rather
+    // than refusing the change as a quote-only plan.
     const p = prorate({ fromPlanId: 'pro', toPlanId: 'enterprise', cycle: 'monthly', subscriptionStart: '2026-01-01T00:00:00Z', at: '2026-01-21T00:00:00Z' });
-    expect(p.ok).toBe(false);
-    expect(p.reason).toBe('contact-sales-plan');
+    expect(p.ok).toBe(true);
+    // 11 of 31 days remain: credit the unused Pro time, charge the Enterprise time.
+    expect(p.credit).toBeCloseTo((9.99 * 11) / 31, 2);
+    expect(p.charge).toBeCloseTo((199.99 * 11) / 31, 2);
+    expect(p.net).toBeCloseTo(((199.99 - 9.99) * 11) / 31, 2);
   });
 });
 

@@ -3,13 +3,28 @@
  * Split out of billing.js deliberately. The plan list is read all over the app
  * at startup — the header, the pricing page, every entitlement check — while the
  * billing engine beside it (period arithmetic, proration, dunning, refunds) is
- * only needed on the billing page.
+ * only needed on the billing page. They lived in one module, so the first eager
+ * importer of `PLANS` dragged the whole engine into the initial bundle and
+ * pushed the entry chunk over its budget.
  *
- * They lived in one module, so the first eager importer of `PLANS` dragged the
- * whole engine into the initial bundle and pushed the entry chunk over its
- * budget. A small leaf module fixes that structurally, rather than by raising
- * the budget: billing.js re-exports every name below, so no existing import
- * changes.
+ * `billing.js` re-exports every name below, so no existing import changes.
+ *
+ * THE SIX PAID PRICES ARE THE APPROVED TARGETS for this implementation:
+ *
+ *   Pro        $9.99/mo   $99.99/yr
+ *   Business   $24.99/mo  $249.99/yr
+ *   Enterprise $199.99/mo $1,999.99/yr
+ *
+ * They are stated in exactly one place — here. The banner, the pricing page, the
+ * upgrade prompts and the checkout mapping all read this, so a displayed price
+ * cannot drift from the plan model. `Annual` is priced at a 17% saving on every
+ * tier, which is arithmetic, not a marketing claim.
+ *
+ * NOT YET VERIFIED: that the corresponding Lemon Squeezy variants exist and
+ * charge these amounts. `PLANS` is what the app DISPLAYS and what the integrity
+ * check compares against; until the six variants are read back from the store,
+ * `pricingIntegrity()` reports every one of them as a mismatch and refuses to
+ * choose a winner. See src/lib/checkout.js.
  *
  * Nothing here branches on a plan NAME. A check like `plan === 'pro'` is how a
  * trial becomes permanent; entitlements are data.
@@ -29,7 +44,7 @@ export const PLANS = [
     }
   },
   {
-    id: 'pro', name: 'Pro', rank: 1, price: { monthly: 29, annual: 290 },
+    id: 'pro', name: 'Pro', rank: 1, price: { monthly: 9.99, annual: 99.99 },
     trialDays: 14,
     entitlements: {
       portfolios: 10, alerts: 100, bots: 3, apiCallsPerMonth: 250000,
@@ -37,7 +52,10 @@ export const PLANS = [
     }
   },
   {
-    id: 'team', name: 'Team', rank: 2, price: { monthly: 99, annual: 990 },
+    // Renamed from Team. The subscription interface and the configuration use
+    // "Business" throughout; the id changed with it so no stored row can refer
+    // to a tier that no longer exists by that name.
+    id: 'business', name: 'Business', rank: 2, price: { monthly: 24.99, annual: 249.99 },
     trialDays: 14,
     entitlements: {
       portfolios: 50, alerts: 1000, bots: 25, apiCallsPerMonth: 2000000,
@@ -45,9 +63,8 @@ export const PLANS = [
     }
   },
   {
-    id: 'enterprise', name: 'Enterprise', rank: 3, price: { monthly: null, annual: null },
-    // Quoted per contract, so there is no list price to prorate against.
-    contactOnly: true,
+    id: 'enterprise', name: 'Enterprise', rank: 3, price: { monthly: 199.99, annual: 1999.99 },
+    trialDays: 14,
     entitlements: {
       portfolios: null, alerts: null, bots: null, apiCallsPerMonth: null,
       seats: null, auditLogDays: 2555, exportFormats: ['csv', 'json', 'xlsx'], support: 'dedicated'

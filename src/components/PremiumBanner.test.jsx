@@ -49,24 +49,22 @@ describe('premium banner: advertises the next tier, not the top one', () => {
     expect(advertisedPlan({ plans, planId: 'free' })?.id).toBe('pro');
   });
 
-  it('advertises Team to a Pro user, because Team genuinely exists', () => {
-    expect(advertisedPlan({ plans, planId: 'pro' })?.id).toBe('team');
+  it('advertises Business to a Pro user, because Business genuinely exists', () => {
+    expect(advertisedPlan({ plans, planId: 'pro' })?.id).toBe('business');
   });
 
   it('advertises nothing on the highest self-serve tier', () => {
     // There is no higher tier to sell, so there must be no banner.
-    expect(advertisedPlan({ plans, planId: 'team' })).toBeNull();
     expect(advertisedPlan({ plans, planId: 'enterprise' })).toBeNull();
   });
 
   it('never advertises the plan the user already has', () => {
-    for (const planId of ['free', 'pro', 'team']) {
+    for (const planId of ['free', 'pro', 'business', 'enterprise']) {
       const target = advertisedPlan({ plans, planId });
       const heldRank = planById(planId)?.rank ?? 0;
-      // On the top tier there is nothing higher, so there is nothing to assert
-      // beyond the absence of a banner.
+      // Enterprise is the top tier, so there is nothing higher to show.
       if (!target) {
-        expect(heldRank, `${planId} has no higher tier`).toBe(2);
+        expect(planId, `${planId} is the top tier`).toBe('enterprise');
         continue;
       }
       expect(target.id, planId).not.toBe(planId);
@@ -75,7 +73,7 @@ describe('premium banner: advertises the next tier, not the top one', () => {
   });
 
   it('never advertises a contact-only plan, which cannot be bought', () => {
-    for (const planId of ['free', 'pro', 'team']) {
+    for (const planId of ['free', 'pro', 'business', 'enterprise']) {
       expect(advertisedPlan({ plans, planId })?.contactOnly).toBeFalsy();
     }
   });
@@ -85,10 +83,10 @@ describe('premium banner: rendered for a free user', () => {
   it('shows the real configured price and interval', () => {
     renderBanner();
     // The Pro monthly list price, straight from the catalogue.
-    expect(screen.getByText('$29.00')).toBeDefined();
+    expect(screen.getByText('$9.99')).toBeDefined();
     expect(screen.getByText('/ month')).toBeDefined();
     // And it is the configured price, not a literal in the component.
-    expect(planById('pro').price.monthly).toBe(29);
+    expect(planById('pro').price.monthly).toBe(9.99);
   });
 
   it('offers a Subscribe Now call to action', () => {
@@ -109,9 +107,9 @@ describe('premium banner: rendered for a free user', () => {
 
   it('shows the real annual saving, computed not invented', () => {
     renderBanner();
-    // $29*12 = $348, annual $290, so $58 saved. It appears on the toggle label
+    // $9.99*12 = $119.88, annual $99.99, so $19.89 saved. It appears on the toggle label
     // and in the equivalent-monthly line, so both are legitimate matches.
-    expect(screen.getAllByText(/save \$58\.00/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/save \$19\.89/).length).toBeGreaterThan(0);
   });
 
   it('makes no scarcity, countdown or social-proof claim', () => {
@@ -137,13 +135,13 @@ describe('premium banner: no Subscribe prompt to someone who already pays', () =
     // which is where the rule lives.
     const plans = pricingPlans();
     expect(advertisedPlan({ plans, planId: 'enterprise' })).toBeNull();
-    expect(advertisedPlan({ plans, planId: 'team' })).toBeNull();
+    expect(advertisedPlan({ plans, planId: 'enterprise' })).toBeNull();
     cleanup();
   });
 
   it('never offers the plan the user is already on', () => {
     const plans = pricingPlans();
-    for (const planId of ['pro', 'team']) {
+    for (const planId of ['pro', 'business']) {
       const target = advertisedPlan({ plans, planId });
       const held = planById(planId);
       if (target) expect(target.rank).toBeGreaterThan(held.rank);

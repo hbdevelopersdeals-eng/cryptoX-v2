@@ -146,14 +146,15 @@ describe('subscription: a checkout redirect grants nothing', () => {
 describe('subscription: pricing comes from one place', () => {
   it('exposes the real plan prices with no invention', () => {
     const rows = pricingPlans();
-    expect(rows.map((p) => p.id)).toEqual(['free', 'pro', 'team']);
-    expect(rows.find((p) => p.id === 'pro')).toMatchObject({ monthly: 29, annual: 290 });
-    expect(rows.find((p) => p.id === 'team')).toMatchObject({ monthly: 99, annual: 990 });
+    expect(rows.map((p) => p.id)).toEqual(['free', 'pro', 'business', 'enterprise']);
+    expect(rows.find((p) => p.id === 'pro')).toMatchObject({ monthly: 9.99, annual: 99.99 });
+    expect(rows.find((p) => p.id === 'business')).toMatchObject({ monthly: 24.99, annual: 249.99 });
     expect(rows.find((p) => p.id === 'free')).toMatchObject({ monthly: 0, annual: 0 });
   });
 
-  it('omits a contact-only plan, which has no list price', () => {
-    expect(pricingPlans().map((p) => p.id)).not.toContain('enterprise');
+  it('includes Enterprise, which is purchasable with a list price', () => {
+    expect(pricingPlans().map((p) => p.id)).toContain('enterprise');
+    expect(planById('enterprise').price.monthly).toBe(199.99);
   });
 
   it('always matches the plan table exactly', () => {

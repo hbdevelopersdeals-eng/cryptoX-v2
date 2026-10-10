@@ -14,7 +14,11 @@ import { PLANS, planById } from './billing.js';
 
 const SECRET = 'whsec_not_a_real_secret';
 const CONFIG = { storeId: 'config-store-id', storeSlug: 'cryptox', webhookSecret: SECRET };
-const MAP = buildVariantMap({ 'pro:monthly': 'v-pro-m', 'pro:annual': 'v-pro-a', 'team:monthly': 'v-team-m', 'team:annual': 'v-team-a' });
+const MAP = buildVariantMap({
+  'pro:monthly': 'v-pro-m', 'pro:annual': 'v-pro-a',
+  'business:monthly': 'v-business-m', 'business:annual': 'v-business-a',
+  'enterprise:monthly': 'v-ent-m', 'enterprise:annual': 'v-ent-a'
+});
 
 const sign = async (body, secret = SECRET) => {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -63,18 +67,18 @@ describe('lemonsqueezy: configuration fails closed', () => {
 describe('lemonsqueezy: plan to variant mapping', () => {
   it('maps a plan and cycle to its variant', () => {
     expect(variantFor(MAP, 'pro', 'monthly')).toMatchObject({ ok: true, variantId: 'v-pro-m', pair: 'pro:monthly' });
-    expect(variantFor(MAP, 'team', 'annual').variantId).toBe('v-team-a');
+    expect(variantFor(MAP, 'business', 'annual').variantId).toBe('v-business-a');
   });
 
   it('refuses an unmapped pair rather than defaulting to a closest plan', () => {
     // A default here charges a customer for something they did not choose.
-    const res = variantFor(MAP, 'enterprise', 'monthly');
+    const res = variantFor(MAP, 'free', 'monthly');
     expect(res.ok).toBe(false);
     expect(res.reason).toBe('variant_not_mapped');
   });
 
   it('resolves a variant back to its plan', () => {
-    expect(planForVariant(MAP, 'v-team-a')).toMatchObject({ ok: true, planId: 'team', cycle: 'annual' });
+    expect(planForVariant(MAP, 'v-business-a')).toMatchObject({ ok: true, planId: 'business', cycle: 'annual' });
   });
 
   it('refuses a variant this build does not know', () => {
@@ -84,13 +88,13 @@ describe('lemonsqueezy: plan to variant mapping', () => {
 
   it('refuses a variant that maps to two different plans', () => {
     // An ambiguous mapping must not resolve by last-write-wins.
-    const ambiguous = buildVariantMap({ 'pro:monthly': 'v-shared', 'team:monthly': 'v-shared' });
+    const ambiguous = buildVariantMap({ 'pro:monthly': 'v-shared', 'business:monthly': 'v-shared' });
     expect(planForVariant(ambiguous, 'v-shared').ok).toBe(false);
     expect(planForVariant(ambiguous, 'v-shared').reason).toBe('variant_unknown');
   });
 
   it('ignores blank and malformed mapping entries', () => {
-    const messy = buildVariantMap({ 'pro:monthly': 'v1', malformed: 'v2', 'team:monthly': '   ' });
+    const messy = buildVariantMap({ 'pro:monthly': 'v1', malformed: 'v2', 'business:monthly': '   ' });
     expect(messy.forward.size).toBe(1);
     expect(variantFor(messy, 'pro', 'monthly').ok).toBe(true);
   });
@@ -433,9 +437,8 @@ describe('lemonsqueezy: the plan catalogue is internally consistent', () => {
     }
   });
 
-  it('never maps the free plan or the contact-only plan to a variant', () => {
-    // Free has no checkout, and enterprise is quoted per contract.
+  it('never maps the free plan to a variant, because it has no checkout', () => {
     expect(variantFor(MAP, 'free', 'monthly').ok).toBe(false);
-    expect(variantFor(MAP, 'enterprise', 'annual').ok).toBe(false);
+    expect(variantFor(MAP, 'free', 'annual').ok).toBe(false);
   });
 });

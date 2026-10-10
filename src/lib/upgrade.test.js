@@ -10,7 +10,7 @@ import { PLANS, planById } from './billing.js';
 import { EVENT_NAMES, validateEvent } from './analytics.js';
 
 const NOW = new Date('2026-10-10T12:00:00Z');
-const PAID = ['pro', 'team'];
+const PAID = ['pro', 'business', 'enterprise'];
 
 /* The upgrade experience. Every gate below exists because PLANS says so. */
 
@@ -69,7 +69,9 @@ describe('upgrade: the target plan is the cheapest one that helps', () => {
   it('suggests Team when Pro would not improve the entitlement', () => {
     // Working down from Team, only Enterprise improves seats, and it is quoted
     // per contract, so there is nothing to sell and that must be reported.
-    expect(cheapestPlanWith('seats', { fromPlanId: 'team' })).toMatchObject({ ok: false, reason: 'no-plan-improves-this' });
+    // Business seats are 25 and Enterprise is unlimited, so Business DOES have
+    // an upgrade to sell here.
+    expect(cheapestPlanWith('seats', { fromPlanId: 'business' })).toMatchObject({ ok: true, planId: 'enterprise' });
   });
 
   it('offers nothing when the plan is already unlimited', () => {
@@ -145,7 +147,7 @@ describe('upgrade: prompts are truthful and minimal', () => {
   it('gives a paid user NO prompt for a feature they already have', () => {
     // Misleading upgrade prompts to a paying subscriber are the thing to avoid.
     expect(upgradePromptFor({ route: '/bots', planId: 'pro', now: NOW })).toBeNull();
-    expect(upgradePromptFor({ route: '/bots', planId: 'team', now: NOW })).toBeNull();
+    expect(upgradePromptFor({ route: '/bots', planId: 'business', now: NOW })).toBeNull();
   });
 
   it('gives no prompt on a free route, for any plan', () => {
@@ -241,12 +243,12 @@ describe('upgrade: dismissal is respected', () => {
 describe('upgrade: annual saving is only claimed when the sums support it', () => {
   it('computes the real saving for Pro', () => {
     const res = annualSaving(planById('pro'));
-    expect(res).toMatchObject({ available: true, fullYear: 348, annual: 290, saving: 58, savingPct: 17, monthlyEquivalent: 24.17 });
+    expect(res).toMatchObject({ available: true, fullYear: 119.88, annual: 99.99, saving: 19.89, savingPct: 17, monthlyEquivalent: 8.33 });
     expect(res.monthsFree).toBe(2);
   });
 
   it('computes the real saving for Team', () => {
-    expect(annualSaving(planById('team'))).toMatchObject({ available: true, fullYear: 1188, annual: 990, saving: 198, savingPct: 17 });
+    expect(annualSaving(planById('business'))).toMatchObject({ available: true, fullYear: 299.88, annual: 249.99, saving: 49.89, savingPct: 17 });
   });
 
   it('refuses to claim a saving for a free plan', () => {
@@ -284,12 +286,14 @@ describe('upgrade: pricing integrity catches app/store drift', () => {
   // A COMPLETE mapping, so "everything agrees" is a fair test. A partial one
   // would report the unmapped plan as a missing variant — correctly — and the
   // fixture, not the module, would be at fault.
-  const mapping = { 'pro:monthly': 'v1', 'pro:annual': 'v2', 'team:monthly': 'v3', 'team:annual': 'v4' };
+  const mapping = { 'pro:monthly': 'v1', 'pro:annual': 'v2', 'business:monthly': 'v3', 'business:annual': 'v4', 'enterprise:monthly': 'v5', 'enterprise:annual': 'v6' };
   const variants = {
-    v1: { price: 29, currency: 'USD', interval: 'month', status: 'published' },
-    v2: { price: 290, currency: 'USD', interval: 'year', status: 'published' },
-    v3: { price: 99, currency: 'USD', interval: 'month', status: 'published' },
-    v4: { price: 990, currency: 'USD', interval: 'year', status: 'published' }
+    v1: { price: 9.99, currency: 'USD', interval: 'month', status: 'published' },
+    v2: { price: 99.99, currency: 'USD', interval: 'year', status: 'published' },
+    v3: { price: 24.99, currency: 'USD', interval: 'month', status: 'published' },
+    v4: { price: 249.99, currency: 'USD', interval: 'year', status: 'published' },
+    v5: { price: 199.99, currency: 'USD', interval: 'month', status: 'published' },
+    v6: { price: 1999.99, currency: 'USD', interval: 'year', status: 'published' }
   };
 
   it('passes when the app and the store agree', () => {
@@ -298,9 +302,9 @@ describe('upgrade: pricing integrity catches app/store drift', () => {
   });
 
   it('catches a price difference and refuses to pick a winner', () => {
-    const res = pricingIntegrity({ mapping, variants: { ...variants, v1: { ...variants.v1, price: 9.99 } } });
+    const res = pricingIntegrity({ mapping, variants: { ...variants, v1: { ...variants.v1, price: 29 } } });
     const mismatch = res.mismatches.find((m) => m.planId === 'pro' && m.cycle === 'monthly');
-    expect(mismatch).toMatchObject({ verdict: 'price-mismatch', appPrice: 29, variantPrice: 9.99 });
+    expect(mismatch).toMatchObject({ verdict: 'price-mismatch', appPrice: 9.99, variantPrice: 29 });
     expect(mismatch.note).toMatch(/One of them is wrong; this gate will not choose/);
     expect(res.ok).toBe(false);
   });
@@ -308,7 +312,7 @@ describe('upgrade: pricing integrity catches app/store drift', () => {
   it('catches a plan that has no variant to sell', () => {
     const res = pricingIntegrity({ mapping: { 'pro:monthly': 'v1' }, variants });
     expect(res.mismatches.map((m) => `${m.planId}:${m.cycle}:${m.verdict}`)).toEqual(
-      expect.arrayContaining(['pro:annual:no-variant', 'team:monthly:no-variant', 'team:annual:no-variant'])
+      expect.arrayContaining(['pro:annual:no-variant', 'business:monthly:no-variant', 'business:annual:no-variant'])
     );
   });
 
@@ -333,15 +337,15 @@ describe('upgrade: pricing integrity catches app/store drift', () => {
     expect(res.mismatches.some((m) => m.verdict === 'variant-unknown')).toBe(true);
   });
 
-  it('never prices the free or contact-only plan', () => {
+  it('never prices the free plan, but does price Enterprise', () => {
     const res = pricingIntegrity({ mapping, variants });
     expect(res.rows.every((r) => r.planId !== 'free')).toBe(true);
-    expect(res.rows.every((r) => r.planId !== 'enterprise')).toBe(true);
+    expect(res.rows.some((r) => r.planId === 'enterprise' && r.verdict === 'ok')).toBe(true);
   });
 
   it('exposes a boolean convenience that agrees with the detail', () => {
     expect(pricingAgrees({ mapping, variants })).toBe(true);
-    expect(pricingAgrees({ mapping, variants: { ...variants, v1: { ...variants.v1, price: 9.99 } } })).toBe(false);
+    expect(pricingAgrees({ mapping, variants: { ...variants, v1: { ...variants.v1, price: 29 } } })).toBe(false);
   });
 });
 
@@ -483,12 +487,13 @@ describe('upgrade: a subscriber sees management, not an advert', () => {
 describe('upgrade: the plan catalogue itself', () => {
   it('orders purchasable plans by rank', () => {
     const rows = purchasablePlans();
-    expect(rows.map((p) => p.id)).toEqual(['pro', 'team']);
+    expect(rows.map((p) => p.id)).toEqual(['pro', 'business', 'enterprise']);
     expect(rows.every((p) => p.rank > 0 && !p.contactOnly)).toBe(true);
   });
 
   it('never lists the free plan or a contact-only plan as purchasable', () => {
-    expect(PLANS.filter((p) => p.contactOnly).map((p) => p.id)).toEqual(['enterprise']);
+    // Enterprise is now purchasable, so no plan is quote-only.
+    expect(PLANS.filter((p) => p.contactOnly).map((p) => p.id)).toEqual([]);
     expect(purchasablePlans().map((p) => p.id)).not.toContain('free');
   });
 
@@ -498,7 +503,8 @@ describe('upgrade: the plan catalogue itself', () => {
       for (let i = 1; i < ladder.length; i += 1) {
         const prev = ladder[i - 1];
         const curr = ladder[i];
-        if (prev == null) break;
+        if (prev == null) break;      // already unlimited
+        if (curr == null) continue;    // unlimited is the top of the ladder
         expect(curr, `${entitlement}: ${prev} → ${curr}`).toBeGreaterThan(prev);
       }
     }

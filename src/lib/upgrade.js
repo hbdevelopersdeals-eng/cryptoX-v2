@@ -243,11 +243,15 @@ export function annualSaving(plan) {
   if (monthly <= 0) return { available: false, reason: 'free-plan-has-no-saving' };
   const fullYear = monthly * 12;
   if (annual >= fullYear) return { available: false, reason: 'annual-is-not-cheaper' };
-  const saving = fullYear - annual;
+  // Rounded to cents. Binary floating point turned $24.99 x 12 - $249.99 into
+  // 49.89000000000004, and a money figure that reaches a component like that
+  // ends up rendered or compared as a different amount.
+  const cents = (n) => Math.round(n * 100) / 100;
+  const saving = cents(fullYear - annual);
   return {
     available: true,
-    fullYear,
-    annual,
+    fullYear: cents(fullYear),
+    annual: cents(annual),
     saving,
     savingPct: Math.round((saving / fullYear) * 100),
     // What the annual price works out to per month, with no rounding fudge.

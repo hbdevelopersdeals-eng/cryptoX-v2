@@ -17,7 +17,8 @@
     "check:i18n": "node scripts/check-i18n-usage.mjs",
     "check:frontend": "node scripts/check-frontend.mjs",
     "check:schema": "node scripts/check-schema.mjs",
-    "check": "npm run check:config && npm run check:locales && npm run check:i18n && npm run check:frontend && npm run check:schema && npm run build && npm run check:bundle",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "check": "npm run check:secrets && npm run check:config && npm run check:locales && npm run check:i18n && npm run check:frontend && npm run check:schema && npm run build && npm run check:bundle",
     "verify": "npm run test && npm run check"
   },
   "dependencies": {

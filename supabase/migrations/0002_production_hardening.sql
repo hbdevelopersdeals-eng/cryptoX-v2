@@ -71,20 +71,43 @@ create index if not exists cx_holdings_live_idx
 create index if not exists cx_alerts_live_idx
   on public.cx_alerts (user_id, symbol) where deleted_at is null;
 
+-- --------------------------------------------------------- alert rule types
+--
+-- 0001 modelled an alert as a price target only (direction + target_price).
+-- The application's model is broader: a rule of { type, value, symbol } with
+-- sixteen types (price_above, pct_change, rsi_below, funding_above, formula…).
+-- The check constraint and the dedupe index below referenced a rule_type column
+-- that no migration ever created, so 0002 aborted on its first constraint and
+-- never applied — meaning the server-side validation it promises was never in
+-- place at all. Discovered by the schema-contract integration test.
+alter table public.cx_alerts add column if not exists rule_type text;
+
+-- Backfill from the price-target model so existing rows keep their meaning:
+-- a 'below' alert is a price_below rule, anything else a price_above rule.
+update public.cx_alerts
+   set rule_type = case when direction = 'below' then 'price_below' else 'price_above' end
+ where rule_type is null;
+
+alter table public.cx_alerts alter column rule_type set not null;
+
 -- --------------------------------------------------- server-side validation
 
 -- These mirror the client validators. Duplicating a rule is the point: the
 -- client copy exists for fast feedback, this one exists because the client
 -- cannot be trusted to run at all.
+--
+-- The column names must match the tables as actually created above; an
+-- earlier revision of this migration named columns that did not exist
+-- (quantity / cost_basis), so the migration failed rather than validating.
 do $$
 begin
   if not exists (select 1 from pg_constraint where conname = 'cx_holdings_qty_positive') then
     alter table public.cx_holdings
-      add constraint cx_holdings_qty_positive check (quantity > 0);
+      add constraint cx_holdings_qty_positive check (amount > 0);
   end if;
   if not exists (select 1 from pg_constraint where conname = 'cx_holdings_cost_nonneg') then
     alter table public.cx_holdings
-      add constraint cx_holdings_cost_nonneg check (cost_basis is null or cost_basis >= 0);
+      add constraint cx_holdings_cost_nonneg check (buy_price >= 0);
   end if;
   if not exists (select 1 from pg_constraint where conname = 'cx_alerts_rule_type_known') then
     alter table public.cx_alerts

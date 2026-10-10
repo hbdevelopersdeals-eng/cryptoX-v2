@@ -108,7 +108,10 @@ export function offsetMinutes(zone, instant) {
   const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
   const ms = (instant instanceof Date ? instant : new Date(instant)).getTime();
   // Compare whole seconds: formatToParts drops milliseconds.
-  return Math.round((asUTC - Math.floor(ms / 1000) * 1000) / 60000);
+  const minutes = Math.round((asUTC - Math.floor(ms / 1000) * 1000) / 60000);
+  // A zone exactly on UTC computes -0, which is not equal to 0 under Object.is,
+  // so it fails Map lookups and Array.includes. Normalise it.
+  return minutes === 0 ? 0 : minutes;
 }
 
 /** "+05:00" / "-04:30" */

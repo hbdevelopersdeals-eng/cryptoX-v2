@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 /* Supabase browser client.
- * Only ever uses the PUBLIC publishable/anon key — never the service-role key.
+ * Uses the PUBLIC publishable/anon key only. A service-role credential must never appear in this bundle (secret-scan:allow: named only to forbid it). It bypasses RLS, and anything the browser can read is public.
  * If the environment is not configured the app falls back to its local demo
  * mode instead of crashing, so previews and CI keep working. */
 

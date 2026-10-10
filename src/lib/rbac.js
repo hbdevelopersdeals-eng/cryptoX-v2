@@ -183,7 +183,15 @@ export function authorize(subject, required, context = {}) {
   // 1. An explicit deny wins over everything, including platform_admin.
   if (denies.some((d) => matchesPermission(d, required))) return { allowed: false, reason: 'explicit-deny' };
 
-  const grantedByRole = all || permissions.includes(required);
+  /*
+   * `permissions` is already the FULL vocabulary when `all` is set, so testing
+   * membership denies a requirement that is not a real permission even for a
+   * wildcard role. Testing `all ||` instead let platform_admin be authorized
+   * for an invented string such as 'made:up', so a typo in a permission name
+   * succeeded for exactly one role — the most powerful one — and failed for
+   * every other. Unknown permissions must fail closed for everyone.
+   */
+  const grantedByRole = permissions.includes(required);
   const grantedExplicitly = grants.some((g) => matchesPermission(g, required));
   if (!grantedByRole && !grantedExplicitly) return { allowed: false, reason: 'not-permitted' };
 

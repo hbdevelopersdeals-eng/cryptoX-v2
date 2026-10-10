@@ -20,7 +20,7 @@ accio-mcp-cli server supabase
 
 If Supabase is not connected, open Accio, go to the Accio Site Builder plugin, connect Supabase, and finish authorization. If connected, the Agent should run `accio-mcp-cli search supabase` to query tool usage, then use Supabase MCP tools such as `get_project_url`, `get_publishable_keys`, `list_tables`, `list_migrations`, `apply_migration`, `execute_sql`, `generate_typescript_types`, `deploy_edge_function`, `get_logs`, and `get_advisors`.
 
-Never paste `SUPABASE_SERVICE_ROLE_KEY`, database passwords, connection strings, or account access tokens in chat.
+Never paste a service-role credential, database passwords, connection strings, or account access tokens in chat. secret-scan:allow this line names the prohibition; it carries no credential.
 
 ## 3. Commerce Requests
 

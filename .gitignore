@@ -4,4 +4,6 @@ dist
 .env
 .env.local
 .env.*.local
+# A named environment file (production.env, staging.env) is still a real one.
+*.env
 .DS_Store

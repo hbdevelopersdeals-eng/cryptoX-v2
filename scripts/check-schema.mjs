@@ -116,6 +116,88 @@ for (const { file, sql } of all) {
   }
 }
 
+/* ---- every referenced column must exist ----
+ *
+ * The guard above checks PRESENCE (an index exists, RLS is on). This checks
+ * REFERENCE: every column named in a constraint, index or trigger must be a
+ * column the same table actually has.
+ *
+ * This is not hypothetical. Migration 0002 added `check (quantity > 0)` to
+ * cx_holdings, which has `amount`, and indexed cx_alerts(rule_type) before any
+ * migration created that column. Postgres aborts the whole migration on the
+ * first such statement, so the server-side validation it promised had never
+ * been applied — while every presence check above still passed. A schema that
+ * cannot be applied is worse than one that is merely incomplete, because it
+ * fails at deploy time rather than at review time.
+ */
+const COLUMN_TYPES = 'uuid|text|numeric|boolean|jsonb|timestamptz|bigint|integer|double precision';
+const columnsOf = new Map();
+for (const { sql } of all) {
+  const body = strip(sql);
+  for (const m of body.matchAll(/create table (?:if not exists )?public\.(\w+)\s*\(([\s\S]*?)\n\);/gi)) {
+    const set = columnsOf.get(m[1]) || new Set();
+    for (const lineText of m[2].split('\n')) {
+      const col = lineText.trim().match(new RegExp(`^([a-z_][a-z0-9_]*)\\s+(${COLUMN_TYPES})`, 'i'));
+      if (col) set.add(col[1]);
+    }
+    columnsOf.set(m[1], set);
+  }
+  for (const m of body.matchAll(/alter table (?:if exists )?public\.(\w+)\s+add column (?:if not exists )?(\w+)/gi)) {
+    const set = columnsOf.get(m[1]) || new Set();
+    set.add(m[2]);
+    columnsOf.set(m[1], set);
+  }
+}
+
+// Keywords, literals and function names are not column references.
+const SQL_WORDS = new Set([
+  'select', 'from', 'where', 'and', 'or', 'not', 'null', 'is', 'in', 'case', 'when',
+  'then', 'else', 'end', 'true', 'false', 'check', 'constraint', 'alter', 'table',
+  'add', 'if', 'exists', 'coalesce', 'char_length', 'now', 'current_user', 'auth',
+  'uid', 'public', 'array', 'default', 'unique', 'index', 'create', 'on', 'using',
+  'text', 'uuid', 'bigint', 'jsonb', 'numeric', 'boolean', 'timestamptz', 'primary',
+  'key', 'references', 'cascade', 'delete', 'set', 'identity', 'always', 'as',
+  'generated', 'by', 'partition', 'range', 'like', 'interval', 'extract', 'epoch',
+  'date', 'lower', 'upper', 'length', 'substring', 'desc', 'asc'
+]);
+const referenced = (expr) => [...new Set(
+  (String(expr).replace(/'[^']*'/g, ' ').match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [])
+    .filter((w) => !SQL_WORDS.has(w.toLowerCase()))
+)];
+
+for (const { file, sql } of all) {
+  const body = strip(sql);
+
+  for (const m of body.matchAll(/alter table (?:if exists )?public\.(\w+)\s+add constraint (\w+)\s+check \(([\s\S]*?)\);/gi)) {
+    const cols = columnsOf.get(m[1]);
+    if (!cols) { err(file, 'constraint-unknown-table', `${m[2]} constrains public.${m[1]}, which no migration creates.`); continue; }
+    for (const id of referenced(m[3])) {
+      if (!cols.has(id)) err(file, 'constraint-missing-column', `${m[2]} references ${m[1]}.${id}, which does not exist. Postgres aborts the migration here.`);
+    }
+  }
+
+  for (const m of body.matchAll(/create (?:unique )?index (?:if not exists )?(\w+)\s+on public\.(\w+)\s*\(([^)]*)\)([\s\S]*?);/gi)) {
+    const cols = columnsOf.get(m[2]);
+    if (!cols) { err(file, 'index-unknown-table', `${m[1]} indexes public.${m[2]}, which no migration creates.`); continue; }
+    for (const raw of m[3].split(',')) {
+      const col = raw.trim().split(/\s+/)[0];
+      if (col && !cols.has(col)) err(file, 'index-missing-column', `${m[1]} indexes ${m[2]}.${col}, which does not exist.`);
+    }
+    for (const id of referenced(m[4])) {
+      if (!cols.has(id)) err(file, 'index-missing-column', `${m[1]} filters on ${m[2]}.${id}, which does not exist.`);
+    }
+  }
+
+  for (const m of body.matchAll(/create trigger (\w+)\s+(?:before|after)\s+\w+\s+on public\.(\w+)/gi)) {
+    const cols = columnsOf.get(m[2]);
+    if (cols && /_touch$/.test(m[1]) && !cols.has('updated_at')) {
+      err(file, 'trigger-missing-column', `${m[1]} assigns updated_at on public.${m[2]}, which has no such column.`);
+    }
+  }
+}
+
+notes.push(`columns checked on ${columnsOf.size} table(s), ${[...columnsOf.values()].reduce((a, s) => a + s.size, 0)} column(s)`);
+
 /* ---- append-only guarantee ---- */
 if (/cx_audit_log/.test(combined)) {
   const hasNoUpdate = /on update to public\.cx_audit_log do instead nothing/i.test(combined);

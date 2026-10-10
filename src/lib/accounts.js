@@ -93,32 +93,54 @@ export const RESERVED_USERNAMES = new Set([
 
 export function updateProfile(profile, patch = {}) {
   const errors = [];
-  const next = { ...profile, ...patch };
+  /*
+   * Fields are validated FIRST and only then written, so the returned profile
+   * never carries a rejected value. Spreading the patch into `next` up front
+   * meant a failed validation still returned the invalid value (asking for
+   * username 'admin' returned a profile whose username was 'admin', with only
+   * the `ok` flag standing between that and storage) — a caller that applied
+   * the result optimistically, or forgot to check `ok`, persisted it.
+   */
+  const next = { ...profile };
 
   if (patch.username !== undefined) {
     const u = validateUsername(patch.username);
     if (!u.valid) errors.push({ field: 'username', reason: u.reason });
     else next.username = u.normalised;
   }
-  if (patch.language !== undefined && !isSupportedLanguage(patch.language)) {
-    errors.push({ field: 'language', reason: 'unsupported' });
+  if (patch.language !== undefined) {
+    if (!isSupportedLanguage(patch.language)) errors.push({ field: 'language', reason: 'unsupported' });
+    else next.language = patch.language;
   }
-  if (patch.currency !== undefined && !currencyByCode(patch.currency)) {
-    errors.push({ field: 'currency', reason: 'unknown-currency' });
+  if (patch.currency !== undefined) {
+    if (!currencyByCode(patch.currency)) errors.push({ field: 'currency', reason: 'unknown-currency' });
+    else next.currency = patch.currency;
   }
-  if (patch.timezone !== undefined && !isValidZone(patch.timezone)) {
-    errors.push({ field: 'timezone', reason: 'invalid-iana-zone' });
+  if (patch.timezone !== undefined) {
+    if (!isValidZone(patch.timezone)) errors.push({ field: 'timezone', reason: 'invalid-iana-zone' });
+    else next.timezone = patch.timezone;
   }
-  if (patch.country !== undefined && patch.country && !countryByCode(patch.country)) {
-    errors.push({ field: 'country', reason: 'unknown-country' });
-  }
-  if (patch.email !== undefined && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(patch.email))) {
-    errors.push({ field: 'email', reason: 'invalid' });
+  if (patch.country !== undefined && patch.country) {
+    if (!countryByCode(patch.country)) errors.push({ field: 'country', reason: 'unknown-country' });
+    else next.country = patch.country;
+  } else if (patch.country !== undefined) {
+    next.country = patch.country; // an explicit clear is allowed
   }
   if (patch.email !== undefined) {
-    // Changing the address always re-opens verification and clears the old flag.
-    next.email = String(patch.email).toLowerCase();
-    next.emailVerified = false;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(patch.email))) {
+      errors.push({ field: 'email', reason: 'invalid' });
+    } else {
+      // Changing the address always re-opens verification and clears the old flag.
+      next.email = String(patch.email).toLowerCase();
+      next.emailVerified = false;
+    }
+  }
+
+  // Everything with no rule of its own (display name, city, notification
+  // preferences…) is copied through unchanged.
+  const VALIDATED = new Set(['username', 'language', 'currency', 'timezone', 'country', 'email']);
+  for (const [key, value] of Object.entries(patch)) {
+    if (!VALIDATED.has(key)) next[key] = value;
   }
 
   return { ok: errors.length === 0, errors, profile: next };

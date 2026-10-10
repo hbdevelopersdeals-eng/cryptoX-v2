@@ -30,6 +30,13 @@ const SKIP_FILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 
 const TEXT_EXT = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json', '.jsonc', '.md', '.txt', '.yml', '.yaml', '.html', '.css', '.sql', '.sh', '.ps1', '.env', '.example']);
 const ALLOW = /secret-scan:allow/;
 
+// Paths that are executed server-side and are never bundled for the browser.
+// Supabase Edge Functions and migrations belong here: an Edge Function that
+// writes to a table whose RLS denies every client NEEDS the service-role key,
+// and that key never leaves the server. The JWT scan below still covers every
+// file, so an actual service-role TOKEN is caught wherever it appears.
+const SERVER_ONLY = ['supabase/functions/', 'supabase/migrations/'];
+
 const errors = [];
 const notes = [];
 const err = (file, rule, msg) => errors.push({ file, rule, msg });
@@ -129,7 +136,10 @@ for (const file of files) {
 
     // A Supabase service-role credential in client code is fatal on sight,
     // because the build ships whatever the browser can read.
-    if (/(?:supabase[_-]?)?service[_-]?role/i.test(line)) {
+    // A Supabase service-role credential in code the BROWSER receives is fatal
+    // on sight, because the build ships whatever the browser can read. Scoped to
+    // what actually ships: see SERVER_ONLY.
+    if (!SERVER_ONLY.some((prefix) => rel.startsWith(prefix)) && /(?:supabase[_-]?)?service[_-]?role/i.test(line)) {
       err(at, 'service-role-in-client', 'A service-role credential is referenced in shipped code. Anything the browser can read is public.');
     }
   });

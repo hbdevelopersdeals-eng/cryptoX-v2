@@ -33,13 +33,16 @@ const sign = async (raw, secret = SECRET) => {
 };
 
 /** An in-memory stand-in for the database, recording every call. */
-function makeStore({ existingEvent = null, nonceUser = 'user-1' } = {}) {
-  const calls = { recorded: [], upserted: [], processed: [] };
+function makeStore({ existingEvent = null, nonceUser = 'user-1', existingSubscription = null } = {}) {
+  const calls = { recorded: [], upserted: [], processed: [], consumed: [] };
   return {
     calls,
     async findEvent() { return existingEvent; },
     async recordEvent(row) { calls.recorded.push(row); },
-    async resolveNonce() { return nonceUser; },
+    async findSubscription() { return existingSubscription; },
+    // A consumed nonce stops resolving, which is what makes it single-use.
+    async resolveNonce(nonce) { return calls.consumed.includes(nonce) ? null : nonceUser; },
+    async consumeNonce(nonce) { calls.consumed.push(nonce); },
     async upsertSubscription(row) { calls.upserted.push(row); },
     async markEventProcessed(key, outcome) { calls.processed.push({ key, outcome }); }
   };
@@ -254,6 +257,41 @@ describe('webhook: lifecycle', () => {
     const res = await handleRequest({ rawBody: raw, signature: await sign(raw), headers: {}, env, store });
     expect(res.body).toMatchObject({ ignored: 'no-user-for-nonce' });
     expect(store.calls.upserted).toEqual([]);
+  });
+
+  it('consumes the nonce on first use, so it cannot open a second subscription', async () => {
+    const store = makeStore();
+    await run({}, store);
+    expect(store.calls.consumed).toEqual(['n1']);
+  });
+
+  it('applies a RENEWAL to the same user without needing the nonce again', async () => {
+    // The critical renewal case: a second event arrives for a subscription that
+    // already exists, with no usable nonce (already consumed, or absent from
+    // custom_data). It must update the SAME row, not be dropped.
+    const store = makeStore({ nonceUser: null, existingSubscription: { user_id: 'user-1', plan_id: 'pro' } });
+    const raw = body({ meta: { event_name: 'subscription_payment_success', custom_data: {} }, attributes: { status: 'active', renews_at: '2026-12-10T00:00:00Z' } });
+    const res = await handleRequest({ rawBody: raw, signature: await sign(raw), headers: {}, env, store });
+    expect(res.body).toMatchObject({ applied: true, status: 'active' });
+    expect(store.calls.upserted[0]).toMatchObject({ user_id: 'user-1', status: 'active', renews_at: '2026-12-10T00:00:00Z' });
+    // The nonce was never consulted, so it must not have been consumed.
+    expect(store.calls.consumed).toEqual([]);
+  });
+
+  it('applies a CANCELLATION to the same user when the nonce no longer resolves', async () => {
+    const store = makeStore({ nonceUser: null, existingSubscription: { user_id: 'user-1' } });
+    const raw = body({ meta: { event_name: 'subscription_cancelled' }, attributes: { status: 'cancelled', ends_at: '2026-11-01T00:00:00Z' } });
+    const res = await handleRequest({ rawBody: raw, signature: await sign(raw), headers: {}, env, store });
+    expect(res.body).toMatchObject({ applied: true, status: 'cancelled' });
+    expect(store.calls.upserted[0]).toMatchObject({ user_id: 'user-1', cancelled: true });
+  });
+
+  it('does not let a captured nonce re-point an existing subscription at another user', async () => {
+    // The subscription already belongs to user-1. A nonce resolving elsewhere
+    // must not move it.
+    const store = makeStore({ nonceUser: 'attacker' , existingSubscription: { user_id: 'user-1' } });
+    const { store: s } = await run({}, store);
+    expect(s.calls.upserted[0].user_id).toBe('user-1');
   });
 });
 

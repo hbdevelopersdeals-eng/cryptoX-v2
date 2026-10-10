@@ -57,6 +57,15 @@ Deno.serve(async (req: Request) => {
       const { error } = await client.from('cx_webhook_events').insert(row);
       if (error && error.code !== '23505') throw new Error(error.message);
     },
+    async findSubscription(providerSubscriptionId: string) {
+      const { data } = await client
+        .from('cx_subscriptions')
+        .select('user_id')
+        .eq('provider', 'lemonsqueezy')
+        .eq('provider_subscription_id', providerSubscriptionId)
+        .maybeSingle();
+      return data;
+    },
     async resolveNonce(nonce: string) {
       const { data } = await client
         .from('cx_checkout_nonces')
@@ -66,6 +75,14 @@ Deno.serve(async (req: Request) => {
         .gt('expires_at', new Date().toISOString())
         .maybeSingle();
       return data?.user_id ?? null;
+    },
+    async consumeNonce(nonce: string) {
+      // Single use. The filter makes a double-consume a no-op rather than a
+      // second attribution.
+      await client.from('cx_checkout_nonces')
+        .update({ consumed_at: new Date().toISOString() })
+        .eq('nonce', nonce)
+        .is('consumed_at', null);
     },
     async upsertSubscription(row: Record<string, unknown>) {
       const { error } = await client

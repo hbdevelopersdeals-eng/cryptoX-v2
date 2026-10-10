@@ -222,11 +222,13 @@ export function subscriptionRow({ event, planId, cycle, userId }) {
  * The whole request, with the database injected.
  *
  * `store` must provide:
- *   findEvent(key)                  -> row | null
- *   recordEvent(row)                -> void        (insert; collision = duplicate)
- *   resolveNonce(nonce)             -> userId | null
- *   upsertSubscription(row)         -> void
- *   markEventProcessed(key, outcome)-> void
+ *   findEvent(key)                        -> row | null
+ *   recordEvent(row)                      -> void   (insert; collision = duplicate)
+ *   findSubscription(providerSubId)       -> row | null
+ *   resolveNonce(nonce)                   -> userId | null
+ *   consumeNonce(nonce)                   -> void
+ *   upsertSubscription(row)               -> void
+ *   markEventProcessed(key, outcome)      -> void
  *
  * The order is deliberate: verify, then de-duplicate, then decide, then write.
  * A duplicate is answered 200 so the provider stops retrying, but changes nothing.
@@ -284,9 +286,37 @@ export async function handleRequest({ rawBody, signature, headers = {}, env = {}
     return respond(200, { ok: true, ignored: decision.reason });
   }
 
-  // Attribution: the nonce is a lookup key. Without a row for it there is no
-  // user, so the payment cannot be assigned and nothing is granted.
-  const userId = event.nonce ? await store.resolveNonce(event.nonce) : null;
+  // Attribution, in order of reliability.
+  //
+  // 1. An existing subscription for this provider subscription id. A renewal,
+  //    a cancellation and an expiry all carry the SAME subscription, and must
+  //    land on the same user. Resolving the nonce again for those events would
+  //    be wrong twice over: once a nonce is consumed (below) it no longer
+  //    resolves at all, and the provider is not guaranteed to repeat
+  //    custom_data on every event.
+  // 2. Otherwise the nonce — the first event of a new subscription.
+  //
+  // With neither there is no user, so the payment cannot be assigned and
+  // nothing is granted.
+  let userId = null;
+  let attributedBy = null;
+
+  const existingSubscription = await store.findSubscription(event.subscriptionId);
+  if (existingSubscription?.user_id) {
+    userId = existingSubscription.user_id;
+    attributedBy = 'subscription';
+  }
+
+  if (!userId && event.nonce) {
+    userId = await store.resolveNonce(event.nonce);
+    if (userId) {
+      attributedBy = 'nonce';
+      // Single use: a nonce that has already opened one subscription must not
+      // be replayable to open another.
+      await store.consumeNonce(event.nonce);
+    }
+  }
+
   if (!userId) {
     await store.markEventProcessed(key.key, 'unattributed');
     return respond(200, { ok: true, ignored: 'no-user-for-nonce' });

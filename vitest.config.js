@@ -12,7 +12,9 @@ export default defineConfig({
       VITE_SUPABASE_PUBLISHABLE_KEY: '',
       VITE_SUPABASE_ANON_KEY: ''
     },
-    include: ['src/**/*.test.{js,jsx}'],
+    // The Edge Function's pure logic lives under supabase/functions so Deno can
+    // import it directly; its tests run here with everything else.
+    include: ['src/**/*.test.{js,jsx}', 'supabase/functions/**/*.test.js'],
     restoreMocks: true,
     coverage: {
       provider: 'v8',

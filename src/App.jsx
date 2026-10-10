@@ -47,6 +47,7 @@ const AccountPage = lazy(() => import('./pages/Account.jsx'));
 const OrganizationPage = lazy(() => import('./pages/Organization.jsx'));
 const BillingPage = lazy(() => import('./pages/Billing.jsx'));
 const PricingPage = lazy(() => import('./pages/Pricing.jsx'));
+const UpgradeSuccessPage = lazy(() => import('./pages/UpgradeSuccess.jsx'));
 const CompliancePage = lazy(() => import('./pages/Compliance.jsx'));
 
 export function PageFallback() {
@@ -125,6 +126,9 @@ export default function App() {
                     <Route path="/organization" element={<OrganizationPage />} />
                     <Route path="/billing" element={<BillingPage />} />
                     <Route path="/pricing" element={<PricingPage />} />
+        {/* Where Lemon Squeezy returns a buyer after checkout. It confirms
+            nothing by itself; it re-reads the subscription the webhook writes. */}
+        <Route path="/upgrade/success" element={<UpgradeSuccessPage />} />
                     <Route path="/compliance" element={<CompliancePage />} />
                     <Route path="/coin/:id" element={<CoinDetailPage />} />
                     <Route path="/404" element={<NotFoundPage />} />

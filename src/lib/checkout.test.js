@@ -120,25 +120,40 @@ describe('checkout: URLs', () => {
     expect(a.interval).toBe('year');
   });
 
-  it('refuses to build a checkout it cannot attribute', () => {
-    // Taking a payment that cannot be tied to an account is worse than not
-    // offering checkout at all.
+  it('never claims attribution for a URL built without a nonce', () => {
+    // buildCheckoutUrl is the manual-test path only — the application goes
+    // through the server, which mints the nonce. A URL without one stays
+    // buildable so a human can exercise the provider, but it must admit it is
+    // unattributed rather than look like a normal purchase link.
     const res = buildCheckoutUrl({ plan: 'pro', cycle: 'monthly' });
-    expect(res.ok).toBe(false);
-    expect(res.reason).toBe('attribution-not-ready');
+    expect(res.ok).toBe(true);
+    expect(res.attributed).toBe(false);
+    expect(res.url).not.toMatch(/nonce/);
+  });
+
+  it('marks a URL as attributed when a nonce is supplied', () => {
+    expect(buildCheckoutUrl({ plan: 'pro', cycle: 'monthly', nonce: 'n1' }).attributed).toBe(true);
   });
 
   it('refuses a plan with no variant', () => {
     expect(buildCheckoutUrl({ plan: 'free', cycle: 'monthly', nonce: 'n' }).reason).toBe('no-variant-mapped');
   });
 
-  it('is gated until attribution exists, and says why', () => {
-    expect(ATTRIBUTION_READY).toBe(false);
-    expect(checkoutEnabled()).toBe(false);
+  it('is enabled, and says so, now that the server can attribute a purchase', () => {
+    // The gate is still the constant; it is true because the checkout and
+    // webhook functions are deployed and the mapping validates.
+    expect(ATTRIBUTION_READY).toBe(true);
+    expect(checkoutEnabled()).toBe(true);
     const status = checkoutStatus();
-    expect(status.enabled).toBe(false);
-    expect(status.reason).toBe('attribution-not-ready');
-    expect(status.note).toMatch(/attribute a purchase to an account/);
+    expect(status.enabled).toBe(true);
+    expect(status.reason).toBe('ready');
+  });
+
+  it('reports the mapping as valid, so the gate is not open over a broken map', () => {
+    // If the prices the provider charges ever drift from the catalogue, the
+    // gate must close rather than offer a checkout at a price the app does not
+    // display.
+    expect(validateMapping().ok).toBe(true);
   });
 });
 

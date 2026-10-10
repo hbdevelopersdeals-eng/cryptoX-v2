@@ -43,12 +43,21 @@ const base = (over = {}) => ({
 const start = (over = {}) => startCheckout(base(over));
 
 describe('subscribe: the gate', () => {
-  it('refuses with NO request while attribution is not ready', async () => {
+  it('the default gate is exactly ATTRIBUTION_READY, whatever that is set to', async () => {
+    // No attributionReady override here, so this exercises production
+    // behaviour. The invariant is the coupling, not the value: flipping the
+    // constant must flip what the app does, with no other edit. Both branches
+    // assert, so this is never vacuous.
     const { fetchImpl, calls } = okResponse();
-    // The real default is used here: no attributionReady override.
     const res = await startCheckout({ plan: 'pro', cycle: 'monthly', client: clientWith(), endpoint: ENDPOINT, fetchImpl });
-    expect(res).toMatchObject({ ok: false, reason: 'attribution-not-ready' });
-    expect(calls).toEqual([]);
+    if (ATTRIBUTION_READY) {
+      expect(res.ok).toBe(true);
+      expect(res.url).toMatch(/^https:\/\//);
+      expect(calls).toHaveLength(1);
+    } else {
+      expect(res).toMatchObject({ ok: false, reason: 'attribution-not-ready' });
+      expect(calls).toEqual([]);
+    }
   });
 
   it('refuses when the gate is explicitly closed, even with everything else valid', async () => {

@@ -17,18 +17,30 @@
  * All six are standard fixed-price subscriptions. The old metered "Default"
  * variant is gone: the product now carries exactly these six.
  *
- * WHY CHECKOUT IS STILL GATED. A hosted checkout can be opened for any variant
- * right now. What is missing is ATTRIBUTION: with no server to mint and store a
- * nonce, nothing reliably ties a completed purchase back to an account. A
+ * WHY ATTRIBUTION IS THE GATE. A hosted checkout can be opened for any variant
+ * at any time. What has to exist first is ATTRIBUTION: a server that mints and
+ * stores a nonce, so a completed purchase can be tied back to an account. A
  * checkout that takes money and cannot say whose it is would be worse than one
- * that is not offered yet. So `attributionReady` is false, the UI says so, and
- * flipping it is the single line that enables checkout once the backend exists.
+ * that is not offered at all.
+ *
+ * That server now exists and is deployed:
+ *   lemonsqueezy-checkout  mints the nonce and creates the checkout
+ *   lemonsqueezy-webhook   verifies the signature, consumes the nonce and
+ *                          writes the subscription row
+ * So `ATTRIBUTION_READY` is true. It is still the single line that controls
+ * this: set it back to false and the UI stops offering checkout rather than
+ * offering one that cannot be attributed.
  */
 
 import { PLANS, planById } from './plans.js';
 
-/** Set true only when a server can mint and validate checkout nonces. */
-export const ATTRIBUTION_READY = false;
+/**
+ * True because the checkout and webhook Edge Functions are deployed and the
+ * six variants are mapped. The browser never mints a nonce itself, and never
+ * treats a return from checkout as evidence of payment — the subscription row
+ * written by the webhook is the only thing that grants access.
+ */
+export const ATTRIBUTION_READY = true;
 
 /** The store. The slug is what forms the checkout origin. */
 export const STORE = { slug: 'hbstore', id: '489130' };

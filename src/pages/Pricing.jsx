@@ -5,6 +5,24 @@ import { annualSaving, purchasablePlans } from '../lib/upgrade.js';
 import { formatMoney } from '../lib/currency.jsx';
 import { UPGRADE_EVENTS } from '../lib/upgrade.js';
 import { trackUpgradeEvent, bufferedEvents, resetBufferedEvents } from '../lib/upgradeEvents.js';
+import { beginCheckout } from '../lib/subscribe.js';
+import { checkoutStatus } from '../lib/checkout.js';
+
+/** A reason a checkout did not start, said in a way a buyer can act on. */
+function checkoutErrorMessage(reason) {
+  switch (reason) {
+    case 'not-signed-in':
+      return 'Please sign in, then choose your plan again.';
+    case 'not-configured':
+      return 'Checkout is temporarily unavailable. Nothing has been charged — please try again shortly.';
+    case 'attribution-not-ready':
+      return 'Checkout is not open yet. Nothing has been charged.';
+    case 'navigation-failed':
+      return 'Your browser blocked the checkout window. Check your pop-up settings and try again.';
+    default:
+      return 'We could not start checkout. Nothing has been charged — please try again.';
+  }
+}
 
 /* The pricing page.
  *
@@ -49,6 +67,14 @@ export default function Pricing() {
   const plans = useMemo(() => pricingPlans(), []);
   const paid = useMemo(() => purchasablePlans(), []);
   const [cycle, setCycle] = useState('monthly');
+  // Checkout state. `pending` names the plan currently being started so only
+  // that button changes, and `error` carries a reason a buyer can act on.
+  const [pending, setPending] = useState(null);
+  const [error, setError] = useState(null);
+  // The single gate. It is false until the server can attribute a purchase to
+  // an account, and it is false if the plan/variant mapping does not agree.
+  const checkout = useMemo(() => checkoutStatus(), []);
+  const canCheckout = checkout.enabled;
 
   // Only offer the annual toggle where an annual price genuinely exists.
   const annualOffers = paid.filter((p) => annualSaving(p).available);
@@ -56,10 +82,34 @@ export default function Pricing() {
 
   const currentPlanId = sub.isPaid ? sub.planId : 'free';
 
-  const onSelect = (planId) => {
+  /**
+   * Start a checkout for this plan at the currently selected cycle.
+   *
+   * The browser sends only the plan and the cycle. The server resolves the
+   * variant, mints the attribution nonce and returns a URL — so nothing here
+   * decides a price, and a "success" redirect still grants nothing.
+   */
+  const onSelect = async (planId) => {
     trackUpgradeEvent(UPGRADE_EVENTS.clicked.name, { context: '/pricing', plan: currentPlanId, targetPlan: planId });
-    // No variant mapping is configured, so a checkout cannot honestly start.
-    // Firing checkout.started here would record an intent that never happened.
+    if (!canCheckout || pending) return;
+
+    setError(null);
+    setPending(planId);
+
+    const result = await beginCheckout({ plan: planId, cycle });
+
+    if (!result.ok) {
+      setPending(null);
+      setError(checkoutErrorMessage(result.reason));
+      return;
+    }
+    if (!result.opened) {
+      // The URL is valid but navigation was blocked. Give the buyer the link
+      // rather than silently doing nothing.
+      setPending(null);
+      setError(`${checkoutErrorMessage('navigation-failed')} ${result.url}`);
+    }
+    // On success the browser is already leaving for the checkout.
   };
 
   return (
@@ -169,7 +219,7 @@ export default function Pricing() {
 
               <button
                 type="button"
-                disabled={isFree || isCurrent}
+                disabled={isFree || isCurrent || !canCheckout || pending === plan.id}
                 aria-label={isFree ? 'Free plan — no purchase required' : isCurrent ? `${plan.name} is your current plan` : `Upgrade to ${plan.name}`}
                 onClick={() => onSelect(plan.id)}
                 className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
@@ -178,7 +228,13 @@ export default function Pricing() {
                     : 'bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-40'
                 }`}
               >
-                {isFree ? 'Included' : isCurrent ? 'Your plan' : `Upgrade to ${plan.name}`}
+                {isFree
+                  ? 'Included'
+                  : isCurrent
+                    ? 'Your plan'
+                    : pending === plan.id
+                      ? 'Opening checkout…'
+                      : `Upgrade to ${plan.name}`}
                 {!isFree && !isCurrent ? <ArrowRight size={13} aria-hidden="true" /> : null}
               </button>
             </section>
@@ -186,11 +242,31 @@ export default function Pricing() {
         })}
       </div>
 
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-destructive/40 bg-card p-4 text-xs text-muted-foreground"
+        >
+          {error}
+        </p>
+      ) : null}
+
       <p className="rounded-xl border border-border bg-card p-4 text-xs text-muted-foreground">
-        <strong className="font-semibold text-foreground">Checkout is not yet enabled.</strong>{' '}
-        The prices above are the application&apos;s configured list prices. Online checkout is still being finalised, so
-        no payment can be taken from this page yet — nothing here will charge you. When checkout opens, plan changes and
-        cancellations will be handled through the billing portal.
+        {canCheckout ? (
+          <>
+            <strong className="font-semibold text-foreground">Payments are handled by Lemon Squeezy.</strong>{' '}
+            You will be taken to their secure checkout to complete the purchase. Your plan is activated once the payment
+            is confirmed — returning to this site is not itself proof of payment. Plan changes and cancellations are
+            handled through the billing portal.
+          </>
+        ) : (
+          <>
+            <strong className="font-semibold text-foreground">Checkout is not yet enabled.</strong>{' '}
+            The prices above are the application&apos;s configured list prices. Online checkout is still being finalised, so
+            no payment can be taken from this page yet — nothing here will charge you. When checkout opens, plan changes and
+            cancellations will be handled through the billing portal.
+          </>
+        )}
       </p>
     </div>
   );

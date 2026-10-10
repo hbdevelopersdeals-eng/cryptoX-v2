@@ -33,7 +33,10 @@ export const COMMON_ZONES = [
   'Europe/Kyiv', 'Europe/Moscow', 'Europe/Istanbul',
   'Africa/Casablanca', 'Africa/Lagos', 'Africa/Cairo', 'Africa/Johannesburg',
   'Africa/Nairobi', 'Africa/Accra', 'Africa/Algiers',
-  'America/Sao_Paulo', 'America/Argentina/Buenos_Aires', 'America/Santiago',
+  // Brazil spans four zones, so the list needs more than Sao Paulo: a user in
+  // Manaus had no zone to select. Found by the country-policy coherence check.
+  'America/Sao_Paulo', 'America/Manaus', 'America/Rio_Branco', 'America/Fortaleza',
+  'America/Argentina/Buenos_Aires', 'America/Santiago',
   'America/Bogota', 'America/Lima', 'America/Caracas',
   'America/New_York', 'America/Toronto', 'America/Chicago', 'America/Denver',
   'America/Phoenix', 'America/Los_Angeles', 'America/Vancouver',

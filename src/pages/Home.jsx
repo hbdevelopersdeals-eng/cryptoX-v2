@@ -5,6 +5,7 @@ import { useMarket } from '../lib/market.jsx';
 import { fmtCompact, fmtPrice, fmtNum, cls } from '../lib/format.js';
 import { CoinImg, Sparkline, CoinLink, Stat } from '../components/ui.jsx';
 import { useWatchlist } from '../lib/prefs.jsx';
+import { PremiumBanner } from '../components/PremiumBanner.jsx';
 
 function TickerRow({ r }) {
   return (
@@ -128,6 +129,11 @@ export default function HomePage() {
           )}
         </div>
       </div>
+
+      {/* Premium upgrade panel. Placed below the market header so prices stay
+          prominent, and it renders as a status strip for a user who already
+          holds the advertised plan. */}
+      <PremiumBanner />
 
       {/* Global stats */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -139,7 +139,11 @@ describe('AuthProvider lifecycle', () => {
     await act(async () => { locked = await expose.current.login(EMAIL, PASSWORD); });
     expect(locked.ok).toBe(false);
     expect(locked.error).toMatch(/Too many failed attempts/i);
-  });
+    // This test performs ~7 PBKDF2 verifications at 210,000 iterations each —
+    // roughly 1.7M iterations of real work. That legitimately exceeds the 5s
+    // default under load, and a timeout here also cascades into the next test,
+    // which then gets a null hook. The assertion is right; the budget was not.
+  }, 45_000);
 
   it('does not reveal whether an email exists', async () => {
     const expose = mountAuth();

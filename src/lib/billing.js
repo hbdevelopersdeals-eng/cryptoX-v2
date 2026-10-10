@@ -18,69 +18,15 @@ import { roundToCurrency } from './rates.js';
  * Plans and entitlements
  * ------------------------------------------------------------------------ */
 
-export const BILLING_CYCLES = [
-  { id: 'monthly', label: 'Monthly', months: 1 },
-  { id: 'annual', label: 'Annual', months: 12 }
-];
-
-/**
- * Plans carry entitlements as data. Nothing in the application should branch on
- * a plan name — a check like `plan === 'pro'` is how a trial becomes permanent.
- */
-export const PLANS = [
-  {
-    id: 'free', name: 'Free', rank: 0, price: { monthly: 0, annual: 0 },
-    entitlements: {
-      portfolios: 1, alerts: 5, bots: 0, apiCallsPerMonth: 1000,
-      seats: 1, auditLogDays: 7, exportFormats: ['csv'], support: 'community'
-    }
-  },
-  {
-    id: 'pro', name: 'Pro', rank: 1, price: { monthly: 29, annual: 290 },
-    trialDays: 14,
-    entitlements: {
-      portfolios: 10, alerts: 100, bots: 3, apiCallsPerMonth: 250000,
-      seats: 3, auditLogDays: 90, exportFormats: ['csv', 'json'], support: 'email'
-    }
-  },
-  {
-    id: 'team', name: 'Team', rank: 2, price: { monthly: 99, annual: 990 },
-    trialDays: 14,
-    entitlements: {
-      portfolios: 50, alerts: 1000, bots: 25, apiCallsPerMonth: 2000000,
-      seats: 25, auditLogDays: 365, exportFormats: ['csv', 'json', 'xlsx'], support: 'priority'
-    }
-  },
-  {
-    id: 'enterprise', name: 'Enterprise', rank: 3, price: { monthly: null, annual: null },
-    // Quoted per contract, so there is no list price to prorate against.
-    contactOnly: true,
-    entitlements: {
-      portfolios: null, alerts: null, bots: null, apiCallsPerMonth: null,
-      seats: null, auditLogDays: 2555, exportFormats: ['csv', 'json', 'xlsx'], support: 'dedicated'
-    }
-  }
-];
-
-export const planById = (id) => PLANS.find((p) => p.id === id) || null;
-
-/** A null entitlement means unlimited. Distinguishing that from 0 matters. */
-export function hasEntitlement(planId, key, usage = 0) {
-  const plan = planById(planId);
-  if (!plan) return false;
-  const limit = plan.entitlements?.[key];
-  if (limit == null) return true;
-  if (key === 'exportFormats' || key === 'support') return true;
-  return usage <= limit;
-}
-
-export function entitlementGap(fromPlanId, toPlanId, entitlement) {
-  const from = planById(fromPlanId)?.entitlements?.[entitlement];
-  const to = planById(toPlanId)?.entitlements?.[entitlement];
-  if (to == null) return { unlimited: true };
-  const shrinking = from != null && to < from;
-  return { from, to, shrinking, note: shrinking ? 'Downgrade reduces this limit.' : null };
-}
+/* The plan catalogue lives in plans.js and is re-exported here, so every
+ * existing `from './billing.js'` import keeps working. It was moved because an
+ * eager importer of `PLANS` was pulling this whole engine — period arithmetic,
+ * proration, dunning, refunds — into the initial bundle. */
+// Imported for local use AND re-exported. `export { … } from` alone creates no
+// local binding, so periodFor, trialState and prorate below could not see them —
+// the functions this module is named for stopped working.
+import { BILLING_CYCLES, PLANS, planById, hasEntitlement, entitlementGap } from './plans.js';
+export { BILLING_CYCLES, PLANS, planById, hasEntitlement, entitlementGap };
 
 /* ---------------------------------------------------------------------------
  * Billing periods — month ends are the whole difficulty

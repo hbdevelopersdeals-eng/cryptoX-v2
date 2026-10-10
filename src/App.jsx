@@ -6,6 +6,8 @@ import { MarketProvider } from './lib/market.jsx';
 import { StrategyEngineProvider } from './lib/engine.jsx';
 import { I18nProvider } from './lib/i18n.jsx';
 import { CurrencyProvider } from './lib/currency.jsx';
+import { SubscriptionProvider } from './lib/subscription.jsx';
+import { UpgradeGate } from './components/Upgrade.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import ConsentBanner from './components/ConsentBanner.jsx';
 import Shell from './components/Shell.jsx';
@@ -44,6 +46,7 @@ const RegionPage = lazy(() => import('./pages/Region.jsx'));
 const AccountPage = lazy(() => import('./pages/Account.jsx'));
 const OrganizationPage = lazy(() => import('./pages/Organization.jsx'));
 const BillingPage = lazy(() => import('./pages/Billing.jsx'));
+const PricingPage = lazy(() => import('./pages/Pricing.jsx'));
 const CompliancePage = lazy(() => import('./pages/Compliance.jsx'));
 
 export function PageFallback() {
@@ -70,6 +73,7 @@ export default function App() {
       <I18nProvider>
         <CurrencyProvider>
       <AuthProvider>
+        <SubscriptionProvider>
         <MarketProvider>
           <HashRouter>
             <ScrollToTop />
@@ -99,19 +103,19 @@ export default function App() {
                     <Route path="/watchlist" element={<WatchlistPage />} />
                     <Route path="/portfolio" element={<PortfolioPage />} />
                     <Route path="/alerts" element={<AlertsPage />} />
-                    <Route path="/derivatives" element={<DerivativesPage />} />
+                    <Route path="/derivatives" element={<UpgradeGate><DerivativesPage /></UpgradeGate>} />
                     <Route path="/charting" element={<ChartingPage />} />
-                    <Route path="/exchange" element={<ExchangePage />} />
+                    <Route path="/exchange" element={<UpgradeGate><ExchangePage /></UpgradeGate>} />
                     <Route path="/aggregator" element={<AggregatorPage />} />
                     <Route path="/wallet-lab" element={<WalletLabPage />} />
                     <Route path="/explorer" element={<ExplorerPage />} />
-                    <Route path="/bots" element={<BotsPage />} />
+                    <Route path="/bots" element={<UpgradeGate><BotsPage /></UpgradeGate>} />
                     <Route path="/defi" element={<DeFiNftPage />} />
                     <Route path="/assistant" element={<AssistantPage />} />
                     <Route path="/rsi-scanner" element={<RsiScannerPage />} />
                     <Route path="/market-intel" element={<MarketIntelPage />} />
                     <Route path="/data-sources" element={<DataSourcesPage />} />
-                    <Route path="/strategies" element={<StrategiesPage />} />
+                    <Route path="/strategies" element={<UpgradeGate><StrategiesPage /></UpgradeGate>} />
                     <Route path="/paper-trading" element={<PaperTradingPage />} />
                     <Route path="/calculator" element={<CalculatorPage />} />
                     <Route path="/news" element={<NewsPage />} />
@@ -120,6 +124,7 @@ export default function App() {
                     <Route path="/account" element={<AccountPage />} />
                     <Route path="/organization" element={<OrganizationPage />} />
                     <Route path="/billing" element={<BillingPage />} />
+                    <Route path="/pricing" element={<PricingPage />} />
                     <Route path="/compliance" element={<CompliancePage />} />
                     <Route path="/coin/:id" element={<CoinDetailPage />} />
                     <Route path="/404" element={<NotFoundPage />} />
@@ -130,6 +135,7 @@ export default function App() {
             </StrategyEngineProvider>
           </HashRouter>
         </MarketProvider>
+        </SubscriptionProvider>
       </AuthProvider>
         </CurrencyProvider>
       </I18nProvider>

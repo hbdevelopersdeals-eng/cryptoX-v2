@@ -45,7 +45,16 @@ export const EVENT_REGISTRY = {
   'refund.issued': { category: 'revenue', required: ['amount', 'kind'] },
   'bot.created': { category: 'activation', required: ['engine'] },
   'export.downloaded': { category: 'engagement', required: ['format'] },
-  'error.shown': { category: 'reliability', required: ['scope'] }
+  'error.shown': { category: 'reliability', required: ['scope'] },
+  /* Conversion funnel. `context` is the page or limit that produced the prompt,
+   * which is what makes "which page converts?" answerable. Note there is no
+   * `subscription.activated`: `subscription.started` above already covers it
+   * with richer properties, and two names for one event is how a funnel stops
+   * adding up. */
+  'upgrade.prompt_viewed': { category: 'revenue', required: ['context', 'plan', 'kind'] },
+  'upgrade.clicked': { category: 'revenue', required: ['context', 'plan', 'targetPlan'] },
+  'checkout.started': { category: 'revenue', required: ['plan', 'cycle'] },
+  'checkout.cancelled': { category: 'revenue', required: ['plan', 'cycle'] }
 };
 
 export const EVENT_NAMES = Object.keys(EVENT_REGISTRY);

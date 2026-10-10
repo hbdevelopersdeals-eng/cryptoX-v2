@@ -10,6 +10,7 @@ import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
 import { useCurrency, CURRENCIES } from '../lib/currency.jsx';
 import { useMarket } from '../lib/market.jsx';
 import { CoinImg } from './ui.jsx';
+import { UpgradeButton } from './Upgrade.jsx';
 import { agoLabel } from '../lib/format.js';
 
 const NAV = [
@@ -54,6 +55,7 @@ const NAV = [
     group: 'Insights',
     items: [
       { to: '/news', label: 'News', icon: Newspaper },
+      { to: '/pricing', label: 'Plans & Pricing', icon: Sparkles },
       { to: '/region', label: 'Region & Language', icon: Globe2 },
       { to: '/account', label: 'Account & Security', icon: ShieldCheck },
       { to: '/organization', label: 'Organization', icon: Building2 },
@@ -89,6 +91,7 @@ const TITLES = {
   '/region': ['Region & Language', 'Country and territory selection, 25 languages with RTL support, address and postal formats, E.164 phone numbers, localized dates, numbers and measurements'],
   '/account': ['Account & Security', 'Profile, password, two-factor authentication, sessions and devices, login history and data requests'],
   '/organization': ['Organization', 'Members, roles and permissions, invitations, enterprise policies and the audit log'],
+  '/pricing': ['Plans & Pricing', 'Compare plans, monthly and annual billing, and the limits each tier raises'],
   '/billing': ['Billing & Tax', 'Plans, proration, coupons, metered usage, invoices, credit notes and jurisdiction tax rules'],
   '/compliance': ['Compliance', 'Policies and acceptance, consent, data-subject requests, retention, legal hold and framework readiness']
 };
@@ -282,6 +285,7 @@ export default function Shell() {
                 <Radio size={12} /> SYNC
               </span>
             )}
+            <UpgradeButton compact />
             <div className="hidden items-center gap-1.5 sm:flex">
               <label className="sr-only" htmlFor="lang-select">{t('common.language')}</label>
               <select

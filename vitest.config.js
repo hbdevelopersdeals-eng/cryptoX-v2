@@ -14,7 +14,9 @@ export default defineConfig({
     },
     // The Edge Function's pure logic lives under supabase/functions so Deno can
     // import it directly; its tests run here with everything else.
-    include: ['src/**/*.test.{js,jsx}', 'supabase/functions/**/*.test.js'],
+    // Build-time helpers under scripts/ are tested too: the CSP derivation is
+    // the difference between a working auth flow and a silent "Failed to fetch".
+    include: ['src/**/*.test.{js,jsx}', 'supabase/functions/**/*.test.js', 'scripts/**/*.test.mjs'],
     restoreMocks: true,
     coverage: {
       provider: 'v8',

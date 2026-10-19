@@ -133,6 +133,46 @@ export function vwap(highs, lows, closes, volumes) {
   return out;
 }
 
+export function stochRsi(closes, rsiPeriod = 14, stochPeriod = 14, smoothK = 3, smoothD = 3) {
+  const rsiVals = rsi(closes, rsiPeriod);
+  const n = closes.length;
+  const raw = new Array(n).fill(null);
+
+  for (let i = 0; i < n; i++) {
+    if (i < rsiPeriod + stochPeriod - 1) continue;
+    const window = rsiVals.slice(i - stochPeriod + 1, i + 1);
+    if (window.some((v) => v == null)) continue;
+    const minRsi = Math.min(...window);
+    const maxRsi = Math.max(...window);
+    raw[i] = maxRsi === minRsi ? 50 : ((rsiVals[i] - minRsi) / (maxRsi - minRsi)) * 100;
+  }
+
+  const k = sma(raw.map((v) => (v == null ? 0 : v)), smoothK).map((v, i) => (raw[i] == null ? null : v));
+  const d = sma(k.map((v) => (v == null ? 0 : v)), smoothD).map((v, i) => (k[i] == null ? null : v));
+
+  return { raw, k, d };
+}
+
+export function cci(highs, lows, closes, period = 20) {
+  const n = closes.length;
+  const out = new Array(n).fill(null);
+  if (n < period) return out;
+
+  const tp = highs.map((h, i) => (h + lows[i] + closes[i]) / 3);
+  const smaTp = sma(tp, period);
+
+  for (let i = period - 1; i < n; i++) {
+    if (smaTp[i] == null) continue;
+    let devSum = 0;
+    for (let j = i - period + 1; j <= i; j++) {
+      devSum += Math.abs(tp[j] - smaTp[i]);
+    }
+    const meanDev = devSum / period;
+    out[i] = meanDev === 0 ? 0 : (tp[i] - smaTp[i]) / (0.015 * meanDev);
+  }
+  return out;
+}
+
 // Deterministic seeded PRNG for offline demo candles
 export function mulberry32(a) {
   return function () {

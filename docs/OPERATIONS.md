@@ -26,7 +26,7 @@ Non-secret, build-time only (see `.env.example`):
 
 **Release checklist**
 1. `npm ci` (locked install).
-2. `npm run verify` → 56 tests green + build succeeds.
+2. `npm run verify` → 1,892 tests green + build succeeds.
 3. `node scripts/check-config.mjs` and `node scripts/check-bundle.mjs` → both green.
 4. `npm audit --omit=dev` → no critical; review high/moderate against SECURITY.md applicability table.
 5. Preview the built bundle; confirm login, home, coin chart, strategy backtest, paper trader at desktop **and** 375px mobile width.

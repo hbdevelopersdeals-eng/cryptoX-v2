@@ -2,6 +2,19 @@
 
 All notable changes to CryptoX are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] — "Two more presets, one honest feed"
+
+### Added
+- **Stochastic RSI preset** (`stoch-rsi`): %K/%D crossover gated to the oversold and overbought zones, implemented in both the strategy engine and `signalSeries`, so what an armed strategy signals and what the backtester measures are the same rule.
+- **CCI Reversal preset** (`cci-reversal`): CCI crossing back through ±100, with configurable period and thresholds.
+- The market table now carries CoinGecko's full 250-coin page instead of an arbitrary 150-row cut of a response already being paid for; the header states `showing N of M`.
+
+### Changed
+- **The invented price movement is gone.** A sine-wave "wobble" used to nudge every row without a live exchange pair — and the headline market cap, volume and BTC dominance — so the table looked alive. It was fabricated movement drawn exactly like a real tick. Rows without a live pair now keep the provider's last value, are marked `~` with a tooltip and a footnote, and move only when the provider refreshes them every 60 seconds.
+
+### Fixed
+- `stochRsi` could emit values outside 0–100 on a flat or near-flat window; `raw`, `%K` and `%D` are now clamped.
+
 ## [Unreleased] — "Wallet Lab (read-only)"
 
 **Scope decision.** Section 9 asked for a non-custodial wallet. This app deliberately does **not** implement key custody. Generating or storing a seed phrase / private key in a browser-only React app is a catastrophic risk: localStorage is readable by any script on the origin, there is no secure element, and an XSS bug becomes irreversible total loss. Nothing is generated, derived, stored, signed or broadcast. What was built instead is the safe, genuinely working half: everything you should check *before* you sign.

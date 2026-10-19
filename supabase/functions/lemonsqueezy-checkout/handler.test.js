@@ -155,6 +155,14 @@ describe('checkout: the nonce is the attribution key', () => {
     expect(many.size).toBe(200);
   });
 
+  it('offers exactly the six fixed-price variants, never the metered base', () => {
+    // 2228036 is the product's original metered "Default" variant. Selling it
+    // through this table would charge a fixed price for usage-based access and
+    // then attribute it to a plan, so it must not appear here at all.
+    expect(VARIANTS).toHaveLength(6);
+    expect(VARIANTS.map((v) => v.id)).not.toContain('2228036');
+  });
+
   it('binds the nonce to the user, plan, cycle and variant', async () => {
     const store = makeStore();
     await run({ store, body: { plan: 'enterprise', cycle: 'annual' } });

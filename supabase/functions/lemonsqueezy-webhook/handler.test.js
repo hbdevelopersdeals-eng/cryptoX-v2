@@ -162,6 +162,15 @@ describe('webhook: variant mapping never defaults', () => {
     expect(planForVariant('2230943')).toMatchObject({ ok: true, planId: 'enterprise', cycle: 'annual' });
   });
 
+  it('never maps the metered base variant to a plan', () => {
+    // 2228036 is the product's original "Default" variant and is METERED
+    // (usage_aggregation=sum). It exists only to keep the product's historical
+    // metering intact and is not one of the six fixed-price plans. Mapping it
+    // would hand a paid plan to anyone who bought usage-based access, so its
+    // absence from the map is a deliberate guarantee, not an oversight.
+    expect(planForVariant('2228036')).toMatchObject({ ok: false, reason: 'variant-unknown' });
+  });
+
   it('refuses an unknown variant instead of assuming a plan', async () => {
     expect(planForVariant('9999999')).toMatchObject({ ok: false, reason: 'variant-unknown' });
     const store = makeStore();

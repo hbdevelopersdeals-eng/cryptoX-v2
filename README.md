@@ -1,6 +1,6 @@
 # CryptoX
 
-A real-time cryptocurrency dashboard: live market data, candlestick charts with indicators, eight one-click trading strategies, an honest backtester, and a paper-trading simulator.
+A real-time cryptocurrency dashboard: live market data, candlestick charts with indicators, ten one-click trading strategies, an honest backtester, and a paper-trading simulator.
 
 **Live demo:** https://cryptox.site.accio.ai
 
@@ -12,9 +12,9 @@ A real-time cryptocurrency dashboard: live market data, candlestick charts with 
 
 | Area | What it does |
 |---|---|
-| Market | Market cap / BTC dominance / 24h volume, scrolling ticker, gainers & losers, searchable 100+ coin table with 7-day sparklines |
+| Market | Market cap / BTC dominance / 24h volume, scrolling ticker, gainers & losers, searchable 250-coin table with 7-day sparklines; rows without a live exchange pair are marked `~` and refresh on the 60s provider poll |
 | Charts | Canvas candlestick chart: volume, MA20/MA50, RSI-14 panel, 5m–1d timeframes, keyboard-navigable, with a table alternative |
-| Strategies | Eight presets — RSI Reversal (buy < 30 / sell > 70), Golden Cross, MACD, Bollinger, Stochastic, Momentum, Donchian, VWAP |
+| Strategies | Ten presets — RSI Reversal (buy < 30 / sell > 70), Golden Cross, MACD, Bollinger, Stochastic, Momentum, Donchian, VWAP, Stochastic RSI, CCI Reversal |
 | Backtesting | Next-bar fills, fees, slippage, long-only; Sharpe/Sortino/max-drawdown/win-rate/profit-factor, buy & hold comparison, walk-forward split |
 | Paper trading | Auto-trading bot on a virtual balance with equity curve, trade log and win rate |
 | Portfolio tools | Watchlist, portfolio with CSV export, price alerts, bubbles, fear & greed, P&L/liquidation calculator |
@@ -39,7 +39,7 @@ src/
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173
-npm test           # 56 unit + component tests
+npm test           # 1,892 unit + component tests (65 files)
 npm run test:coverage
 npm run build      # production bundle in dist/
 npm run verify     # tests + build (use before publishing)
@@ -68,7 +68,7 @@ See [.env.example](.env.example). All variables are build-time and non-secret:
 
 ## Deployment
 
-1. `npm run verify` — must be green (56 tests + build).
+1. `npm run verify` — must be green (1,892 tests + build).
 2. `node scripts/check-config.mjs && node scripts/check-bundle.mjs`.
 3. Publish `dist/` (or use the site-builder publish flow). The site is static; no runtime env needed.
 4. Post-deploy: confirm the login screen renders, the topbar shows `LIVE` (or `SYNC` while connecting), and `/status` reports healthy feeds.

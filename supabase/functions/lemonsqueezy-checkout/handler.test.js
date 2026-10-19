@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   REQUIRED_SECRETS, STORE_ID, PRODUCT_ID, SELLABLE_PLANS, CYCLES, NONCE_TTL_MS, VARIANTS,
-  checkSecrets, readIntent, variantFor, mintNonce, nonceExpiry,
+  checkSecrets, readIntent, variantFor, mintNonce, nonceExpiry, isTestMode,
+  TEST_API_KEY, TEST_MODE_FLAG,
   buildProviderRequest, readProviderResponse, handleRequest
 } from './handler.js';
 import { VARIANTS as APP_VARIANTS, variantFor as appVariantFor } from '../../../src/lib/checkout.js';
@@ -43,7 +44,7 @@ const run = (over = {}) => handleRequest({
 describe('checkout: fails closed without an API key', () => {
   it('names the secret it requires', () => {
     expect(REQUIRED_SECRETS).toEqual(['LEMONSQUEEZY_API_KEY']);
-    expect(checkSecrets({})).toEqual({ ok: false, missing: ['LEMONSQUEEZY_API_KEY'] });
+    expect(checkSecrets({})).toMatchObject({ ok: false, missing: ['LEMONSQUEEZY_API_KEY'] });
     expect(checkSecrets({ LEMONSQUEEZY_API_KEY: '  ' }).ok).toBe(false);
     expect(checkSecrets(env).ok).toBe(true);
   });
@@ -314,5 +315,75 @@ describe('checkout: no secret reaches the response', () => {
       const res = await run(over);
       expect(JSON.stringify(res.body ?? {})).not.toMatch(/ls_test_key_not_real/);
     }
+  });
+});
+
+describe('checkout: test and live are separated by key, not by a toggle', () => {
+  const live = 'live_key_not_real';
+  const test = 'test_key_not_real';
+
+  it('reads the mode flag strictly — only an explicit yes means test', () => {
+    expect(isTestMode({ [TEST_MODE_FLAG]: 'true' })).toBe(true);
+    expect(isTestMode({ [TEST_MODE_FLAG]: ' TRUE ' })).toBe(true);
+    expect(isTestMode({ [TEST_MODE_FLAG]: 'false' })).toBe(false);
+    expect(isTestMode({ [TEST_MODE_FLAG]: '' })).toBe(false);
+    expect(isTestMode({})).toBe(false);
+    // Anything that is not an explicit yes leaves the live key in charge. A
+    // stray "1" or "yes" must not silently redirect real money to a test key,
+    // and must never be read as permission to try the test path.
+    expect(isTestMode({ [TEST_MODE_FLAG]: '1' })).toBe(false);
+    expect(isTestMode({ [TEST_MODE_FLAG]: 'yes' })).toBe(false);
+  });
+
+  it('uses the live key when test mode is off', () => {
+    const out = checkSecrets({ LEMONSQUEEZY_API_KEY: live, [TEST_API_KEY]: test });
+    expect(out).toMatchObject({ ok: true, testMode: false, apiKey: live });
+  });
+
+  it('uses the test key when test mode is on', () => {
+    const out = checkSecrets({ LEMONSQUEEZY_API_KEY: live, [TEST_API_KEY]: test, [TEST_MODE_FLAG]: 'true' });
+    expect(out).toMatchObject({ ok: true, testMode: true, apiKey: test });
+  });
+
+  it('fails closed with no test key, even though a live key is present', () => {
+    // The dangerous failure is a "test" purchase that quietly charges a real
+    // card through the live key. Refuse instead of falling back.
+    const out = checkSecrets({ LEMONSQUEEZY_API_KEY: live, [TEST_MODE_FLAG]: 'true' });
+    expect(out.ok).toBe(false);
+    expect(out.missing).toEqual([TEST_API_KEY]);
+    expect(out.apiKey).toBeNull();
+  });
+
+  it('sends the test key, never the live key, when test mode is on', async () => {
+    let auth = null;
+    const fetchImpl = async (_url, init) => {
+      auth = init.headers.authorization;
+      return { status: 201, json: async () => ({ data: { attributes: { url: 'https://x.lemonsqueezy.com/c' } } }) };
+    };
+    const res = await handleRequest({
+      method: 'POST',
+      body: JSON.stringify({ plan: 'pro', cycle: 'monthly' }),
+      userId: 'user-1',
+      env: { LEMONSQUEEZY_API_KEY: live, [TEST_API_KEY]: test, [TEST_MODE_FLAG]: 'true' },
+      store: makeStore(),
+      fetchImpl
+    });
+    expect(res.status).toBe(200);
+    expect(auth).toBe(`Bearer ${test}`);
+  });
+
+  it('answers 503 and never reaches the provider when the test key is missing', async () => {
+    let touched = false;
+    const res = await handleRequest({
+      method: 'POST',
+      body: JSON.stringify({ plan: 'pro', cycle: 'monthly' }),
+      userId: 'user-1',
+      env: { LEMONSQUEEZY_API_KEY: live, [TEST_MODE_FLAG]: 'true' },
+      store: makeStore(),
+      fetchImpl: async () => { touched = true; throw new Error('must not reach the provider'); }
+    });
+    expect(res.status).toBe(503);
+    expect(res.body).toMatchObject({ error: 'not-configured', missing: [TEST_API_KEY] });
+    expect(touched).toBe(false);
   });
 });

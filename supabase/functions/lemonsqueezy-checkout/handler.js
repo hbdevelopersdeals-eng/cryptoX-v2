@@ -64,9 +64,42 @@ const respond = (status, body) => ({ status, headers: JSON_HEADERS, body });
 
 /* ------------------------------------------------------------------ secrets */
 
+/**
+ * Which API key to use.
+ *
+ * Lemon Squeezy issues SEPARATE API keys for test mode and live mode, and the
+ * key itself decides which data set the request touches. Toggling the store
+ * into test mode does NOT make a live key produce test checkouts — that is why
+ * a checkout created with the live key came back with test_mode:false while the
+ * dashboard said test mode on.
+ *
+ * So both keys may be configured and exactly one is used, chosen by a flag:
+ *   LEMONSQUEEZY_TEST_MODE = 'true'  -> LEMONSQUEEZY_TEST_API_KEY
+ *   anything else                    -> LEMONSQUEEZY_API_KEY
+ *
+ * Flipping that flag is the whole go-live switch, so a test key cannot end up
+ * in charge of a production checkout by a stray secret edit. A missing test key
+ * fails closed instead of quietly falling back to the live one, because a
+ * "test" run that actually charges a card is the worst possible outcome here.
+ */
+export const TEST_MODE_FLAG = 'LEMONSQUEEZY_TEST_MODE';
+export const TEST_API_KEY = 'LEMONSQUEEZY_TEST_API_KEY';
+
+export function isTestMode(env = {}) {
+  return String(env[TEST_MODE_FLAG] ?? '').trim().toLowerCase() === 'true';
+}
+
 export function checkSecrets(env = {}) {
-  const missing = REQUIRED_SECRETS.filter((key) => !env[key] || String(env[key]).trim() === '');
-  return { ok: missing.length === 0, missing };
+  const testMode = isTestMode(env);
+  const required = testMode ? TEST_API_KEY : REQUIRED_SECRETS[0];
+  const value = env[required];
+  const missing = !value || String(value).trim() === '' ? [required] : [];
+  return {
+    ok: missing.length === 0,
+    missing,
+    testMode,
+    apiKey: missing.length === 0 ? String(value).trim() : null
+  };
 }
 
 /* ------------------------------------------------------------------- intent */
@@ -218,6 +251,8 @@ export async function handleRequest({
     return respond(503, { error: 'not-configured', missing: secrets.missing });
   }
 
+  const { apiKey } = secrets;
+
   const intent = readIntent(body);
   if (!intent.ok) return respond(400, { error: intent.reason, detail: intent.detail ?? null });
 
@@ -245,7 +280,7 @@ export async function handleRequest({
       headers: {
         accept: 'application/vnd.api+json',
         'content-type': 'application/vnd.api+json',
-        authorization: `Bearer ${env.LEMONSQUEEZY_API_KEY}`
+        authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify(buildProviderRequest({ variant: intent.variant, nonce, env }))
     });

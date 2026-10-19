@@ -29,13 +29,15 @@ const flat = (n = 120) => {
 };
 
 describe('preset catalogue', () => {
-  it('exposes eight unique presets with defaults', () => {
-    expect(PRESETS.length).toBe(8);
-    expect(new Set(PRESETS.map((p) => p.id)).size).toBe(8);
+  it('exposes all unique presets with defaults', () => {
+    expect(PRESETS.length).toBe(10);
+    expect(new Set(PRESETS.map((p) => p.id)).size).toBe(10);
     PRESETS.forEach((p) => expect(typeof p.defaults).toBe('object'));
   });
   it('looks presets up by id', () => {
     expect(presetById('rsi-reversal').name).toBe('RSI Reversal');
+    expect(presetById('stoch-rsi').name).toBe('Stochastic RSI');
+    expect(presetById('cci-reversal').name).toBe('CCI Reversal');
     expect(presetById('nope')).toBeUndefined();
   });
   it('exposes the five timeframes with labels', () => {

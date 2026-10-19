@@ -3,7 +3,7 @@
 // plus a reason string. Signals: 'BUY' | 'SELL' | null (hold).
 
 import {
-  rsi, sma, ema, macd, bollinger, stochastic, roc, donchian, vwap
+  rsi, sma, ema, macd, bollinger, stochastic, roc, donchian, vwap, stochRsi, cci
 } from './indicators.js';
 
 export const INTERVALS = [
@@ -79,6 +79,22 @@ export const PRESETS = [
     desc: 'Buy when price pulls back and reclaims the session VWAP; sell below VWAP on weakness.',
     defaults: {},
     color: '#facc15'
+  },
+  {
+    id: 'stoch-rsi',
+    name: 'Stochastic RSI',
+    icon: 'Activity',
+    desc: 'Buy when StochRSI %K crosses above %D from oversold (<20); sell when %K crosses below %D from overbought (>80).',
+    defaults: { rsiPeriod: 14, stochPeriod: 14, smoothK: 3, smoothD: 3, low: 20, high: 80 },
+    color: '#10b981'
+  },
+  {
+    id: 'cci-reversal',
+    name: 'CCI Reversal',
+    icon: 'Layers',
+    desc: 'Buy when CCI crosses back above -100 from oversold; sell when CCI falls below +100 from overbought.',
+    defaults: { period: 20, oversold: -100, overbought: 100 },
+    color: '#8b5cf6'
   }
 ];
 
@@ -209,6 +225,51 @@ export function evaluateStrategy(presetId, k, params, ticker) {
       }
       state = p > cur ? 'bullish' : 'bearish';
       if (!sig) reason = p > cur ? 'Trading above VWAP' : 'Trading below VWAP';
+      break;
+    }
+    case 'stoch-rsi': {
+      const sr = stochRsi(
+        c,
+        params?.rsiPeriod || 14,
+        params?.stochPeriod || 14,
+        params?.smoothK || 3,
+        params?.smoothD || 3
+      );
+      const kk = last(sr.k), dd = last(sr.d), kp = prev(sr.k), dp = prev(sr.d);
+      if (kk == null || dd == null) { reason = 'Warming up StochRSI window'; break; }
+      const lo = params?.low ?? 20;
+      const hi = params?.high ?? 80;
+      if (kp != null && dp != null) {
+        if (kp <= dp && kk > dd && kk < lo + 15) {
+          sig = 'BUY';
+          reason = `StochRSI %K (${kk.toFixed(1)}) crossed above %D (${dd.toFixed(1)}) in oversold zone`;
+        } else if (kp >= dp && kk < dd && kk > hi - 15) {
+          sig = 'SELL';
+          reason = `StochRSI %K (${kk.toFixed(1)}) crossed below %D (${dd.toFixed(1)}) in overbought zone`;
+        }
+      }
+      state = kk > dd ? 'bullish' : 'bearish';
+      if (!sig) reason = `StochRSI %K ${kk.toFixed(1)} / %D ${dd.toFixed(1)}`;
+      break;
+    }
+    case 'cci-reversal': {
+      const p = params?.period || 20;
+      const cciVals = cci(high, low, c, p);
+      const cur = last(cciVals), pv = prev(cciVals);
+      if (cur == null) { reason = 'Warming up CCI window'; break; }
+      const os = params?.oversold ?? -100;
+      const ob = params?.overbought ?? 100;
+      if (pv != null) {
+        if (pv <= os && cur > os) {
+          sig = 'BUY';
+          reason = `CCI(${p}) crossed back above ${os} (${pv.toFixed(1)} → ${cur.toFixed(1)})`;
+        } else if (pv >= ob && cur < ob) {
+          sig = 'SELL';
+          reason = `CCI(${p}) fell back below ${ob} (${pv.toFixed(1)} → ${cur.toFixed(1)})`;
+        }
+      }
+      state = cur > 0 ? 'bullish' : 'bearish';
+      if (!sig) reason = `CCI(${p}) at ${cur.toFixed(1)} (neutral)`;
       break;
     }
     default:

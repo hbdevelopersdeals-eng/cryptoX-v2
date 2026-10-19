@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  sma, ema, rsi, macd, bollinger, stochastic, roc, donchian, vwap, mulberry32
+  sma, ema, rsi, macd, bollinger, stochastic, roc, donchian, vwap, mulberry32, stochRsi, cci
 } from './indicators.js';
 
 const seq = (n, f = (i) => i + 1) => Array.from({ length: n }, (_, i) => f(i));
@@ -128,5 +128,32 @@ describe('mulberry32', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThan(1);
     }
+  });
+});
+
+describe('stochRsi', () => {
+  it('computes stochastic oscillator over RSI values and bounds within 0..100', () => {
+    const closes = seq(60, (i) => 100 + Math.sin(i / 4) * 15);
+    const res = stochRsi(closes, 14, 14, 3, 3);
+    expect(res.raw.length).toBe(60);
+    expect(res.k.length).toBe(60);
+    expect(res.d.length).toBe(60);
+    res.k.filter((v) => v !== null).forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(100);
+    });
+  });
+});
+
+describe('cci', () => {
+  it('computes Commodity Channel Index oscillating around 0', () => {
+    const highs = seq(50, (i) => 110 + Math.sin(i / 3) * 10);
+    const lows = seq(50, (i) => 90 + Math.sin(i / 3) * 10);
+    const closes = seq(50, (i) => 100 + Math.sin(i / 3) * 10);
+    const out = cci(highs, lows, closes, 20);
+    expect(out.length).toBe(50);
+    expect(out[18]).toBeNull();
+    expect(out[19]).not.toBeNull();
+    expect(typeof out[30]).toBe('number');
   });
 });

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Activity, TrendingUp, BarChart3, Gauge, Waves, Zap, Rocket, Compass,
+  Activity, TrendingUp, BarChart3, Gauge, Waves, Zap, Rocket, Compass, Layers,
   X, Search, Check, Radio, Flame, Snowflake, Minus, AlertTriangle
 } from 'lucide-react';
 import { useMarket } from '../lib/market.jsx';
@@ -11,12 +11,14 @@ import { fmtPrice, timeAgo, cls } from '../lib/format.js';
 import { CoinImg, CoinLink, Card } from '../components/ui.jsx';
 import BacktestPanel from '../components/BacktestPanel.jsx';
 
-const ICONS = { Activity, TrendingUp, BarChart3, Gauge, Waves, Zap, Rocket, Compass };
+const ICONS = { Activity, TrendingUp, BarChart3, Gauge, Waves, Zap, Rocket, Compass, Layers };
 const PARAM_LABELS = {
   fast: 'Fast MA period', slow: 'Slow MA period', signal: 'Signal period',
   period: 'Lookback period', mult: 'Std-dev ×', k: '%K period', d: '%D period',
   low: 'Oversold level', high: 'Overbought level', threshold: 'Trigger %',
-  buyBelow: 'Buy when RSI below', sellAbove: 'Sell when RSI above'
+  buyBelow: 'Buy when RSI below', sellAbove: 'Sell when RSI above',
+  rsiPeriod: 'RSI Period', stochPeriod: 'Stoch Lookback', smoothK: '%K Smoothing', smoothD: '%D Smoothing',
+  oversold: 'Oversold trigger', overbought: 'Overbought trigger'
 };
 
 function ArmModal({ preset, onClose, onArm, rows }) {

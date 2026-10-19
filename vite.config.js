@@ -67,7 +67,8 @@ export default defineConfig(({ mode }) => {
           // Keep the auth/vendor SDK out of the critical entry chunk so the first
           // paint stays small; both chunks are still loaded at boot, in parallel.
           manualChunks: {
-            supabase: ['@supabase/supabase-js']
+            supabase: ['@supabase/supabase-js'],
+            'react-vendor': ['react', 'react-dom', 'react-router-dom']
           }
         }
       }

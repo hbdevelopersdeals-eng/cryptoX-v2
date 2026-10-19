@@ -1,38 +1,49 @@
-// Curated coin universe: CoinGecko id + image, Binance symbol, fallback prices.
+// Curated coin universe: CoinGecko id, Binance symbol, fallback prices.
 // Coin images come from the CoinGecko CDN as part of live market data.
+//
+// Stored as tuples rather than objects on purpose. Thirty rows of
+// `{ id: ..., sym: ..., name: ... }` repeat seven key names thirty times, and
+// this module sits in the entry chunk — the repeated keys cost more than the
+// data. The tuple order is fixed by COIN_FIELDS below.
 
-export const COINS = [
-  { id: 'bitcoin', sym: 'BTC', name: 'Bitcoin', binance: 'BTCUSDT', cg: 1, color: '#F7931A', base: 58700 },
-  { id: 'ethereum', sym: 'ETH', name: 'Ethereum', binance: 'ETHUSDT', cg: 279, color: '#627EEA', base: 2470 },
-  { id: 'tether', sym: 'USDT', name: 'Tether', binance: 'USDTUSDT', cg: 825, color: '#26A17B', base: 1 },
-  { id: 'binancecoin', sym: 'BNB', name: 'BNB', binance: 'BNBUSDT', cg: 1839, color: '#F3BA2F', base: 556 },
-  { id: 'solana', sym: 'SOL', name: 'Solana', binance: 'SOLUSDT', cg: 5426, color: '#9945FF', base: 142 },
-  { id: 'ripple', sym: 'XRP', name: 'XRP', binance: 'XRPUSDT', cg: 44, color: '#23292F', base: 0.58 },
-  { id: 'usd-coin', sym: 'USDC', name: 'USDC', binance: 'USDCUSDT', cg: 6319, color: '#2775CA', base: 1 },
-  { id: 'cardano', sym: 'ADA', name: 'Cardano', binance: 'ADAUSDT', cg: 2010, color: '#0033AD', base: 0.42 },
-  { id: 'dogecoin', sym: 'DOGE', name: 'Dogecoin', binance: 'DOGEUSDT', cg: 5, color: '#C2A633', base: 0.11 },
-  { id: 'litecoin', sym: 'LTC', name: 'Litecoin', binance: 'LTCUSDT', cg: 2, color: '#345D9D', base: 78 },
-  { id: 'polkadot', sym: 'DOT', name: 'Polkadot', binance: 'DOTUSDT', cg: 12171, color: '#E6007A', base: 6.2 },
-  { id: 'avalanche-2', sym: 'AVAX', name: 'Avalanche', binance: 'AVAXUSDT', cg: 12559, color: '#E84142', base: 25 },
-  { id: 'chainlink', sym: 'LINK', name: 'Chainlink', binance: 'LINKUSDT', cg: 8775, color: '#2A5ADA', base: 13.5 },
-  { id: 'matic-network', sym: 'POL', name: 'Polygon', binance: 'POLUSDT', cg: 4713, color: '#8247E5', base: 0.55 },
-  { id: 'uniswap', sym: 'UNI', name: 'Uniswap', binance: 'UNIUSDT', cg: 12504, color: '#FF007A', base: 8.1 },
-  { id: 'near', sym: 'NEAR', name: 'NEAR Protocol', binance: 'NEARUSDT', cg: 10365, color: '#00EC97', base: 4.9 },
-  { id: 'sui', sym: 'SUI', name: 'Sui', binance: 'SUIUSDT', cg: 20947, color: '#4DA2FF', base: 0.95 },
-  { id: 'aptos', sym: 'APT', name: 'Aptos', binance: 'APTUSDT', cg: 26415, color: '#fff', base: 7.4 },
-  { id: 'pepe', sym: 'PEPE', name: 'Pepe', binance: '1000PEPEUSDT', cg: 29850, color: '#2E9E58', base: 0.0000084 },
-  { id: 'render-token', sym: 'RNDR', name: 'Render', binance: 'RNDRUSDT', cg: 11636, color: '#8A2BE2', base: 6.6 },
-  { id: 'internet-computer', sym: 'ICP', name: 'Internet Computer', binance: 'ICPUSDT', cg: 14495, color: '#2A6AE1', base: 10.4 },
-  { id: 'arbitrum', sym: 'ARB', name: 'Arbitrum', binance: 'ARBUSDT', cg: 28176, color: '#12AAFF', base: 0.82 },
-  { id: 'optimism', sym: 'OP', name: 'Optimism', binance: 'OPUSDT', cg: 12532, color: '#FF0420', base: 1.75 },
-  { id: 'cosmos', sym: 'ATOM', name: 'Cosmos Hub', binance: 'ATOMUSDT', cg: 3794, color: '#2E3148', base: 6.9 },
-  { id: 'stellar', sym: 'XLM', name: 'Stellar', binance: 'XLMUSDT', cg: 512, color: '#3E6DB5', base: 0.095 },
-  { id: 'the-open-network', sym: 'TON', name: 'Toncoin', binance: 'TONUSDT', cg: 11419, color: '#0098EA', base: 6.4 },
-  { id: 'filecoin', sym: 'FIL', name: 'Filecoin', binance: 'FILUSDT', cg: 12817, color: '#0090FF', base: 4.5 },
-  { id: 'injective-protocol', sym: 'INJ', name: 'Injective', binance: 'INJUSDT', cg: 11829, color: '#00E1FF', base: 21.5 },
-  { id: 'trons-usd', sym: 'TRX', name: 'TRON', binance: 'TRXUSDT', cg: 1958, color: '#FF060A', base: 0.155 },
-  { id: 'monero', sym: 'XMR', name: 'Monero', binance: 'XMRUSDT', cg: 328, color: '#FF6600', base: 152 }
+const COIN_FIELDS = ['id', 'sym', 'name', 'binance', 'cg', 'color', 'base'];
+
+const RAW = [
+  ['bitcoin', 'BTC', 'Bitcoin', 'BTCUSDT', 1, '#F7931A', 58700],
+  ['ethereum', 'ETH', 'Ethereum', 'ETHUSDT', 279, '#627EEA', 2470],
+  ['tether', 'USDT', 'Tether', 'USDTUSDT', 825, '#26A17B', 1],
+  ['binancecoin', 'BNB', 'BNB', 'BNBUSDT', 1839, '#F3BA2F', 556],
+  ['solana', 'SOL', 'Solana', 'SOLUSDT', 5426, '#9945FF', 142],
+  ['ripple', 'XRP', 'XRP', 'XRPUSDT', 44, '#23292F', 0.58],
+  ['usd-coin', 'USDC', 'USDC', 'USDCUSDT', 6319, '#2775CA', 1],
+  ['cardano', 'ADA', 'Cardano', 'ADAUSDT', 2010, '#0033AD', 0.42],
+  ['dogecoin', 'DOGE', 'Dogecoin', 'DOGEUSDT', 5, '#C2A633', 0.11],
+  ['litecoin', 'LTC', 'Litecoin', 'LTCUSDT', 2, '#345D9D', 78],
+  ['polkadot', 'DOT', 'Polkadot', 'DOTUSDT', 12171, '#E6007A', 6.2],
+  ['avalanche-2', 'AVAX', 'Avalanche', 'AVAXUSDT', 12559, '#E84142', 25],
+  ['chainlink', 'LINK', 'Chainlink', 'LINKUSDT', 8775, '#2A5ADA', 13.5],
+  ['matic-network', 'POL', 'Polygon', 'POLUSDT', 4713, '#8247E5', 0.55],
+  ['uniswap', 'UNI', 'Uniswap', 'UNIUSDT', 12504, '#FF007A', 8.1],
+  ['near', 'NEAR', 'NEAR Protocol', 'NEARUSDT', 10365, '#00EC97', 4.9],
+  ['sui', 'SUI', 'Sui', 'SUIUSDT', 20947, '#4DA2FF', 0.95],
+  ['aptos', 'APT', 'Aptos', 'APTUSDT', 26415, '#fff', 7.4],
+  ['pepe', 'PEPE', 'Pepe', '1000PEPEUSDT', 29850, '#2E9E58', 0.0000084],
+  ['render-token', 'RNDR', 'Render', 'RNDRUSDT', 11636, '#8A2BE2', 6.6],
+  ['internet-computer', 'ICP', 'Internet Computer', 'ICPUSDT', 14495, '#2A6AE1', 10.4],
+  ['arbitrum', 'ARB', 'Arbitrum', 'ARBUSDT', 28176, '#12AAFF', 0.82],
+  ['optimism', 'OP', 'Optimism', 'OPUSDT', 12532, '#FF0420', 1.75],
+  ['cosmos', 'ATOM', 'Cosmos Hub', 'ATOMUSDT', 3794, '#2E3148', 6.9],
+  ['stellar', 'XLM', 'Stellar', 'XLMUSDT', 512, '#3E6DB5', 0.095],
+  ['the-open-network', 'TON', 'Toncoin', 'TONUSDT', 11419, '#0098EA', 6.4],
+  ['filecoin', 'FIL', 'Filecoin', 'FILUSDT', 12817, '#0090FF', 4.5],
+  ['injective-protocol', 'INJ', 'Injective', 'INJUSDT', 11829, '#00E1FF', 21.5],
+  ['trons-usd', 'TRX', 'TRON', 'TRXUSDT', 1958, '#FF060A', 0.155],
+  ['monero', 'XMR', 'Monero', 'XMRUSDT', 328, '#FF6600', 152]
 ];
+
+export const COINS = RAW.map((row) =>
+  Object.fromEntries(COIN_FIELDS.map((field, i) => [field, row[i]]))
+);
 
 export const binanceMap = Object.fromEntries(
   COINS.filter((c) => c.binance).map((c) => [c.binance, c])

@@ -9,7 +9,7 @@
  *  - Funding/borrow costs are NOT modelled (spot assumption).
  */
 
-import { rsi, sma, ema, macd, bollinger, stochastic, roc, donchian, vwap } from './indicators.js';
+import { rsi, sma, ema, macd, bollinger, stochastic, roc, donchian, vwap, stochRsi, cci } from './indicators.js';
 
 export const DEFAULT_ASSUMPTIONS = {
   initialCapital: 10000,
@@ -116,6 +116,36 @@ export function signalSeries(presetId, k, params = {}) {
         if (pv == null || cv == null) continue;
         if (pv > cv && close[i] > cv) out[i] = 'BUY';
         else if (pv <= cv && close[i] < cv) out[i] = 'SELL';
+      }
+      break;
+    }
+    case 'stoch-rsi': {
+      const sr = stochRsi(
+        close,
+        params.rsiPeriod || 14,
+        params.stochPeriod || 14,
+        params.smoothK || 3,
+        params.smoothD || 3
+      );
+      const zone = params.low ?? 20;
+      const highZone = params.high ?? 80;
+      for (let i = 1; i < n; i++) {
+        const pk = at(sr.k, i - 1), pd = at(sr.d, i - 1), ck = at(sr.k, i), cd = at(sr.d, i);
+        if (pk == null || pd == null || ck == null || cd == null) continue;
+        if (pk <= pd && ck > cd && ck < zone + 15) out[i] = 'BUY';
+        else if (pk >= pd && ck < cd && ck > highZone - 15) out[i] = 'SELL';
+      }
+      break;
+    }
+    case 'cci-reversal': {
+      const cciVals = cci(high, low, close, params.period || 20);
+      const os = params.oversold ?? -100;
+      const ob = params.overbought ?? 100;
+      for (let i = 1; i < n; i++) {
+        const pc = at(cciVals, i - 1), cc = at(cciVals, i);
+        if (pc == null || cc == null) continue;
+        if (pc <= os && cc > os) out[i] = 'BUY';
+        else if (pc >= ob && cc < ob) out[i] = 'SELL';
       }
       break;
     }

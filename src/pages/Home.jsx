@@ -42,7 +42,17 @@ const Row = memo(function Row({ r, idx, watched, onToggle }) {
     >
       <span className="num text-xs text-muted-foreground">{idx + 1}</span>
       <CoinLink id={r.id} symbol={r.symbol} name={r.name} image={r.image} />
-      <span className="num text-right text-sm">{fmtPrice(r.price)}</span>
+      <span className="num text-right text-sm">
+        {fmtPrice(r.price)}
+        {r.live ? null : (
+          <span
+            className="ml-1 align-super text-[10px] text-muted-foreground"
+            title="No live exchange pair — this is the provider's last price, refreshed every 60 seconds."
+          >
+            ~
+          </span>
+        )}
+      </span>
       <span className={`num text-right text-sm font-medium ${cls(r.pct24)}`}>
         {r.pct24 >= 0 ? '+' : ''}{r.pct24?.toFixed(2)}%
       </span>
@@ -153,7 +163,12 @@ export default function HomePage() {
       {/* Market table */}
       <div className="card-panel overflow-hidden">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold">All Cryptocurrencies</h2>
+          <h2 className="text-sm font-semibold">
+            All Cryptocurrencies
+            <span className="ml-2 text-[11px] font-normal text-muted-foreground">
+              showing {Math.min(limit, rows.length)} of {rows.length}
+            </span>
+          </h2>
           <div className="flex items-center gap-1 rounded-lg border border-input bg-background p-0.5 text-xs">
             {[50, 100].map((n) => (
               <button
@@ -187,6 +202,11 @@ export default function HomePage() {
             Show more <ArrowRight size={15} />
           </button>
         ) : null}
+        <p className="border-t border-border px-4 py-2 text-[11px] leading-relaxed text-muted-foreground">
+          <span className="font-mono">~</span> marks a coin with no live exchange pair: the price is the provider&apos;s
+          last published value and refreshes every 60 seconds. Coins with a live pair update in real time. This feed
+          carries the top {rows.length} by market cap.
+        </p>
       </div>
     </div>
   );

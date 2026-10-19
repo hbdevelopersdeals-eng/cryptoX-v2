@@ -144,11 +144,16 @@ export function stochRsi(closes, rsiPeriod = 14, stochPeriod = 14, smoothK = 3, 
     if (window.some((v) => v == null)) continue;
     const minRsi = Math.min(...window);
     const maxRsi = Math.max(...window);
-    raw[i] = maxRsi === minRsi ? 50 : ((rsiVals[i] - minRsi) / (maxRsi - minRsi)) * 100;
+    const val = maxRsi === minRsi ? 50 : ((rsiVals[i] - minRsi) / (maxRsi - minRsi)) * 100;
+    raw[i] = Math.max(0, Math.min(100, val));
   }
 
-  const k = sma(raw.map((v) => (v == null ? 0 : v)), smoothK).map((v, i) => (raw[i] == null ? null : v));
-  const d = sma(k.map((v) => (v == null ? 0 : v)), smoothD).map((v, i) => (k[i] == null ? null : v));
+  const k = sma(raw.map((v) => (v == null ? 0 : v)), smoothK).map((v, i) =>
+    raw[i] == null ? null : Math.max(0, Math.min(100, v))
+  );
+  const d = sma(k.map((v) => (v == null ? 0 : v)), smoothD).map((v, i) =>
+    k[i] == null ? null : Math.max(0, Math.min(100, v))
+  );
 
   return { raw, k, d };
 }

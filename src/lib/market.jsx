@@ -18,7 +18,16 @@ import { reportError } from './telemetry.js';
  *  - The realtime socket and the 1s tick pause while the tab is hidden.
  * ------------------------------------------------------------------ */
 
-const CG_MARKETS = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=150&page=1&sparkline=true&price_change_percentage=24h%2C7d';
+// 250 is CoinGecko's ceiling for a single /coins/markets request, and one
+// request is what this feed can afford: the payload carries a 7-day sparkline
+// per row. The old value of 150 was an arbitrary cut of a response we were
+// already paying for, so the table simply stopped 100 coins early for no gain.
+//
+// Anything past 250 needs paging. That is deliberately not done here: an
+// endless table is the wrong answer to "I cannot find my coin", so the next
+// step for those is search, not more rows.
+const CG_PER_PAGE = 250;
+const CG_MARKETS = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${CG_PER_PAGE}&page=1&sparkline=true&price_change_percentage=24h%2C7d`;
 const CG_GLOBAL = 'https://api.coingecko.com/api/v3/global';
 
 // Binance pair book for coins we want true real-time quotes.
@@ -107,7 +116,7 @@ export function MarketProvider({ children }) {
   const wsTriesRef = useRef(0);
   const lastTickAtRef = useRef(null);
   const klineCache = useRef({});
-  const wobbleRef = useRef(Math.random() * 1000);
+
 
   /* -------- CoinGecko baseline (60s) -------- */
   useEffect(() => {
@@ -255,7 +264,7 @@ export function MarketProvider({ children }) {
     };
   }, []);
 
-  /* -------- 1s merge tick: live ticks + wobble + staleness (paused when hidden) -------- */
+  /* -------- 1s merge tick: live ticks + staleness (paused when hidden) -------- */
   useEffect(() => {
     const iv = window.setInterval(() => {
       if (typeof document !== 'undefined' && document.hidden) return;
@@ -263,33 +272,27 @@ export function MarketProvider({ children }) {
       if (!base) return;
       const t = tickersRef.current;
       const now = Date.now();
-      const wob = wobbleRef.current;
       const g = globalRef.current;
-      const next = base.map((r, i) => {
+      // Only rows with a live exchange tick are rebuilt; everything else is
+      // returned by reference, so its last provider values stay untouched.
+      //
+      // There used to be a sine-wave "wobble" here that nudged every other row
+      // by a fraction of a percent so the table looked alive. It was invented
+      // movement drawn exactly like a real tick, which is the one thing a price
+      // feed must never do: a stale number that admits it is stale is worth
+      // more than a moving number that is made up.
+      // Headline totals move only when the provider refreshes them, every 60s.
+      // They were wobbled for the same cosmetic reason and are not any more.
+      const next = base.map((r) => {
         const lv = t[r.symbol];
-        if (lv) {
-          const ratio = lv.price / (r._p0 || 1);
-          return {
-            ...r, price: lv.price, pct24: lv.pct, vol: lv.vol || r.vol,
-            mcap: r._m0 ? r._m0 * ratio : r.mcap
-          };
-        }
-        // Coins without a live pair get a tiny visual wobble around the last real close.
-        const ph = Math.sin(now / 2600 + i * 1.7 + wob) * 0.0009;
-        const pw = Math.sin(now / 4200 + i * 2.3 + wob) * 0.0004;
-        return {
-          ...r, price: r._p0 ? r._p0 * (1 + ph + pw) : r.price,
-          pct24: (r.pct24 || 0) + Math.sin(now / 5000 + i * 2.9 + wob) * 0.004,
-          mcap: r._m0 ? r._m0 * (1 + ph + pw) : r.mcap,
-          vol: r.vol * (1 + Math.sin(now / 6000 + i + wob) * 0.01)
-        };
+        if (!lv) return r;
+        const ratio = lv.price / (r._p0 || 1);
+        return { ...r, price: lv.price, pct24: lv.pct ?? r.pct24, vol: lv.vol || r.vol,
+          mcap: r._m0 ? r._m0 * ratio : r.mcap, live: 1 };
       });
       rowsRef.current = next;
       setRows(next);
-      const gph = Math.sin(now / 4000 + wob) * 0.0005;
-      const mcap = g.mcap * (1 + gph);
-      const vol = g.vol * (1 + Math.sin(now / 5300 + wob) * 0.002);
-      const dom = g.btcDom + Math.sin(now / 6100 + wob) * 0.01;
+      const { mcap, vol, btcDom: dom } = g;
       globalRef.current = { mcap, vol, btcDom: dom };
       setGlobal({ mcap, vol, btcDom: dom });
       setConn((c) => {

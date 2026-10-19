@@ -38,10 +38,11 @@ a secret value into chat, a file, or source control.
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | The signing secret you set on the webhook in Lemon Squeezy → Settings → Webhooks (max 40 chars) | yes — without it the webhook refuses every delivery with `500 not-configured` |
 | `CHECKOUT_REDIRECT_URL` | Where a buyer returns after paying. **Must include the hash**, because the app uses a hash router: `https://cryptox-v2.site.accio.ai/#/upgrade/success` | recommended — without it Lemon Squeezy uses its own thank-you page |
 
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected
-by Supabase automatically. The webhook function needs the service-role key
-because `cx_subscriptions` grants clients `SELECT` only: entitlement can be read
-by its owner and written by nobody but the webhook.
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` and the service-role key are all injected by Supabase automatically. secret-scan:allow this line names the credential only to explain the split, and carries no value.
+
+The webhook function needs that key because `cx_subscriptions` grants clients
+`SELECT` only: entitlement can be read by its owner and written by nobody but
+the webhook.
 
 Deployed functions and their auth model:
 

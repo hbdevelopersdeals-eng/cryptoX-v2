@@ -217,19 +217,19 @@ export default function PaperTradingPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="sm:col-span-1">
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">Coin</p>
-                <select value={coinId} onChange={(e) => setCoinId(e.target.value)} className="input-dark !h-10">
+                <select aria-label="Coin" value={coinId} onChange={(e) => setCoinId(e.target.value)} className="input-dark !h-10">
                   {top.map((r) => <option key={r.id} value={r.id}>{r.name} ({r.symbol})</option>)}
                 </select>
               </div>
               <div>
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">Timeframe</p>
-                <select value={interval} onChange={(e) => setInterval(e.target.value)} className="input-dark !h-10">
+                <select aria-label="Timeframe" value={interval} onChange={(e) => setInterval(e.target.value)} className="input-dark !h-10">
                   {INTERVALS.map((it) => <option key={it.key} value={it.key}>{it.label}</option>)}
                 </select>
               </div>
               <div>
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">Starting balance (USD)</p>
-                <input type="number" min="100" step="500" value={cashInput} onChange={(e) => setCashInput(e.target.value)} className="input-dark !h-10 num" />
+                <input aria-label="Starting balance in USD" type="number" min="100" step="500" value={cashInput} onChange={(e) => setCashInput(e.target.value)} className="input-dark !h-10 num" />
               </div>
             </div>
             {sim.trades.length ? (

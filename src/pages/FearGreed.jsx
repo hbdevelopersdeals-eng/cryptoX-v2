@@ -2,13 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Smile } from 'lucide-react';
 import { fetchFearGreed } from '../lib/market.jsx';
 import { Card } from '../components/ui.jsx';
+import { FearGreedGauge, getFearGreedColor } from '../components/FearGreedGauge.jsx';
 
 function colorFor(v) {
-  if (v >= 75) return '#34d399';
-  if (v >= 55) return '#a3e635';
-  if (v >= 45) return '#737B8C';
-  if (v >= 25) return '#fb923c';
-  return '#f87171';
+  return getFearGreedColor(v);
 }
 const ZONES = [
   ['0 – 24', 'Extreme Fear', '#f87171'],
@@ -54,30 +51,16 @@ export default function FearGreedPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="flex flex-col items-center justify-center py-8 lg:col-span-1">
+        <Card className="flex flex-col items-center justify-center p-6 lg:col-span-1">
           {value == null ? (
             <p className="py-16 text-sm text-muted-foreground">{err || 'Loading index…'}</p>
           ) : (
-            <>
-              <svg width="240" height="130" viewBox="0 0 240 130">
-                <path d={`M 20 120 A ${R} ${R} 0 0 1 220 120`} fill="none" stroke="#23272E" strokeWidth="16" strokeLinecap="round" />
-                <path
-                  d={`M 20 120 A ${R} ${R} 0 0 1 220 120`}
-                  fill="none" stroke={colorFor(value)} strokeWidth="16" strokeLinecap="round"
-                  strokeDasharray={`${CIRC * frac} ${CIRC}`}
-                  style={{ transition: 'stroke-dasharray 0.8s ease' }}
-                />
-                {[0, 25, 50, 75, 100].map((t) => {
-                  const a = Math.PI * (1 - t / 100);
-                  const x = 120 + Math.cos(Math.PI + a) * (R + 12);
-                  const y = 120 - Math.sin(a) * (R + 12);
-                  return <text key={t} x={x} y={y + 3} fontSize="8" fill="#737B8C" textAnchor="middle">{t}</text>;
-                })}
-              </svg>
-              <p className="num mt-1 text-5xl font-extrabold" style={{ color: colorFor(value) }}>{value}</p>
-              <p className="mt-1 text-sm font-semibold" style={{ color: colorFor(value) }}>{cur?.label || '—'}</p>
-              <p className="mt-3 text-[11px] text-muted-foreground">Alternative.me Crypto Fear &amp; Greed · {cur ? new Date(cur.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}</p>
-            </>
+            <FearGreedGauge
+              value={value}
+              label={cur?.label || 'Neutral'}
+              date={cur ? `Alternative.me · ${new Date(cur.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}
+              className="w-full"
+            />
           )}
         </Card>
 

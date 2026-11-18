@@ -22,6 +22,7 @@ import {
 } from '../lib/alertExtras.js';
 import { fmtPrice, fmtUsd, timeAgo } from '../lib/format.js';
 import { CoinImg, Card, EmptyState } from '../components/ui.jsx';
+import { EmptyAlertsIllustration } from '../components/EmptyIllustrations.jsx';
 
 const COOLDOWNS = [
   { label: '1 minute', value: 60000 },
@@ -384,7 +385,7 @@ export default function AlertsPage() {
       {!normalised.length ? (
         <Card>
           <EmptyState
-            icon={<BellRing size={28} className="text-muted-foreground" />}
+            icon={<EmptyAlertsIllustration size={100} className="mb-2" />}
             title="No alert rules yet"
             sub="Try “RSI below 30 on BTC” or “SOL volume 3× average”, then leave the page open — rules are checked every second."
             action={<button onClick={() => setOpen(true)} className="btn-primary"><Plus size={15} /> Create Alert</button>}
@@ -492,6 +493,7 @@ export default function AlertsPage() {
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Coin</p>
                 <select
+                  aria-label="Coin"
                   value={form.coinId}
                   onChange={(e) => {
                     const coinId = e.target.value;
@@ -511,6 +513,7 @@ export default function AlertsPage() {
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Condition</p>
                 <select
+                  aria-label="Condition"
                   value={form.type}
                   onChange={(e) => { setForm({ ...form, type: e.target.value, value: '' }); setFormErr(null); }}
                   className="input-dark !h-10"
@@ -532,6 +535,7 @@ export default function AlertsPage() {
                     <input
                       type="number"
                       step="any"
+                      aria-label={fields.value}
                       value={form.value}
                       onChange={(e) => setForm({ ...form, value: e.target.value })}
                       placeholder={fields.placeholder}
@@ -564,6 +568,7 @@ export default function AlertsPage() {
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Formula</p>
                   <input
                     type="text"
+                    aria-label="Formula"
                     value={form.formula}
                     onChange={(e) => setForm({ ...form, formula: e.target.value })}
                     placeholder="rsi < 30 && pct24 < -5"
@@ -585,6 +590,7 @@ export default function AlertsPage() {
                     <p className="mb-1 text-xs font-medium text-muted-foreground">Fast MA</p>
                     <input
                       type="number"
+                      aria-label="Fast moving average period"
                       value={form.fast}
                       onChange={(e) => setForm({ ...form, fast: e.target.value })}
                       className="input-dark !h-10 num"
@@ -594,6 +600,7 @@ export default function AlertsPage() {
                     <p className="mb-1 text-xs font-medium text-muted-foreground">Slow MA</p>
                     <input
                       type="number"
+                      aria-label="Slow moving average period"
                       value={form.slow}
                       onChange={(e) => setForm({ ...form, slow: e.target.value })}
                       className="input-dark !h-10 num"
@@ -605,9 +612,10 @@ export default function AlertsPage() {
               {fields.period ? (
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Range length (bars)</p>
-                  <input
-                    type="number"
-                    value={form.period}
+                    <input
+                      type="number"
+                      aria-label="Range length in bars"
+                      value={form.period}
                     onChange={(e) => setForm({ ...form, period: e.target.value })}
                     className="input-dark !h-10 num"
                   />
@@ -617,6 +625,7 @@ export default function AlertsPage() {
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Don’t repeat more than once per</p>
                 <select
+                  aria-label="Minimum time between repeated alerts"
                   value={form.cooldownMs}
                   onChange={(e) => setForm({ ...form, cooldownMs: Number(e.target.value) })}
                   className="input-dark !h-10"

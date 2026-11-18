@@ -1,0 +1,98 @@
+# robots.txt — CryptoX
+#
+# The public surface is small on purpose: the marketing page, pricing, the data
+# provenance page, system status, the legal documents and compliance. Every
+# other route is a session-scoped view that renders the login wall to an
+# anonymous crawler, so it is disallowed rather than advertised.
+#
+# The AI crawlers below are allowed explicitly. That is a product decision, not
+# an oversight: CryptoX is an educational/simulation product whose pricing and
+# data-provenance pages are the thing we want cited in AI answers. Blocking
+# them would win nothing — the content is public either way — and it would cost
+# every citation.
+
+User-agent: *
+Allow: /$
+Allow: /pricing
+Allow: /data-sources
+Allow: /status
+Allow: /legal/
+Allow: /compliance
+
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /portfolio
+Disallow: /watchlist
+Disallow: /alerts
+Disallow: /account
+Disallow: /organization
+Disallow: /billing
+Disallow: /upgrade
+Disallow: /upgrade/success
+Disallow: /strategies
+Disallow: /paper-trading
+Disallow: /bots
+Disallow: /derivatives
+Disallow: /exchange
+Disallow: /wallet-lab
+Disallow: /explorer
+Disallow: /assistant
+Disallow: /rsi-scanner
+Disallow: /market-intel
+Disallow: /trending
+Disallow: /bubbles
+Disallow: /fear-greed
+Disallow: /charting
+Disallow: /aggregator
+Disallow: /defi
+Disallow: /news
+Disallow: /calculator
+Disallow: /region
+Disallow: /coin
+Disallow: /404
+
+# AI search crawlers — allowed on purpose (see note above).
+User-agent: GPTBot
+Allow: /
+Disallow: /portfolio
+Disallow: /watchlist
+Disallow: /alerts
+Disallow: /account
+Disallow: /billing
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /portfolio
+Disallow: /watchlist
+Disallow: /alerts
+Disallow: /account
+Disallow: /billing
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /portfolio
+Disallow: /watchlist
+Disallow: /alerts
+Disallow: /account
+Disallow: /billing
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /portfolio
+Disallow: /watchlist
+Disallow: /alerts
+Disallow: /account
+Disallow: /billing
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://cryptox-v2.site.accio.ai/sitemap.xml

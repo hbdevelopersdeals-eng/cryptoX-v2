@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Activity, RefreshCw, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMarket } from '../lib/market.jsx';
 import { getErrorLog, clearErrorLog, APP_VERSION, BUILD_STAMP } from '../lib/telemetry.js';
+import { AUTH_MODE } from '../lib/auth.jsx';
 import { timeAgo, fmtUsd } from '../lib/format.js';
 import { Card } from '../components/ui.jsx';
 
@@ -80,6 +81,19 @@ export default function StatusPage() {
 
       <Card>
         <h2 className="mb-1 text-sm font-semibold">Components</h2>
+        {/* Identity first: every other row describes data, this one decides whether
+            an account, a subscription or a quota exists server-side at all. In demo
+            mode a purchase cannot be attributed, so the page says that plainly
+            instead of showing a green tick over a localStorage store. */}
+        <Row
+          label="Identity store"
+          ok={AUTH_MODE === 'supabase'}
+          detail={
+            AUTH_MODE === 'supabase'
+              ? 'Supabase sessions. Accounts, subscriptions and quotas are server-side; a purchase is attributable to this account.'
+              : 'Demo store in localStorage — no server account exists, so a purchase could not be attributed and plan limits are advisory. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in the build environment (see SETUP.md §2.4).'
+          }
+        />
         <Row
           label="Binance realtime stream (WebSocket)"
           ok={realtimeOk}

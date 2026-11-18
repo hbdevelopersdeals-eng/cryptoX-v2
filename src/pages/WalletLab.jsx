@@ -202,13 +202,14 @@ export default function WalletLabPage() {
             <div className="flex flex-wrap items-end gap-3">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Chain</p>
-                <select value={checkChain} onChange={(e) => setCheckChain(e.target.value)} className="input-dark !h-10 !w-auto !text-xs">
+                <select aria-label="Chain" value={checkChain} onChange={(e) => setCheckChain(e.target.value)} className="input-dark !h-10 !w-auto !text-xs">
                   {RESULT_CHAINS.map((c) => <option key={c} value={c}>{chainById(c)?.name || c}</option>)}
                 </select>
               </div>
               <div className="min-w-[18rem] flex-1">
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Address to verify</p>
                 <input
+                  aria-label="Address to verify"
                   value={checkAddr}
                   onChange={(e) => setCheckAddr(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') runCheck(); }}
@@ -306,7 +307,7 @@ export default function WalletLabPage() {
                   Saved addresses are used to detect lookalike (poisoning) addresses on future checks.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <input value={bookLabel} onChange={(e) => setBookLabel(e.target.value)} placeholder="Label, e.g. Cold storage" className="input-dark !h-9 min-w-[14rem] flex-1 !text-xs" />
+                  <input aria-label="Address label" value={bookLabel} onChange={(e) => setBookLabel(e.target.value)} placeholder="Label, e.g. Cold storage" className="input-dark !h-9 min-w-[14rem] flex-1 !text-xs" />
                   <button
                     onClick={() => {
                       bookApi.add({ address: checkResult.validation.normalized || checkAddr.trim(), label: bookLabel.trim() || 'Saved address' });
@@ -415,7 +416,7 @@ export default function WalletLabPage() {
                 <p className="mt-0.5 text-[11px] text-muted-foreground">Read from public RPC (EIP-1559 where supported). Read-only.</p>
               </div>
               <div className="flex items-end gap-2">
-                <select value={gasChain} onChange={(e) => setGasChain(e.target.value)} className="input-dark !h-9 !w-auto !text-xs">
+                <select aria-label="Chain" value={gasChain} onChange={(e) => setGasChain(e.target.value)} className="input-dark !h-9 !w-auto !text-xs">
                   {EVM_CHAINS.map((c) => <option key={c} value={c}>{EVM_RPC[c].name}</option>)}
                 </select>
                 <button onClick={loadFees} disabled={gasBusy} className="btn-primary !h-9 px-3 !text-xs">
@@ -458,25 +459,25 @@ export default function WalletLabPage() {
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Chain</p>
-                <select value={sim.chain} onChange={(e) => setSim({ ...sim, chain: e.target.value })} className="input-dark !h-9 !text-xs">
+                <select aria-label="Chain" value={sim.chain} onChange={(e) => setSim({ ...sim, chain: e.target.value })} className="input-dark !h-9 !text-xs">
                   {EVM_CHAINS.map((c) => <option key={c} value={c}>{EVM_RPC[c].name}</option>)}
                 </select>
               </div>
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">From (optional, enables gas estimate)</p>
-                <input value={sim.from} onChange={(e) => setSim({ ...sim, from: e.target.value })} placeholder="0x…" className="input-dark !h-9 font-mono !text-xs" />
+                <input aria-label="From address" value={sim.from} onChange={(e) => setSim({ ...sim, from: e.target.value })} placeholder="0x…" className="input-dark !h-9 font-mono !text-xs" />
               </div>
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">To (contract or wallet)</p>
-                <input value={sim.to} onChange={(e) => setSim({ ...sim, to: e.target.value })} placeholder="0x…" className="input-dark !h-9 font-mono !text-xs" />
+                <input aria-label="To address" value={sim.to} onChange={(e) => setSim({ ...sim, to: e.target.value })} placeholder="0x…" className="input-dark !h-9 font-mono !text-xs" />
               </div>
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Value (wei, optional)</p>
-                <input value={sim.value} onChange={(e) => setSim({ ...sim, value: e.target.value })} placeholder="0" className="input-dark !h-9 num !text-xs" />
+                <input aria-label="Value in wei" value={sim.value} onChange={(e) => setSim({ ...sim, value: e.target.value })} placeholder="0" className="input-dark !h-9 num !text-xs" />
               </div>
               <div className="md:col-span-2">
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Calldata (optional)</p>
-                <input value={sim.data} onChange={(e) => setSim({ ...sim, data: e.target.value })} placeholder={`0x…  e.g. decimals() is ${SIG.decimals}`} className="input-dark !h-9 font-mono !text-xs" />
+                <input aria-label="Calldata" value={sim.data} onChange={(e) => setSim({ ...sim, data: e.target.value })} placeholder={`0x…  e.g. decimals() is ${SIG.decimals}`} className="input-dark !h-9 font-mono !text-xs" />
               </div>
             </div>
             <button onClick={runSim} disabled={simBusy || !sim.to.trim()} className="btn-primary mt-3 !h-9 px-3 !text-xs">
@@ -516,13 +517,13 @@ export default function WalletLabPage() {
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Chain</p>
-                <select value={approvalChain} onChange={(e) => setApprovalChain(e.target.value)} className="input-dark !h-9 !text-xs">
+                <select aria-label="Chain" value={approvalChain} onChange={(e) => setApprovalChain(e.target.value)} className="input-dark !h-9 !text-xs">
                   {EVM_CHAINS.map((c) => <option key={c} value={c}>{EVM_RPC[c].name}</option>)}
                 </select>
               </div>
               <div className="md:col-span-2">
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Your wallet address</p>
-                <input value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="0x… (the owner)" className="input-dark !h-9 font-mono !text-xs" />
+                <input aria-label="Wallet address" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="0x… (the owner)" className="input-dark !h-9 font-mono !text-xs" />
               </div>
             </div>
 
@@ -530,18 +531,21 @@ export default function WalletLabPage() {
               {pairs.map((p, i) => (
                 <div key={i} className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_1fr_auto]">
                   <input
+                    aria-label={`Token ${i + 1} contract`}
                     value={p.token}
                     onChange={(e) => setPairs(pairs.map((x, j) => (j === i ? { ...x, token: e.target.value } : x)))}
                     placeholder="Token contract 0x…"
                     className="input-dark !h-9 font-mono !text-xs"
                   />
                   <input
+                    aria-label={`Spender ${i + 1}`}
                     value={p.spender}
                     onChange={(e) => setPairs(pairs.map((x, j) => (j === i ? { ...x, spender: e.target.value } : x)))}
                     placeholder="Spender 0x…"
                     className="input-dark !h-9 font-mono !text-xs"
                   />
                   <input
+                    aria-label={`Approval ${i + 1} label`}
                     value={p.label}
                     onChange={(e) => setPairs(pairs.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))}
                     placeholder="Label (e.g. Uniswap Router)"

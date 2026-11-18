@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   REQUIRED_SECRETS, STORE_ID, PRODUCT_ID, SELLABLE_PLANS, CYCLES, NONCE_TTL_MS, VARIANTS,
-  checkSecrets, readIntent, variantFor, mintNonce, nonceExpiry, isTestMode,
+  checkSecrets, readIntent, variantFor, variantTable, mintNonce, nonceExpiry, isTestMode,
   TEST_API_KEY, TEST_MODE_FLAG,
   buildProviderRequest, readProviderResponse, handleRequest
 } from './handler.js';
@@ -364,7 +364,12 @@ describe('checkout: test and live are separated by key, not by a toggle', () => 
       method: 'POST',
       body: JSON.stringify({ plan: 'pro', cycle: 'monthly' }),
       userId: 'user-1',
-      env: { LEMONSQUEEZY_API_KEY: live, [TEST_API_KEY]: test, [TEST_MODE_FLAG]: 'true' },
+      env: {
+        LEMONSQUEEZY_API_KEY: live,
+        [TEST_API_KEY]: test,
+        [TEST_MODE_FLAG]: 'true',
+        LEMONSQUEEZY_TEST_VARIANTS: JSON.stringify({ 'pro:monthly': '2269340' })
+      },
       store: makeStore(),
       fetchImpl
     });

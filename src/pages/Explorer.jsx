@@ -185,6 +185,7 @@ export default function ExplorerPage() {
                   Block height (Bitcoin) or number / 0x hash ({EVM_RPC[evmChain].name})
                 </p>
                 <input
+                  aria-label="Block height or block number"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') doLookup(); }}
@@ -280,6 +281,7 @@ export default function ExplorerPage() {
                   Transaction id — 64 hex chars (Bitcoin) or 0x… ({EVM_RPC[evmChain].name})
                 </p>
                 <input
+                  aria-label="Transaction ID"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') doLookup(); }}
@@ -358,6 +360,7 @@ export default function ExplorerPage() {
                   0x address ({EVM_RPC[evmChain].name}) or a Bitcoin address
                 </p>
                 <input
+                  aria-label="Address to look up"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') doLookup(); }}
@@ -486,6 +489,7 @@ export default function ExplorerPage() {
                   Contract address on {EVM_RPC[evmChain].name}
                 </p>
                 <input
+                  aria-label="Contract address"
                   value={contractAddr}
                   onChange={(e) => setContractAddr(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') inspectContract(); }}

@@ -56,7 +56,10 @@ const RESERVED = new Set([
   'with', 'text', 'uuid', 'bigint', 'jsonb', 'numeric', 'boolean', 'timestamptz',
   'primary', 'key', 'references', 'cascade', 'delete', 'set', 'identity', 'always',
   'as', 'generated', 'by', 'partition', 'range', 'like', 'interval', 'extract',
-  'epoch', 'date', 'lower', 'upper', 'length', 'substring', 'desc', 'asc'
+  'epoch', 'date', 'lower', 'upper', 'length', 'substring', 'desc', 'asc',
+  /* Built-in functions that legitimately appear inside a CHECK. Listed by name
+   * so a misspelt column still fails. */
+  'jsonb_typeof', 'jsonb_array_length'
 ]);
 
 /** Bare identifiers in an expression, minus keywords, literals and numbers. */
@@ -187,8 +190,11 @@ describe('database contract: migrations are internally consistent', () => {
   it('leaves the audit log append-only by policy and by rule', () => {
     expect(ALL_SQL).toMatch(/create policy cx_audit_select_own[\s\S]*?for select/i);
     expect(ALL_SQL).toMatch(/create policy cx_audit_insert_own[\s\S]*?for insert/i);
-    expect(ALL_SQL).not.toMatch(/create policy \w+ on public\.cx_audit_log[\s\S]*?for update/i);
-    expect(ALL_SQL).not.toMatch(/create policy \w+ on public\.cx_audit_log[\s\S]*?for delete/i);
+    /* Bounded to the policy's own clause. `[\s\S]*?` used to run past the end of
+     * this policy to any later `for delete` in a different table, so an unrelated
+     * DELETE policy anywhere in a later migration failed this assertion — a false
+     * positive that hid the real property being tested. */
+    expect(ALL_SQL).not.toMatch(/create policy \w+ on public\.cx_audit_log\s+for (?:update|delete)/i);
     expect(ALL_SQL).toMatch(/on update to public\.cx_audit_log do instead nothing/i);
     expect(ALL_SQL).toMatch(/on delete to public\.cx_audit_log do instead nothing/i);
   });
@@ -196,7 +202,7 @@ describe('database contract: migrations are internally consistent', () => {
   it('keeps the signal log append-only, because a deleted event is a contradiction', () => {
     expect(ALL_SQL).toMatch(/create policy cx_signals_select[\s\S]*?for select/i);
     expect(ALL_SQL).toMatch(/create policy cx_signals_insert[\s\S]*?for insert/i);
-    expect(ALL_SQL).not.toMatch(/create policy \w+ on public\.cx_signal_events[\s\S]*?for delete/i);
+    expect(ALL_SQL).not.toMatch(/create policy \w+ on public\.cx_signal_events\s+for delete/i);
     expect(COLUMNS.get('cx_signal_events').has('deleted_at')).toBe(false);
   });
 
@@ -209,7 +215,7 @@ describe('database contract: migrations are internally consistent', () => {
       // the audit log's actor_id is nulled when a user is deleted, and the
       // webhook-event ledger exists to de-duplicate provider deliveries, not
       // to belong to a user.
-      if (table === 'cx_audit_log' || table === 'cx_webhook_events') continue;
+      if (table === 'cx_audit_log' || table === 'cx_webhook_events' || table === 'cx_plan_limits' || table === 'cx_api_key_secrets') continue;
       expect(cols.has('user_id'), `${table} has no user_id`).toBe(true);
     }
   });

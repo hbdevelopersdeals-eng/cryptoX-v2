@@ -11,6 +11,7 @@ import { VENUES, chainLabelForAsset, CHAINS } from '../lib/assets.js';
 import { SUPPORTED_CHAINS, SYNC_METHODS, TRACKING_LIMITS, fetchWalletBalance, validateAddress, chainMeta } from '../lib/wallets.js';
 import { fmtPrice, fmtUsd, cls, timeAgo } from '../lib/format.js';
 import { CoinImg, Card, EmptyState } from '../components/ui.jsx';
+import { EmptyPortfolioIllustration } from '../components/EmptyIllustrations.jsx';
 
 const TABS = [
   { id: 'holdings', label: 'Holdings', icon: Wallet },
@@ -317,7 +318,7 @@ export default function PortfolioPage() {
       {!txs.length ? (
         <Card>
           <EmptyState
-            icon={<Wallet size={28} className="text-muted-foreground" />}
+            icon={<EmptyPortfolioIllustration size={100} className="mb-2" />}
             title="No transactions yet"
             sub="Add each buy, sell and transfer. Every figure in this page is derived from that history."
             action={<button onClick={() => setOpen(true)} className="btn-primary"><Plus size={15} /> Add transaction</button>}
@@ -532,14 +533,14 @@ export default function PortfolioPage() {
             <div className="mt-3 flex flex-wrap items-end gap-3">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Condition</p>
-                <select value={alertForm.type} onChange={(e) => setAlertForm({ ...alertForm, type: e.target.value })} className="input-dark !h-9 !w-auto !text-xs">
+                <select aria-label="Alert condition" value={alertForm.type} onChange={(e) => setAlertForm({ ...alertForm, type: e.target.value })} className="input-dark !h-9 !w-auto !text-xs">
                   <option value="portfolio_value_above">Value rises above</option>
                   <option value="portfolio_value_below">Value falls below</option>
                 </select>
               </div>
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Threshold (USD)</p>
-                <input type="number" step="any" value={alertForm.value} onChange={(e) => setAlertForm({ ...alertForm, value: e.target.value })} placeholder="10000" className="input-dark !h-9 !w-40 !text-xs num" />
+                <input aria-label="Alert threshold in USD" type="number" step="any" value={alertForm.value} onChange={(e) => setAlertForm({ ...alertForm, value: e.target.value })} placeholder="10000" className="input-dark !h-9 !w-40 !text-xs num" />
               </div>
               <button onClick={createPortfolioAlert} className="btn-primary !h-9 px-3 !text-xs"><Plus size={13} /> Create alert</button>
               <Link to="/alerts" className="text-xs font-medium text-primary hover:underline">Manage alerts</Link>
@@ -711,13 +712,14 @@ export default function PortfolioPage() {
             <div className="flex flex-wrap items-end gap-3 border-b border-border p-4">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Chain</p>
-                <select value={walletForm.chain} onChange={(e) => setWalletForm({ ...walletForm, chain: e.target.value })} className="input-dark !h-9 !w-auto !text-xs">
+                <select aria-label="Chain" value={walletForm.chain} onChange={(e) => setWalletForm({ ...walletForm, chain: e.target.value })} className="input-dark !h-9 !w-auto !text-xs">
                   {SUPPORTED_CHAINS.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div className="min-w-[16rem] flex-1">
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Public address</p>
                 <input
+                  aria-label="Public address"
                   value={walletForm.address}
                   onChange={(e) => setWalletForm({ ...walletForm, address: e.target.value })}
                   placeholder="Paste a public address"
@@ -726,7 +728,7 @@ export default function PortfolioPage() {
               </div>
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Label (optional)</p>
-                <input value={walletForm.label} onChange={(e) => setWalletForm({ ...walletForm, label: e.target.value })} placeholder="Cold storage" className="input-dark !h-9 !w-40 !text-xs" />
+                <input aria-label="Address label" value={walletForm.label} onChange={(e) => setWalletForm({ ...walletForm, label: e.target.value })} placeholder="Cold storage" className="input-dark !h-9 !w-40 !text-xs" />
               </div>
               <button onClick={addWallet} className="btn-primary !h-9 px-3 !text-xs"><Plus size={13} /> Watch</button>
             </div>
@@ -839,6 +841,7 @@ export default function PortfolioPage() {
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Coin</p>
                 <select
+                  aria-label="Coin"
                   value={form.coinId}
                   onChange={(e) => {
                     const id = e.target.value;
@@ -855,38 +858,38 @@ export default function PortfolioPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Amount</p>
-                  <input type="number" step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="input-dark !h-10 num" />
+                  <input aria-label="Amount" type="number" step="any" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" className="input-dark !h-10 num" />
                 </div>
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">
                     Unit price (USD){form.side.startsWith('transfer') ? ' — optional basis' : ''}
                   </p>
-                  <input type="number" step="any" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={form.side.startsWith('transfer') ? 'leave blank if unknown' : '0.00'} className="input-dark !h-10 num" />
+                  <input aria-label="Unit price in USD" type="number" step="any" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={form.side.startsWith('transfer') ? 'leave blank if unknown' : '0.00'} className="input-dark !h-10 num" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Fee (USD)</p>
-                  <input type="number" step="any" value={form.fee} onChange={(e) => setForm({ ...form, fee: e.target.value })} placeholder="0.00" className="input-dark !h-10 num" />
+                  <input aria-label="Fee in USD" type="number" step="any" value={form.fee} onChange={(e) => setForm({ ...form, fee: e.target.value })} placeholder="0.00" className="input-dark !h-10 num" />
                 </div>
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Date</p>
-                  <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="input-dark !h-10 !text-xs" />
+                  <input aria-label="Date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="input-dark !h-10 !text-xs" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Custody venue</p>
-                  <select value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="input-dark !h-10 !text-xs">
+                  <select aria-label="Custody venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="input-dark !h-10 !text-xs">
                     <option value="">Unassigned</option>
                     {VENUES.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Chain</p>
-                  <select value={form.chain} onChange={(e) => setForm({ ...form, chain: e.target.value })} className="input-dark !h-10 !text-xs">
+                  <select aria-label="Chain" value={form.chain} onChange={(e) => setForm({ ...form, chain: e.target.value })} className="input-dark !h-10 !text-xs">
                     <option value="">Auto from asset</option>
                     {Object.entries(CHAINS).map(([k, c]) => <option key={k} value={k}>{c.name}</option>)}
                   </select>
@@ -896,6 +899,7 @@ export default function PortfolioPage() {
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Portfolio</p>
                 <input
+                  aria-label="Portfolio"
                   value={form.portfolio || (portfolio === 'All' ? DEFAULT_PORTFOLIO : portfolio)}
                   onChange={(e) => setForm({ ...form, portfolio: e.target.value })}
                   placeholder="Main"

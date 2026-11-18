@@ -7,8 +7,27 @@ import { useMarket } from '../lib/market.jsx';
 import { useTransactions, useAlerts } from '../lib/prefs.jsx';
 import { buildPortfolio } from '../lib/portfolio.js';
 import { answer, capabilityMap, INTENTS } from '../lib/analyst.js';
+import { askModel } from '../lib/assistantClient.js';
 import { Card } from '../components/ui.jsx';
 import { cls } from '../lib/format.js';
+
+/* The context a model is allowed to see: a small, numeric market snapshot.
+ *
+ * Nothing user-identifying goes here — not the email, not the portfolio value,
+ * not the ledger. A model answer about "how is the market doing" does not need
+ * to know what the reader owns, and anything sent is sent to a third party. */
+export function buildModelContext({ rows = [], global = null, feed = null } = {}) {
+  return {
+    marketCapUsd: Number.isFinite(global?.mcap) ? global.mcap : undefined,
+    btcDominance: Number.isFinite(global?.btcDom) ? global.btcDom : undefined,
+    volume24hUsd: Number.isFinite(global?.vol) ? global.vol : undefined,
+    feed: feed?.simulated ? 'simulated (fallback data — say so in the answer)' : feed?.marketSource || undefined,
+    coins: (rows || [])
+      .filter((r) => r && r.symbol && Number.isFinite(r.price))
+      .slice(0, 8)
+      .map((r) => ({ symbol: r.symbol, price: r.price, pct24: Number.isFinite(r.pct24) ? r.pct24 : undefined }))
+  };
+}
 
 const STATUS = {
   supported: 'bg-up/15 text-up',
@@ -27,7 +46,7 @@ const SUGGESTIONS = [
 ];
 
 export default function AssistantPage() {
-  const { rows, global } = useMarket();
+  const { rows, global, feed } = useMarket();
   const [txs] = useTransactions();
   const [alerts, , , alertApi] = useAlerts();
   const [q, setQ] = useState('');
@@ -43,12 +62,56 @@ export default function AssistantPage() {
 
   const caps = useMemo(() => capabilityMap(), []);
 
-  const ask = (query) => {
+  /**
+   * Ask the server-side model first; fall back to the deterministic router.
+   *
+   * WHICH ONE ANSWERED IS SHOWN. The two are different products — one costs
+   * money and can be wrong in fluent ways, the other is a lookup that cannot
+   * invent a number — so the answer card carries the source. A silent fallback
+   * would let a template masquerade as a model, which is the failure this
+   * product keeps refusing to make everywhere else.
+   */
+  const ask = async (query) => {
     const text = String(query ?? q).trim();
     if (!text) return;
-    const res = answer(text, { rows, global, portfolio });
-    setLog((cur) => [{ id: Date.now(), ...res }, ...cur].slice(0, 12));
+
+    const id = Date.now();
+    const local = answer(text, { rows, global, portfolio });
+    setLog((cur) => [{ id, query: text, pending: true, blocks: [], disclaimer: '' }, ...cur].slice(0, 12));
     setQ('');
+
+    const remote = await askModel({ message: text, context: buildModelContext({ rows, global, feed }) });
+
+    setLog((cur) => {
+      const rest = cur.filter((entry) => entry.id !== id);
+      if (remote.ok) {
+        const entry = {
+          id,
+          query: text,
+          intent: 'model',
+          confidence: 1,
+          blocks: [
+            {
+              title: 'Answer',
+              lines: remote.text.split('\n').filter(Boolean),
+              evidence: `${remote.provider} · ${remote.model}`
+            }
+          ],
+          disclaimer:
+            'Written by a language model from the market snapshot shown. It can be wrong; it has no access to your portfolio and gives no advice.'
+        };
+        return [entry, ...rest].slice(0, 12);
+      }
+
+      // Deterministic answer, labelled with why the model was not used.
+      const note =
+        remote.reason === 'not-configured'
+          ? 'No model key is configured on this deployment, so the built-in analyst answered.'
+          : remote.reason === 'not-signed-in'
+            ? 'You are not signed in, so the built-in analyst answered.'
+            : 'The model was unavailable, so the built-in analyst answered.';
+      return [{ id, ...local, fallbackNote: note }, ...rest].slice(0, 12);
+    });
   };
 
   /**
@@ -76,9 +139,10 @@ export default function AssistantPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">CryptoX AI</h1>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          A deterministic analyst that computes answers from this app&apos;s own data — market rows, your ledger, the
-          indicator engines and on-chain reads. There is no language model behind it, so every answer is reproducible and
-          carries the evidence it came from.
+          Answers come from one of two places, and each card says which. The deterministic analyst computes from this
+          app&apos;s own data — market rows, your ledger, the indicator engines and on-chain reads — so it is reproducible
+          and cannot invent a number. Where the deployment has a model key, a language model may answer instead, using
+          only the small market snapshot shown to it; that answer is labelled with the provider and can be wrong.
         </p>
       </div>
 
@@ -86,10 +150,11 @@ export default function AssistantPage() {
         <p className="flex items-start gap-2 text-[11px]">
           <Info size={13} className="mt-0.5 shrink-0 text-primary" />
           <span>
-            <b className="text-foreground">Not a chatbot.</b>{' '}
+            <b className="text-foreground">Deterministic unless labelled otherwise.</b>{' '}
             <span className="text-muted-foreground">
               Your query is matched to one of {INTENTS.length} known tasks and answered by a function. If nothing matches,
-              it says so rather than improvising — and it never invents a number.
+              it says so rather than improvising — and it never invents a number. When a model key is configured on the
+              server, a model answer may replace it; that card names the provider and says it can be wrong.
             </span>
           </span>
         </p>
@@ -102,6 +167,7 @@ export default function AssistantPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') ask(); }}
+            aria-label="Ask the assistant about the market, a coin, your portfolio or an address"
             placeholder="Ask about the market, a coin, your portfolio, or an address…"
             className="input-dark !h-10 min-w-[240px] flex-1 !text-xs"
           />
@@ -125,8 +191,16 @@ export default function AssistantPage() {
             <Sparkles size={12} className="text-primary" />
             <span className="font-semibold text-foreground">{entry.query}</span>
             {entry.intent ? <span className="num">· {entry.intent}</span> : null}
-            <span className="num">· confidence {(entry.confidence * 100).toFixed(0)}%</span>
+            {Number.isFinite(entry.confidence) ? (
+              <span className="num">· confidence {(entry.confidence * 100).toFixed(0)}%</span>
+            ) : null}
           </p>
+
+          {entry.pending ? (
+            <p role="status" className="text-[11px] text-muted-foreground">
+              Asking…
+            </p>
+          ) : null}
 
           {entry.blocks.map((b, i) => (
             <div key={i} className="mb-2 rounded-lg border border-border p-3">
@@ -174,9 +248,17 @@ export default function AssistantPage() {
             </div>
           ) : null}
 
-          <p className="mt-2 flex items-start gap-1.5 text-[10px] text-muted-foreground">
-            <Info size={11} className="mt-0.5 shrink-0 text-primary" /> {entry.disclaimer}
-          </p>
+          {entry.fallbackNote ? (
+            <p className="mt-2 flex items-start gap-1.5 rounded-lg border border-border px-2 py-1.5 text-[10px] text-muted-foreground">
+              <Info size={11} className="mt-0.5 shrink-0" /> {entry.fallbackNote}
+            </p>
+          ) : null}
+
+          {entry.disclaimer ? (
+            <p className="mt-2 flex items-start gap-1.5 text-[10px] text-muted-foreground">
+              <Info size={11} className="mt-0.5 shrink-0 text-primary" /> {entry.disclaimer}
+            </p>
+          ) : null}
         </Card>
       ))}
 

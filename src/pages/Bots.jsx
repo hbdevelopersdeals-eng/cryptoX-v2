@@ -30,6 +30,7 @@ function ParamFields({ type, values, onChange }) {
           <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">{p.label}</p>
           {p.options ? (
             <select
+              aria-label={p.label}
               value={values[p.key] ?? p.default}
               onChange={(e) => onChange({ ...values, [p.key]: e.target.value })}
               className="input-dark !h-9 !text-xs"
@@ -39,6 +40,7 @@ function ParamFields({ type, values, onChange }) {
           ) : (
             <input
               type="number"
+              aria-label={p.label}
               value={values[p.key] ?? p.default}
               min={p.min}
               step={p.step ?? 'any'}
@@ -61,6 +63,7 @@ function ConditionRows({ label, rows, onChange }) {
         {rows.map((r, i) => (
           <div key={i} className="flex flex-wrap gap-2">
             <select
+              aria-label={`Condition ${i + 1} field`}
               value={r.field}
               onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, field: e.target.value } : x)))}
               className="input-dark !h-9 !w-auto !text-xs"
@@ -68,6 +71,7 @@ function ConditionRows({ label, rows, onChange }) {
               {CONDITION_FIELDS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
             </select>
             <select
+              aria-label={`Condition ${i + 1} operator`}
               value={r.op}
               onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, op: e.target.value } : x)))}
               className="input-dark !h-9 !w-auto !text-xs"
@@ -76,6 +80,7 @@ function ConditionRows({ label, rows, onChange }) {
             </select>
             <input
               type="number"
+              aria-label={`Condition ${i + 1} value`}
               value={r.value}
               onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))}
               className="input-dark !h-9 !w-24 num !text-xs"
@@ -278,7 +283,7 @@ export default function BotsPage() {
             <div className="space-y-3">
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Coin</p>
-                <select value={symbol} onChange={(e) => setSymbol(e.target.value)} className="input-dark !h-9 !text-xs">
+                <select aria-label="Coin" value={symbol} onChange={(e) => setSymbol(e.target.value)} className="input-dark !h-9 !text-xs">
                   {top.map((r) => <option key={r.id} value={r.symbol}>{r.symbol} — {r.name}</option>)}
                 </select>
               </div>
@@ -299,6 +304,7 @@ export default function BotsPage() {
                     <p className="mb-0.5 text-[10px] text-muted-foreground">{label}</p>
                     <input
                       type="number"
+                      aria-label={label}
                       value={limits[k]}
                       onChange={(e) => setLimits({ ...limits, [k]: Number(e.target.value) })}
                       className="input-dark !h-8 num !text-xs"

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, ShieldCheck, Activity } from 'lucide-react';
 import { useSubscription, pricingPlans } from '../lib/subscription.jsx';
 import { annualSaving, purchasablePlans } from '../lib/upgrade.js';
 import { formatMoney } from '../lib/currency.jsx';
@@ -7,6 +7,7 @@ import { UPGRADE_EVENTS } from '../lib/upgrade.js';
 import { trackUpgradeEvent, bufferedEvents, resetBufferedEvents } from '../lib/upgradeEvents.js';
 import { beginCheckout } from '../lib/subscribe.js';
 import { checkoutStatus } from '../lib/checkout.js';
+import { ENFORCEMENT, QUOTA_KEYS, QUOTA_LABELS, enforcementState } from '../lib/entitlements.js';
 
 /** A reason a checkout did not start, said in a way a buyer can act on. */
 function checkoutErrorMessage(reason) {
@@ -61,6 +62,93 @@ export function featureRows(plan) {
   if (e.support) rows.push(`${e.support[0].toUpperCase()}${e.support.slice(1)} support`);
   return rows;
 }
+
+/* ---------------------------------------------------------------------------
+ * Quota enforcement disclosure
+ *
+ * The pricing table sells five quotas. Three of them are refused by Postgres
+ * (`cx_consume_quota()` / the BEFORE INSERT triggers) and two are counted in the
+ * browser only, because there is no row to count yet: portfolios live inside a
+ * JSON settings document, and organisation membership tables are not migrated.
+ *
+ * That difference is invisible to a buyer unless the page states it, and a paid
+ * limit that nothing enforces is a false claim on a pricing table — the exact
+ * failure `docs/LAUNCH-READINESS.md` P0-2 names. So the split is derived from
+ * `ENFORCEMENT` rather than written here, and this page cannot advertise the
+ * stronger claim after the weaker one is true.
+ * ------------------------------------------------------------------------ */
+
+/** Quotas the database actually refuses past the limit, in this deployment. */
+export const SERVER_ENFORCED_KEYS = QUOTA_KEYS.filter((key) => enforcementState(key) === 'server');
+
+/** Quotas a migration would enforce, but which may not be applied yet. */
+export const PENDING_KEYS = QUOTA_KEYS.filter((key) => enforcementState(key) === 'pending-migration');
+
+/** Quotas with no server mechanism at all — counted in the app only. */
+export const DISPLAY_ONLY_KEYS = QUOTA_KEYS.filter((key) => enforcementState(key) === 'display-only');
+
+/** The migration(s) the pending keys are waiting on, named once. */
+export function pendingMigrations(keys = PENDING_KEYS) {
+  const names = new Set(keys.map((key) => ENFORCEMENT[key]?.migration).filter(Boolean));
+  return [...names];
+}
+
+const labelList = (keys, conjunction) => {
+  const labels = keys.map((key) => QUOTA_LABELS[key] || key);
+  if (labels.length <= 1) return labels.join('');
+  return `${labels.slice(0, -1).join(', ')} ${conjunction} ${labels.at(-1)}`;
+};
+
+/**
+ * The sentence the page must show, built from `ENFORCEMENT`.
+ *
+ * Returns `null` when every quota is server-enforced — at that point there is
+ * nothing to disclose, and a permanent disclaimer would just train readers to
+ * skip it.
+ */
+export function enforcementDisclosure({
+  enforced = SERVER_ENFORCED_KEYS,
+  pending = PENDING_KEYS,
+  displayOnly = DISPLAY_ONLY_KEYS,
+  migrations = pendingMigrations(pending)
+} = {}) {
+  if (displayOnly.length === 0 && pending.length === 0) return null;
+
+  const parts = [];
+  if (enforced.length) {
+    parts.push(
+      `${labelList(enforced, 'and')} ${enforced.length === 1 ? 'is' : 'are'} refused by the database: those limits cannot be passed by editing this page.`
+    );
+  } else {
+    parts.push('No quota is refused by the database yet.');
+  }
+
+  if (pending.length) {
+    const named = migrations.length ? migrations.join(', ') : 'a pending migration';
+    parts.push(
+      `${labelList(pending, 'and')} ${pending.length === 1 ? 'is' : 'are'} blocked by ${named} as soon as it is applied to this deployment; until then ${pending.length === 1 ? 'it is' : 'they are'} counted in the app only.`
+    );
+  }
+
+  if (displayOnly.length) {
+    parts.push(
+      `${labelList(displayOnly, 'and')} ${displayOnly.length === 1 ? 'is' : 'are'} counted in the app with no server mechanism yet, so ${displayOnly.length === 1 ? 'that limit is' : 'those limits are'} a product boundary rather than a guarantee.`
+    );
+  }
+
+  return parts.join(' ');
+}
+
+export function QuotaEnforcementNote() {
+  const text = enforcementDisclosure();
+  if (!text) return null;
+  return (
+    <p role="note" data-testid="quota-enforcement" className="rounded-xl border border-border bg-card p-4 text-xs text-muted-foreground">
+      <strong className="font-semibold text-foreground">How these limits are enforced.</strong> {text}
+    </p>
+  );
+}
+
 
 export default function Pricing() {
   const sub = useSubscription();
@@ -250,6 +338,33 @@ export default function Pricing() {
           {error}
         </p>
       ) : null}
+
+      <QuotaEnforcementNote />
+
+      {/* Visual Trust Guarantee Bar */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-3.5">
+          <ShieldCheck size={20} className="text-primary shrink-0" />
+          <div className="text-xs">
+            <p className="font-semibold text-foreground">Zero Custody Risk</p>
+            <p className="text-muted-foreground">Never asks for private keys or seed phrases.</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-3.5">
+          <Activity size={20} className="text-up shrink-0" />
+          <div className="text-xs">
+            <p className="font-semibold text-foreground">Next-Bar Simulation</p>
+            <p className="text-muted-foreground">Backtests with realistic fees &amp; slippage.</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-3.5">
+          <Sparkles size={20} className="text-amber-400 shrink-0" />
+          <div className="text-xs">
+            <p className="font-semibold text-foreground">Cancel Anytime</p>
+            <p className="text-muted-foreground">Self-serve billing management &amp; export.</p>
+          </div>
+        </div>
+      </div>
 
       <p className="rounded-xl border border-border bg-card p-4 text-xs text-muted-foreground">
         {canCheckout ? (

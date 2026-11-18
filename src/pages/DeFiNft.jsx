@@ -247,6 +247,7 @@ export default function DeFiNftPage() {
                 <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Minimum pool TVL (USD)</p>
                 <input
                   type="number"
+                  aria-label="Minimum pool TVL in USD"
                   value={minTvl}
                   step="100000"
                   onChange={(e) => setMinTvl(Math.max(0, Number(e.target.value)))}
@@ -470,17 +471,17 @@ export default function DeFiNftPage() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <div>
               <p className="mb-0.5 text-[10px] text-muted-foreground">Chain</p>
-              <select value={chain} onChange={(e) => setChain(e.target.value)} className="input-dark !h-8 !text-[11px]">
+              <select aria-label="Chain" value={chain} onChange={(e) => setChain(e.target.value)} className="input-dark !h-8 !text-[11px]">
                 {Object.keys(EVM_RPC).map((c) => <option key={c} value={c}>{EVM_RPC[c].name}</option>)}
               </select>
             </div>
             <div>
               <p className="mb-0.5 text-[10px] text-muted-foreground">Collection contract</p>
-              <input value={contract} onChange={(e) => setContract(e.target.value)} placeholder="0x…" className="input-dark !h-8 num !text-[11px]" />
+              <input aria-label="Collection contract" value={contract} onChange={(e) => setContract(e.target.value)} placeholder="0x…" className="input-dark !h-8 num !text-[11px]" />
             </div>
             <div>
               <p className="mb-0.5 text-[10px] text-muted-foreground">Owner</p>
-              <input value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="0x…" className="input-dark !h-8 num !text-[11px]" />
+              <input aria-label="Owner address" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="0x…" className="input-dark !h-8 num !text-[11px]" />
             </div>
           </div>
 

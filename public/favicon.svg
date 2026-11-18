@@ -1,4 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#FFC105"/>
-  <text x="32" y="44" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="800" text-anchor="middle" fill="#0D0E12">X</text>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cx-fav-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FFE066" />
+      <stop offset="50%" stopColor="#FFC105" />
+      <stop offset="100%" stopColor="#E59400" />
+    </linearGradient>
+    <linearGradient id="cx-fav-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#181B22" />
+      <stop offset="100%" stopColor="#08090B" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#cx-fav-dark)" stroke="url(#cx-fav-gold)" stroke-width="2.5" />
+  <circle cx="32" cy="32" r="23" stroke="#242832" stroke-width="1.5" stroke-dasharray="3 3" />
+  
+  <path d="M19 18L45 46" stroke="url(#cx-fav-gold)" stroke-width="5" stroke-linecap="round" />
+  <path d="M45 18L19 46" stroke="url(#cx-fav-gold)" stroke-width="5" stroke-linecap="round" />
+
+  <circle cx="32" cy="32" r="5" fill="#09090C" stroke="#FFE066" stroke-width="2.5" />
+  <circle cx="32" cy="32" r="2.5" fill="#FFC105" />
 </svg>

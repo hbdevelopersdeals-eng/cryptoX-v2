@@ -2,6 +2,25 @@
 
 All notable changes to CryptoX are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] — "Every claim checkable"
+
+### Added
+- **Server-side quota enforcement for the last two keys** (`0008_quotas_portfolios_seats.sql`): portfolios are counted from the `cx_settings.portfolios` array by a BEFORE INSERT/UPDATE trigger, and seats from a new `cx_org_members` table whose limit comes from the **organisation owner's** plan. Both fail closed on an unknown plan or key, and `cx_consume_quota()` now understands both shapes.
+- **A real model behind the assistant, server-side** (`supabase/functions/ai-assistant`): provider abstraction with fallback order (Anthropic → OpenAI → Google), the system prompt held on the server, an allow-listed market context, secret and injection screening, output validation that refuses advice-shaped answers, and a 501 when no key is configured. The page now says which of the two answered — a model or the deterministic router — and why.
+- **A build gate for the deploy environment** (`scripts/check-deploy-env.mjs`, wired into `npm run check`): a build with no `VITE_SUPABASE_URL` ships demo auth, where a paid purchase has no account to attach to. The gate fails that build and refuses a privileged admin key in any `VITE_` variable.
+- **Service-worker versioning and registration** (`src/lib/pwa.js`, stamped build): the worker was never registered and its cache version was the literal `cx-v1`, so a shipped fix could never replace the cached shell. It now registers in production, carries the build stamp, serves documents network-first, and waits for the user before taking over.
+
+### Changed
+- **Quota state is three-valued, not two.** `enforcementState()` returns `server`, `pending-migration` or `display-only`, and the pricing table's disclosure names which keys are refused by Postgres today and which are waiting on migration 0008. Claiming "enforced" for a migration that may not be applied is the same false claim as selling a quota nobody checks.
+- **Error reports are sanitised before they leave the browser**: query strings dropped, emails/keys/JWTs redacted, stacks capped, 20 reports per session with a 30-second de-duplication window, and an `http://` collector refused rather than downgraded.
+
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
+### Fixed
+- `shouldSend()` swallowed the first sighting of an error; `activateUpdate()` reported success when no worker was waiting.
+- The frontend guard counted markup mentioned inside a **comment** as real markup (a test file explaining `<select>` was reported as an unlabelled control), and the schema contract used an unbounded regex that failed on any later `for delete` policy in a different table.
+- **All 71 `[control-label]` defects are fixed**; the ratchet baseline is now 0, so a new unlabelled control fails the build.
+
 ## [Unreleased] — "Two more presets, one honest feed"
 
 ### Added
@@ -12,6 +31,8 @@ All notable changes to CryptoX are documented here. Format follows [Keep a Chang
 ### Changed
 - **The invented price movement is gone.** A sine-wave "wobble" used to nudge every row without a live exchange pair — and the headline market cap, volume and BTC dominance — so the table looked alive. It was fabricated movement drawn exactly like a real tick. Rows without a live pair now keep the provider's last value, are marked `~` with a tooltip and a footnote, and move only when the provider refreshes them every 60 seconds.
 
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
 ### Fixed
 - `stochRsi` could emit values outside 0–100 on a flat or near-flat window; `raw`, `%K` and `%D` are now clamped.
 
@@ -30,6 +51,8 @@ All notable changes to CryptoX are documented here. Format follows [Keep a Chang
 ### Verified live
 `eth_feeHistory`, `eth_call decimals()` (USDC → 6), `eth_getCode` (contract detection) and `eth_call allowance()` were each exercised against public RPC before being claimed to work.
 
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
 ### Fixed
 - Bitcoin bech32 validation fed the witness-version byte into the 5→8 bit conversion, making the padding invalid and **rejecting every valid segwit address**.
 - `KNOWN_BURN` used mixed-case keys while every lookup lowercases first, so the burn-address check silently never matched.
@@ -54,6 +77,8 @@ All notable changes to CryptoX are documented here. Format follows [Keep a Chang
 - Portfolio storage moved from a flat holdings list to a transaction ledger; existing holdings are **migrated automatically** into buy transactions so cost basis is preserved.
 - DexScreener quotes now carry real on-chain pool liquidity.
 
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
 ### Fixed
 - `buildPortfolio` exposed two different `totals` objects (lots vs positions) under the same key, so position totals were silently overwritten by realized totals.
 - An oversell is reported as a warning and clamped to the units actually held, instead of generating phantom lots.
@@ -76,6 +101,8 @@ All notable changes to CryptoX are documented here. Format follows [Keep a Chang
 - Existing `{ dir, target }` price alerts are migrated to the rule schema on read instead of being dropped (`normaliseAlert`).
 - Transaction history is retained locally in the browser (last 200 firings).
 
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
 ### Fixed
 - `bestBidAsk` returned a **negative** spread because it subtracted the highest venue price from the lowest; cross-venue last trades are now modelled with unambiguous `bestBuy` / `bestSell` semantics and a non-negative spread.
 - Average-price dispersion divided by the median instead of the lowest venue price.
@@ -104,6 +131,8 @@ All notable changes to CryptoX are documented here. Format follows [Keep a Chang
 - Google sign-in is explicitly labelled a demo shortcut.
 - Fear & Greed endpoint now returns source provenance and is badged when the live feed is unavailable.
 
+### Measured, not yet fixed
+- **Translation coverage is 3 of 44 pages.** The 24 catalogs and the 100-key parity check are real, but only three pages call `useI18n`; the rest of the interface renders English regardless of the selected language. Recorded here so the language selector is not mistaken for a translated product. Full localisation is a multi-day track, not a release task.
 ### Fixed
 - Coin detail page crash (`Cannot read properties of null (reading 'length')`) — guarded before chart render.
 - Infinite render loop and "objects are not valid as a React child" on the coin page — caused by a state setter named `setInterval` shadowing the global timer (also fixed pre-emptively in the paper trader); `scripts/check-config.mjs` now fails the build if that pattern reappears.

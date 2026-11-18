@@ -87,7 +87,7 @@ export default function IndicatorMarketplace({ candles = [] }) {
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Average</p>
-            <select value={ma} onChange={(e) => setMa(e.target.value)} className="input-dark !h-9 !w-auto !text-xs">
+            <select aria-label="Average type" value={ma} onChange={(e) => setMa(e.target.value)} className="input-dark !h-9 !w-auto !text-xs">
               {MA_TYPES.map((m) => <option key={m} value={m}>{m.toUpperCase()}</option>)}
             </select>
           </div>
@@ -95,6 +95,7 @@ export default function IndicatorMarketplace({ candles = [] }) {
             <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Period</p>
             <input
               type="number"
+              aria-label="Period"
               min="1"
               max="500"
               value={period}

@@ -5,6 +5,7 @@ import { useMarket } from '../lib/market.jsx';
 import { useWatchlist } from '../lib/prefs.jsx';
 import { fmtPrice, fmtCompact, cls } from '../lib/format.js';
 import { CoinImg, CoinLink, Sparkline, EmptyState, Card } from '../components/ui.jsx';
+import { EmptyWatchlistIllustration } from '../components/EmptyIllustrations.jsx';
 
 export default function WatchlistPage() {
   const { rows, byId } = useMarket();
@@ -15,7 +16,7 @@ export default function WatchlistPage() {
 
   const copyShare = async () => {
     try {
-      await navigator.clipboard.writeText(`${location.origin}${location.pathname}#/watchlist`);
+      await navigator.clipboard.writeText(`${location.origin}/watchlist`);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch { /* clipboard unavailable */ }
@@ -38,7 +39,7 @@ export default function WatchlistPage() {
       {!coins.length ? (
         <Card>
           <EmptyState
-            icon={<Star size={28} className="text-muted-foreground" />}
+            icon={<EmptyWatchlistIllustration size={100} className="mb-2" />}
             title="No coins in your watchlist yet"
             sub="Browse markets and tap the star on any row to add it here."
             action={<Link to="/" className="btn-primary">Browse markets</Link>}

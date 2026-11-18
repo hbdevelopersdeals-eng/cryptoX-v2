@@ -72,6 +72,11 @@ if (!globalThis.crypto.getRandomValues) {
   };
 }
 
+// scrollTo stub for jsdom
+if (typeof window !== 'undefined') {
+  window.scrollTo = () => {};
+}
+
 // quiet expected act() noise unless DEBUG_TESTS is set
 if (!process.env.DEBUG_TESTS) {
   const origError = console.error;

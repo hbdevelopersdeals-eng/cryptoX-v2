@@ -6,6 +6,67 @@
     <meta name="theme-color" content="#09090C" />
     <meta name="description" content="CryptoX — a real-time cryptocurrency terminal with live multi-venue market data, portfolio tracking with FIFO cost basis, a blockchain explorer, trading bots, a read-only wallet security lab and paper trading. Educational demo; not investment advice." />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>CryptoX — Real-time Crypto Market Dashboard</title>
+
+    <!-- Static SEO/social defaults.
+         Every one of these is rewritten in place by src/lib/seo.js as soon as the
+         router resolves a path, so the per-route values win in a JS-capable client.
+         They exist because an AI crawler (GPTBot, PerplexityBot, ClaudeBot) and
+         most link unfurlers fetch the raw HTML and never run React: without them
+         the document had a title but no canonical, no social card and no entity
+         data, which is exactly the identity an answer engine needs to cite.
+         `data-cx` / `data-cx-ld` are the selectors seo.js updates; do not remove
+         them or the runtime will append a second canonical / JSON-LD block. -->
+    <link rel="canonical" href="https://cryptox-v2.site.accio.ai/" data-cx="canonical" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CryptoX" />
+    <meta property="og:title" content="CryptoX — Real-time Crypto Market Dashboard" />
+    <meta property="og:description" content="Live multi-venue crypto prices, candlestick charts with RSI and moving averages, ten strategy presets, an honest backtester and a paper-trading simulator. Educational demo; not investment advice." />
+    <meta property="og:url" content="https://cryptox-v2.site.accio.ai/" />
+    <meta property="og:image" content="https://cryptox-v2.site.accio.ai/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CryptoX — crypto market terminal" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CryptoX — Real-time Crypto Market Dashboard" />
+    <meta name="twitter:description" content="Live multi-venue crypto prices, candlestick charts with RSI and moving averages, ten strategy presets, an honest backtester and a paper-trading simulator." />
+    <meta name="twitter:image" content="https://cryptox-v2.site.accio.ai/og-image.png" />
+
+    <script type="application/ld+json" data-cx-ld="website">
+      {"@context":"https://schema.org","@type":"WebSite","name":"CryptoX","alternateName":"CryptoX Terminal","url":"https://cryptox-v2.site.accio.ai/","inLanguage":"en","description":"Real-time cryptocurrency market terminal with charts, strategy backtesting and paper trading."}
+    </script>
+    <script type="application/ld+json" data-cx-ld="app">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "CryptoX",
+        "applicationCategory": "FinanceApplication",
+        "applicationSubCategory": "Cryptocurrency market data and paper trading",
+        "operatingSystem": "Any (web browser)",
+        "url": "https://cryptox-v2.site.accio.ai/",
+        "description": "Cryptocurrency market terminal: live CoinGecko and Binance data for 250+ coins, candlestick charts with RSI and moving averages, ten strategy presets, a next-bar-fill backtester, a paper-trading simulator and a read-only wallet safety lab.",
+        "offers": [
+          {"@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD"},
+          {"@type": "Offer", "name": "Pro Monthly", "price": "9.99", "priceCurrency": "USD"},
+          {"@type": "Offer", "name": "Business Monthly", "price": "24.99", "priceCurrency": "USD"}
+        ],
+        "isAccessibleForFree": true,
+        "disclaimer": "Educational demo and simulation software. No orders are placed and nothing here is investment advice."
+      }
+    </script>
+    <script type="application/ld+json" data-cx-ld="org">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CryptoX",
+        "url": "https://cryptox-v2.site.accio.ai/",
+        "logo": "https://cryptox-v2.site.accio.ai/favicon.svg",
+        "description": "CryptoX builds a research and simulation terminal for cryptocurrency markets."
+      }
+    </script>
     <!-- Content Security Policy. NOTE: frame-ancestors / HSTS / Permissions-Policy must be
          set as real HTTP headers by the host — see public/_headers and SECURITY.md. -->
     <meta
@@ -13,14 +74,26 @@
       content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' __SUPABASE_CONNECT_SRC__ https://api.coingecko.com https://api.binance.com https://data-api.binance.vision https://api.alternative.me wss://stream.binance.com:9443 wss://data-stream.binance.vision; worker-src 'self' blob:; frame-src 'none'"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>CryptoX — Real-time Crypto Market Dashboard</title>
   </head>
   <body>
     <div id="root"></div>
     <noscript>
       <div style="font-family: system-ui, sans-serif; color: #F0F2F5; background: #09090C; padding: 24px">
-        <h1>CryptoX needs JavaScript</h1>
-        <p>This dashboard uses live market data streams and interactive charts. Please enable JavaScript to continue.</p>
+        <h1>CryptoX — real-time crypto market terminal</h1>
+        <p>
+          CryptoX is a cryptocurrency dashboard: live CoinGecko and Binance market data for 250+ coins,
+          candlestick charts with RSI and moving averages, ten one-click strategy presets, a backtester with
+          next-bar fills, fees and slippage, a paper-trading simulator, a portfolio with FIFO cost basis and a
+          read-only wallet safety lab. It is research and simulation software — no real orders are ever placed,
+          and nothing in it is investment advice.
+        </p>
+        <p>
+          This dashboard uses live market data streams and interactive charts, so it needs JavaScript.
+          <a href="/pricing" style="color: #2DD4BF">Plans and pricing</a> ·
+          <a href="/data-sources" style="color: #2DD4BF">Data sources and provenance</a> ·
+          <a href="/status" style="color: #2DD4BF">System status</a> ·
+          <a href="/legal/risk" style="color: #2DD4BF">Risk disclosure</a>
+        </p>
       </div>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>

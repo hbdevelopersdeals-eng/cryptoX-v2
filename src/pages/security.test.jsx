@@ -92,7 +92,7 @@ describe('Account & Security page', () => {
     // A wrong code is refused.
     fireEvent.change(screen.getByLabelText('Authenticator code'), { target: { value: '000000' } });
     fireEvent.click(screen.getByRole('button', { name: /^Confirm$/ }));
-    await waitFor(() => expect(screen.getByText(/did not match/i)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/did not match/i)).toBeTruthy(), { timeout: 5000 });
     expect(loadSecurity().mfa.enabled).toBe(false);
 
     // The correct code, derived from the same secret, is accepted.

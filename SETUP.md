@@ -62,6 +62,61 @@ accio-mcp-cli call deploy_edge_function --json-file "$env:TEMP/cx_deploy_lemonsq
 `scripts/probe-edge-functions.mjs` checks fail-closed behaviour from outside,
 without needing any credential.
 
+## 2.2 Quota Migrations (0007, 0008)
+
+Apply in order. 0008 depends on the helpers `0007_entitlements.sql` creates.
+
+```bash
+# Supabase SQL editor, or: supabase db push
+#   0007_entitlements.sql            alerts, bots, API calls; cx_plan_limits; cx_consume_quota
+#   0008_quotas_portfolios_seats.sql portfolios + seats; cx_organizations; cx_org_members
+```
+
+After 0008 is applied, flip `portfolios` and `seats` to `server: true` in
+`src/lib/entitlements.js` and redeploy. Until then the pricing page correctly says
+those two are "blocked by migration 0008 as soon as it is applied" — a client
+cannot verify a migration from the browser, and claiming otherwise is the false
+claim the disclosure exists to prevent. The page text shrinks by itself once the
+flags flip, because it is derived from `ENFORCEMENT`.
+
+Verify from the SQL editor:
+
+```sql
+select plan_id, key, limit_value from public.cx_plan_limits order by 1, 2;
+select public.cx_consume_quota('portfolios', 1);   -- as an authenticated user
+```
+
+## 2.3 AI Assistant (optional)
+
+The assistant works without this: with no key it answers from the deterministic
+router (`src/lib/analyst.js`) and says so. To enable model answers, set **one** of
+these as an Edge Function secret and deploy the function:
+
+```bash
+# Supabase -> Edge Functions -> Secrets
+#   ANTHROPIC_API_KEY | OPENAI_API_KEY | GOOGLE_API_KEY   (first one found wins)
+```
+
+Deploy with `verify_jwt = true`, exactly like the Lemon Squeezy functions. The key
+never reaches the browser: the client sends `{ message, context }` and the system
+prompt is built server-side. Responses that look like investment advice are
+refused by the handler, not by a prompt instruction alone.
+
+## 2.4 Build Environment (required for a real deployment)
+
+`npm run check` now fails a build without `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY`, because such a build runs in demo auth mode and a
+completed purchase would have no account to attach to:
+
+```bash
+node scripts/check-deploy-env.mjs            # report only
+node scripts/check-deploy-env.mjs --strict   # what `npm run check` runs
+```
+
+Set both values in the site-builder build settings (not only in a local
+`.env.local`), then rebuild and confirm the login footer no longer says
+"Demo build".
+
 ## 3. Commerce Requests
 
 > **Superseded for this site.** The note below is the Site Builder plugin's

@@ -79,8 +79,16 @@ Deno.serve(async (req: Request) => {
     body,
     userId,
     store,
+    // An explicit allow-list, so the function can only ever see the settings it
+    // is meant to use. That also means EVERY new setting has to be added here:
+    // a secret can be saved in the dashboard and still be invisible to the
+    // handler, which is exactly how the test-mode switch silently did nothing
+    // and produced a live checkout while the dashboard showed test mode on.
     env: {
       LEMONSQUEEZY_API_KEY: Deno.env.get('LEMONSQUEEZY_API_KEY') ?? '',
+      LEMONSQUEEZY_TEST_MODE: Deno.env.get('LEMONSQUEEZY_TEST_MODE') ?? '',
+      LEMONSQUEEZY_TEST_API_KEY: Deno.env.get('LEMONSQUEEZY_TEST_API_KEY') ?? '',
+      LEMONSQUEEZY_TEST_VARIANTS: Deno.env.get('LEMONSQUEEZY_TEST_VARIANTS') ?? '',
       CHECKOUT_REDIRECT_URL: Deno.env.get('CHECKOUT_REDIRECT_URL') ?? '',
       DEPLOYMENT_LIVE: Deno.env.get('DEPLOYMENT_LIVE') ?? 'true'
     }

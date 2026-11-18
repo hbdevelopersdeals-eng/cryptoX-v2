@@ -116,6 +116,7 @@ export default function DerivativesExtras({ symbol = 'BTCUSDT' }) {
             <span className="text-[10px] text-muted-foreground">carry rate</span>
             <input
               type="number"
+              aria-label="Carry rate"
               value={rate}
               step="0.5"
               onChange={(e) => setRate(Number(e.target.value))}
@@ -204,26 +205,26 @@ export default function DerivativesExtras({ symbol = 'BTCUSDT' }) {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           <div>
             <p className="mb-0.5 text-[10px] text-muted-foreground">Side</p>
-            <select value={side} onChange={(e) => setSide(e.target.value)} className="input-dark !h-8 !text-[11px]">
+            <select aria-label="Side" value={side} onChange={(e) => setSide(e.target.value)} className="input-dark !h-8 !text-[11px]">
               <option value="long">long</option>
               <option value="short">short</option>
             </select>
           </div>
           <div>
             <p className="mb-0.5 text-[10px] text-muted-foreground">Entry</p>
-            <input value={entry} onChange={(e) => setEntry(e.target.value)} placeholder={mark ? String(mark) : '0'} className="input-dark !h-8 num !text-[11px]" />
+            <input aria-label="Entry price" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder={mark ? String(mark) : '0'} className="input-dark !h-8 num !text-[11px]" />
           </div>
           <div>
             <p className="mb-0.5 text-[10px] text-muted-foreground">Size</p>
-            <input value={qty} onChange={(e) => setQty(e.target.value)} placeholder="1" className="input-dark !h-8 num !text-[11px]" />
+            <input aria-label="Position size" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="1" className="input-dark !h-8 num !text-[11px]" />
           </div>
           <div>
             <p className="mb-0.5 text-[10px] text-muted-foreground">Close qty</p>
-            <input value={closeQty} onChange={(e) => setCloseQty(e.target.value)} placeholder={qty || '1'} className="input-dark !h-8 num !text-[11px]" />
+            <input aria-label="Quantity to close" value={closeQty} onChange={(e) => setCloseQty(e.target.value)} placeholder={qty || '1'} className="input-dark !h-8 num !text-[11px]" />
           </div>
           <div>
             <p className="mb-0.5 text-[10px] text-muted-foreground">Leverage</p>
-            <input type="number" value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="input-dark !h-8 num !text-[11px]" />
+            <input aria-label="Leverage" type="number" value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="input-dark !h-8 num !text-[11px]" />
           </div>
         </div>
 

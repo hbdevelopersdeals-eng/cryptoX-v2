@@ -67,6 +67,7 @@ function ArmModal({ preset, onClose, onArm, rows }) {
             <div className="relative">
               <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
+                aria-label="Search coins"
                 value={coin ? `${coin.name} (${coin.symbol})` : q}
                 onChange={(e) => { setCoin(null); setQ(e.target.value); setOpenList(true); }}
                 onFocus={() => setOpenList(true)}

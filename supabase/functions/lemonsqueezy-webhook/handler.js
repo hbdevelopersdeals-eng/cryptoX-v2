@@ -136,9 +136,36 @@ export function interpretEvent(payload) {
   };
 }
 
+/**
+ * Test-mode variant map, inverted for lookup.
+ *
+ * Shares LEMONSQUEEZY_TEST_VARIANTS with the checkout function: one JSON object
+ * of 'plan:cycle' -> test variant id, which the checkout reads forwards and the
+ * webhook needs backwards. A test purchase carries a test variant id, so
+ * without this every test event would be ignored as variant-unknown and the
+ * whole exercise would prove nothing.
+ */
+export function testVariantMap(env = {}) {
+  const raw = env.LEMONSQUEEZY_TEST_VARIANTS;
+  if (!raw) return {};
+  try {
+    const map = JSON.parse(raw);
+    const out = {};
+    for (const [key, id] of Object.entries(map)) {
+      const [plan, cycle] = String(key).split(':');
+      // Same shape as VARIANT_TO_PLAN: downstream reads `planId`, so emitting
+      // `plan` here would write an undefined plan_id into the subscription.
+      if (plan && cycle && id) out[String(id)] = { planId: plan, cycle };
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 /** The plan and cycle a variant represents, or a refusal. Never a default. */
-export function planForVariant(variantId) {
-  const entry = VARIANT_TO_PLAN[String(variantId ?? '')];
+export function planForVariant(variantId, variantMap = VARIANT_TO_PLAN) {
+  const entry = variantMap[String(variantId ?? '')];
   if (!entry) return { ok: false, reason: 'variant-unknown', variantId: String(variantId ?? '') };
   return { ok: true, ...entry };
 }
@@ -158,7 +185,7 @@ export function statusFor(event) {
  * Pure decision: the caller performs the writes, so the test can assert the
  * decision without a database.
  */
-export function decide({ event, existingEvent = null, variantMap = VARIANT_TO_PLAN }) {
+export function decide({ event, existingEvent = null, variantMap = VARIANT_TO_PLAN, productId = PRODUCT_ID }) {
   if (!event?.ok) return { action: 'reject', status: 400, reason: 'invalid-event' };
 
   // Idempotency first: a retry must not touch anything.
@@ -166,11 +193,11 @@ export function decide({ event, existingEvent = null, variantMap = VARIANT_TO_PL
 
   if (!event.handled) return { action: 'record-only', status: 200, reason: 'unhandled-event' };
 
-  if (event.productId && event.productId !== PRODUCT_ID) {
+  if (event.productId && event.productId !== productId) {
     return { action: 'record-only', status: 200, reason: 'other-product' };
   }
 
-  const mapped = planForVariant(event.variantId);
+  const mapped = planForVariant(event.variantId, variantMap);
   if (!mapped.ok) {
     // An unknown variant must never fall back to a plan: that is how a customer
     // on an unrecognised product is handed access anyway.
@@ -262,7 +289,15 @@ export async function handleRequest({ rawBody, signature, headers = {}, env = {}
   if (!event.ok) return respond(400, { error: event.reason });
 
   const existingEvent = await store.findEvent(key.key);
-  const decision = decide({ event, existingEvent });
+  // Test and live are different storefronts with different ids, so which
+  // variant map and which product id apply is decided here, once, from the flag.
+  const testMode = String(env.LEMONSQUEEZY_TEST_MODE ?? '').trim().toLowerCase() === 'true';
+  const decision = decide({
+    event,
+    existingEvent,
+    variantMap: testMode ? testVariantMap(env) : VARIANT_TO_PLAN,
+    productId: testMode ? String(env.LEMONSQUEEZY_TEST_PRODUCT_ID ?? '') : PRODUCT_ID
+  });
 
   if (decision.action === 'reject') return respond(decision.status, { error: decision.reason });
 

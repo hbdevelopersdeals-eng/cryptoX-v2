@@ -301,7 +301,7 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signUp({
           email: v.email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/#/` }
+          options: { emailRedirectTo: `${window.location.origin}/` }
         });
         if (error) return { ok: false, error: error.message };
         if (data?.session) return { ok: true };
@@ -352,7 +352,7 @@ export function AuthProvider({ children }) {
     if (mode === 'supabase') {
       setBusy(true);
       try {
-        const { error } = await supabase.auth.resend({ type: 'signup', email: v.email, options: { emailRedirectTo: `${window.location.origin}/#/` } });
+        const { error } = await supabase.auth.resend({ type: 'signup', email: v.email, options: { emailRedirectTo: `${window.location.origin}/` } });
         if (error) return { ok: false, error: error.message };
         return { ok: true, delivery: 'email' };
       } finally {
@@ -448,7 +448,7 @@ export function AuthProvider({ children }) {
     setBusy(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(v.email, {
-        redirectTo: `${window.location.origin}/#/reset-password`
+        redirectTo: `${window.location.origin}/reset-password`
       });
       // Always report success: never reveal whether an address is registered.
       if (error) reportError(error, { kind: 'auth.resetPassword' });

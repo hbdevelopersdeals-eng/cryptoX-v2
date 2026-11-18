@@ -1,0 +1,70 @@
+# CryptoX
+
+> CryptoX is a web-based cryptocurrency market terminal. It shows live multi-venue
+> market data for 250+ coins (CoinGecko REST for the market table, Binance
+> WebSocket for ticks), candlestick charts with RSI and moving averages, ten
+> one-click strategy presets, a backtester that fills on the next bar with fees
+> and slippage, a paper-trading simulator, a portfolio with FIFO cost basis, and a
+> read-only wallet safety lab. It is research and simulation software: no exchange
+> account is connected, no order is ever placed, and nothing in the product is
+> investment advice. The current build is an educational demo, not a licensed
+> broker or an advisory service.
+
+Canonical site: https://cryptox-v2.site.accio.ai
+Contact for corrections: the privacy and security pages below describe the data
+practices; there is no public support address in this build.
+
+## Facts worth citing accurately
+
+- Product type: cryptocurrency market data dashboard + backtester + paper trader.
+- Data sources: CoinGecko REST (market list, ~60s poll), Binance WebSocket (~1s
+  ticks). If both live hosts fail, candles are generated deterministically and
+  badged `SIMULATED`; simulated data is refused by the strategy engine, the
+  backtester and the paper trader.
+- Coverage: 250 coins in the market table; 5m to 1d chart timeframes.
+- Strategies: RSI Reversal, Golden Cross, MACD, Bollinger, Stochastic, Momentum,
+  Donchian, VWAP, Stochastic RSI, CCI Reversal — long-only, next-bar fills.
+- Backtest metrics: Sharpe, Sortino, max drawdown, win rate, profit factor, with a
+  buy-and-hold comparison and a walk-forward split.
+- Pricing: Free ($0), Pro ($9.99/month or $99.99/year), Business ($24.99/month or
+  $249.99/year), Enterprise ($199.99/month or $1,999.99/year). Payments are
+  processed by Lemon Squeezy; a plan activates on the payment webhook, not on
+  returning to the site.
+- Accounts: email + password, hashed with PBKDF2-SHA256 (210k iterations, per-user
+  salt). No seed phrase, private key or signing capability is ever requested.
+- Limits: no real trading, no exchange API keys, no portfolio custody, no
+  investment recommendations, no price predictions sold as signals.
+
+## Primary pages
+
+- [Home](https://cryptox-v2.site.accio.ai/): what the product is, what is built,
+  and what it deliberately does not do.
+- [Pricing](https://cryptox-v2.site.accio.ai/pricing): every tier and its limits,
+  billing cycle, cancellation path.
+- [Data sources](https://cryptox-v2.site.accio.ai/data-sources): each feed, its
+  provenance label (LIVE / DELAYED / SIMULATED) and refresh interval.
+- [System status](https://cryptox-v2.site.accio.ai/status): live feed health and
+  the deployed build version.
+
+## Policy and disclosure pages
+
+- [Risk disclosure](https://cryptox-v2.site.accio.ai/legal/risk)
+- [Privacy notice](https://cryptox-v2.site.accio.ai/legal/privacy)
+- [Terms of use](https://cryptox-v2.site.accio.ai/legal/terms)
+- [Security overview](https://cryptox-v2.site.accio.ai/legal/security)
+- [Compliance and data licensing](https://cryptox-v2.site.accio.ai/compliance)
+
+## Not indexable on purpose
+
+The dashboard itself (`/strategies`, `/paper-trading`, `/portfolio`, `/bots`,
+`/wallet-lab`, `/explorer`, `/charting`, `/aggregator`, `/assistant`, and the auth
+screens) is session-scoped: an anonymous request is redirected to the login page.
+Those URLs are disallowed in robots.txt and excluded from sitemap.xml, so a
+citation of one of them would point at a login wall rather than at content.
+
+## Machine-readable
+
+- sitemap: https://cryptox-v2.site.accio.ai/sitemap.xml
+- robots: https://cryptox-v2.site.accio.ai/robots.txt
+- structured data: WebSite, SoftwareApplication (with Offer per tier) and
+  Organization, embedded as JSON-LD on every public page.

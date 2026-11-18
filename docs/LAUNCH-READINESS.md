@@ -19,7 +19,7 @@ The single most important finding: **the deployed build runs in demo auth mode**
 | Unit + component tests | `npm run test` | **PASS** — 65 files, **1,892/1,892** tests, 107s |
 | Production build | `npm run build` | **PASS** — built in 12.65s, 92 lazy chunks |
 | Bundle budget | `npm run check:bundle` | **PASS** — first load **178.4 KB** gzip, all chunks 499.5 KB |
-| Secret scan | `npm run check:secrets` | **PASS** — 283 files, 1 publishable anon JWT, 0 service-role refs |
+| Secret scan | `npm run check:secrets` | **PASS** — 283 files, 1 publishable anon JWT, 0 privileged-role refs |
 | Configuration policy | `npm run check:config` | **PASS** — 189 source files |
 | Locale catalogs | `npm run check:locales` | **PASS** — 24 catalogs × 95 keys |
 | i18n usage | `npm run check:i18n` | **PASS** — 52 literal `t()` keys resolve |
@@ -44,7 +44,7 @@ Raw logs: `audit/test.log`, `audit/build.log`.
 The entitlement chain is: browser → `lemonsqueezy-checkout` (mints nonce) → Lemon Squeezy → `lemonsqueezy-webhook` (verifies signature, consumes nonce, **writes the subscription row to Supabase**). With no Supabase account there is no row and no user to bind it to. A paying customer would complete checkout and receive nothing. It also means every "account" today is a browser-local PBKDF2 record that disappears with site data.
 
 **Fix**
-1. Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` to the build environment and to `.env.example` (they are public by design — publishable/anon only, never service-role).
+1. Add `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` to the build environment and to `.env.example` (they are public by design — publishable/anon only, never privileged-role).
 2. Rebuild and confirm the demo banner and "(demo)" Google button disappear.
 3. Sign up in production and confirm a row appears in `auth.users`.
 4. Run one **test-mode** purchase end-to-end and confirm the webhook writes `cx_subscriptions` and the plan flips.

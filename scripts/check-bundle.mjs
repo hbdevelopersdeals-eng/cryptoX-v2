@@ -27,16 +27,17 @@ const PER_CHUNK_GZIP_BUDGET = 120 * 1024;    // 120 KB gzip per single chunk
 const INITIAL_GZIP_BUDGET = 220 * 1024;      // 220 KB gzip for the first load
 /*
  * Raised 440 -> 480 KB for the Account and Organization pages, then 480 -> 520
- * KB for Billing and Compliance.
+ * KB for Billing and Compliance, then 520 -> 560 KB for Brand Identity &
+ * Terminal Showcase assets.
  *
  * This number is a TRIPWIRE, not a limit: its job is to make growth a conscious
  * decision rather than something noticed after the fact. Every raise is
  * deliberate and recorded. The figure that governs user experience is
- * INITIAL_GZIP_BUDGET above - first load is 161 KB against 220 KB, and 91 lazy
+ * INITIAL_GZIP_BUDGET above - first load is 182 KB against 220 KB, and 104 lazy
  * chunks exist of which a visitor downloads roughly two. If first load ever
  * approaches its budget, that is the signal to act on.
  */
-const TOTAL_GZIP_BUDGET = 520 * 1024;        // 520 KB gzip across every chunk
+const TOTAL_GZIP_BUDGET = 560 * 1024;        // 560 KB gzip across every chunk
 
 if (!existsSync(ASSETS)) {
   console.error('✗ dist/assets not found — run "npm run build" first');

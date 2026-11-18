@@ -1,0 +1,165 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#12151B" stopOpacity="0.95" />
+      <stop offset="100%" stopColor="#0B0D11" stopOpacity="0.98" />
+    </linearGradient>
+    <linearGradient id="accent-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FFE066" />
+      <stop offset="100%" stopColor="#FFC105" />
+    </linearGradient>
+    <linearGradient id="chart-green" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#34D399" stopOpacity="0.35" />
+      <stop offset="100%" stopColor="#34D399" stopOpacity="0.0" />
+    </linearGradient>
+    <linearGradient id="card-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#343B48" />
+      <stop offset="50%" stopColor="#1F232B" />
+      <stop offset="100%" stopColor="#FFC105" stopOpacity="0.3" />
+    </linearGradient>
+    <filter id="glow-gold" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Ambient Glows -->
+  <circle cx="680" cy="120" r="140" fill="#FFC105" fillOpacity="0.06" filter="url(#glow-gold)" />
+  <circle cx="120" cy="400" r="160" fill="#34D399" fillOpacity="0.04" filter="url(#glow-gold)" />
+
+  <!-- Main Terminal Window Frame -->
+  <rect x="20" y="20" width="760" height="480" rx="20" fill="url(#bg-grad)" stroke="url(#card-border)" strokeWidth="1.5" />
+
+  <!-- Terminal Header Bar -->
+  <rect x="20" y="20" width="760" height="46" rx="20" fill="#161920" />
+  <rect x="20" y="46" width="760" height="20" fill="#161920" />
+  <line x1="20" y1="66" x2="780" y2="66" stroke="#232730" strokeWidth="1" />
+
+  <!-- Mac style dots -->
+  <circle cx="44" cy="43" r="5" fill="#EF4444" />
+  <circle cx="60" cy="43" r="5" fill="#F59E0B" />
+  <circle cx="76" cy="43" r="5" fill="#10B981" />
+
+  <!-- Terminal Tab Header -->
+  <rect x="105" y="31" width="160" height="26" rx="6" fill="#0D0E12" stroke="#252A34" strokeWidth="1" />
+  <circle cx="120" cy="44" r="3.5" fill="#FFC105" />
+  <text x="132" y="48" fill="#F0F2F5" fontFamily="system-ui, sans-serif" fontSize="11" fontWeight="600">BTC/USDT · Live Pro</text>
+
+  <!-- Top Right Live Status Pill -->
+  <rect x="650" y="32" width="110" height="24" rx="12" fill="#0E2319" stroke="#059669" strokeWidth="1" />
+  <circle cx="664" cy="44" r="3.5" fill="#34D399" />
+  <text x="674" y="48" fill="#34D399" fontFamily="system-ui, sans-serif" fontSize="10" fontWeight="700">WS · 1.02s LIVE</text>
+
+  <!-- Left Sidebar (Coin Pairs) -->
+  <rect x="20" y="66" width="210" height="434" fill="#101217" />
+  <line x1="230" y1="66" x2="230" y2="500" stroke="#1F232B" strokeWidth="1" />
+
+  <!-- Sidebar Items -->
+  <!-- BTC Item (Active) -->
+  <rect x="30" y="80" width="190" height="54" rx="10" fill="#1D212A" stroke="#FFC105" strokeWidth="1" strokeOpacity="0.5" />
+  <circle cx="54" cy="107" r="14" fill="#F7931A" />
+  <text x="54" y="112" fill="#FFFFFF" fontFamily="sans-serif" fontSize="13" fontWeight="bold" textAnchor="middle">₿</text>
+  <text x="76" y="102" fill="#FFFFFF" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="bold">Bitcoin</text>
+  <text x="76" y="118" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="11">BTC · $96,420</text>
+  <text x="208" y="106" fill="#34D399" fontFamily="monospace" fontSize="11" fontWeight="bold" textAnchor="end">+3.48%</text>
+
+  <!-- ETH Item -->
+  <rect x="30" y="142" width="190" height="50" rx="10" fill="#14171E" />
+  <circle cx="54" cy="167" r="14" fill="#627EEA" />
+  <text x="54" y="172" fill="#FFFFFF" fontFamily="sans-serif" fontSize="12" fontWeight="bold" textAnchor="middle">Ξ</text>
+  <text x="76" y="162" fill="#D6D9DE" fontFamily="system-ui, sans-serif" fontSize="12" fontWeight="600">Ethereum</text>
+  <text x="76" y="178" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="10">ETH · $3,410</text>
+  <text x="208" y="166" fill="#34D399" fontFamily="monospace" fontSize="11" textAnchor="end">+1.82%</text>
+
+  <!-- SOL Item -->
+  <rect x="30" y="200" width="190" height="50" rx="10" fill="#14171E" />
+  <circle cx="54" cy="225" r="14" fill="#00FFA3" />
+  <text x="54" y="229" fill="#000000" fontFamily="sans-serif" fontSize="10" fontWeight="bold" textAnchor="middle">S</text>
+  <text x="76" y="220" fill="#D6D9DE" fontFamily="system-ui, sans-serif" fontSize="12" fontWeight="600">Solana</text>
+  <text x="76" y="236" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="10">SOL · $198.40</text>
+  <text x="208" y="224" fill="#34D399" fontFamily="monospace" fontSize="11" textAnchor="end">+6.14%</text>
+
+  <!-- Main Chart Area -->
+  <!-- Top Metrics Bar -->
+  <g transform="translate(250, 80)">
+    <text x="0" y="16" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="11" fontWeight="500">INDEX PRICE</text>
+    <text x="0" y="40" fill="#F0F2F5" fontFamily="monospace" fontSize="22" fontWeight="bold">$96,420.50</text>
+    
+    <text x="160" y="16" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="11" fontWeight="500">24H HIGH</text>
+    <text x="160" y="38" fill="#F0F2F5" fontFamily="monospace" fontSize="14" fontWeight="600">$97,850.00</text>
+
+    <text x="270" y="16" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="11" fontWeight="500">24H LOW</text>
+    <text x="270" y="38" fill="#F0F2F5" fontFamily="monospace" fontSize="14" fontWeight="600">$93,210.00</text>
+
+    <text x="380" y="16" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="11" fontWeight="500">PROVENANCE</text>
+    <rect x="380" y="24" width="115" height="18" rx="4" fill="#FFC105" fillOpacity="0.15" />
+    <text x="437" y="37" fill="#FFC105" fontFamily="monospace" fontSize="10" fontWeight="bold" textAnchor="middle">CoinGecko + CEX</text>
+  </g>
+
+  <!-- Grid lines -->
+  <line x1="250" y1="150" x2="760" y2="150" stroke="#1C2027" strokeWidth="1" strokeDasharray="4 4" />
+  <line x1="250" y1="210" x2="760" y2="210" stroke="#1C2027" strokeWidth="1" strokeDasharray="4 4" />
+  <line x1="250" y1="270" x2="760" y2="270" stroke="#1C2027" strokeWidth="1" strokeDasharray="4 4" />
+  <line x1="250" y1="330" x2="760" y2="330" stroke="#1C2027" strokeWidth="1" strokeDasharray="4 4" />
+
+  <!-- Dynamic Price Area Fill -->
+  <path d="M250 280 Q 300 290 350 240 T 450 210 T 550 180 T 650 140 T 760 110 L 760 360 L 250 360 Z" fill="url(#chart-green)" />
+  
+  <!-- Candlestick chart simulation -->
+  <!-- Candle 1 -->
+  <line x1="280" y1="260" x2="280" y2="300" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="274" y="270" width="12" height="20" fill="#34D399" rx="2" />
+  <!-- Candle 2 -->
+  <line x1="320" y1="240" x2="320" y2="290" stroke="#F87171" strokeWidth="1.5" />
+  <rect x="314" y="250" width="12" height="25" fill="#F87171" rx="2" />
+  <!-- Candle 3 -->
+  <line x1="360" y1="210" x2="360" y2="260" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="354" y="220" width="12" height="30" fill="#34D399" rx="2" />
+  <!-- Candle 4 -->
+  <line x1="400" y1="190" x2="400" y2="240" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="394" y="200" width="12" height="26" fill="#34D399" rx="2" />
+  <!-- Candle 5 (Bullish breakout) -->
+  <line x1="440" y1="170" x2="440" y2="225" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="434" y="175" width="12" height="36" fill="#34D399" rx="2" />
+  <!-- Candle 6 -->
+  <line x1="480" y1="160" x2="480" y2="210" stroke="#F87171" strokeWidth="1.5" />
+  <rect x="474" y="170" width="12" height="18" fill="#F87171" rx="2" />
+  <!-- Candle 7 -->
+  <line x1="520" y1="145" x2="520" y2="195" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="514" y="150" width="12" height="32" fill="#34D399" rx="2" />
+  <!-- Candle 8 -->
+  <line x1="560" y1="130" x2="560" y2="180" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="554" y="135" width="12" height="35" fill="#34D399" rx="2" />
+  <!-- Candle 9 -->
+  <line x1="600" y1="115" x2="600" y2="165" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="594" y="120" width="12" height="30" fill="#34D399" rx="2" />
+  <!-- Candle 10 (High Peak) -->
+  <line x1="640" y1="95" x2="640" y2="150" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="634" y="100" width="12" height="35" fill="#34D399" rx="2" />
+  <!-- Candle 11 -->
+  <line x1="680" y1="105" x2="680" y2="145" stroke="#F87171" strokeWidth="1.5" />
+  <rect x="674" y="110" width="12" height="20" fill="#F87171" rx="2" />
+  <!-- Candle 12 (Current) -->
+  <line x1="720" y1="90" x2="720" y2="135" stroke="#34D399" strokeWidth="1.5" />
+  <rect x="714" y="95" width="12" height="25" fill="#34D399" rx="2" />
+
+  <!-- Moving Average Trend Curve Line -->
+  <path d="M250 280 Q 300 290 350 240 T 450 210 T 550 180 T 650 140 T 760 110" stroke="#FFC105" strokeWidth="3" fill="none" />
+
+  <!-- Floating Strategy Engine Signal Badge -->
+  <g transform="translate(480, 240)">
+    <rect width="250" height="74" rx="12" fill="#12161F" stroke="#FFC105" strokeWidth="1.25" />
+    <circle cx="24" cy="24" r="8" fill="#FFC105" fillOpacity="0.2" />
+    <circle cx="24" cy="24" r="4" fill="#FFC105" />
+    <text x="40" y="28" fill="#F0F2F5" fontFamily="system-ui, sans-serif" fontSize="12" fontWeight="bold">RSI-14 Strategy Signal</text>
+    <rect x="186" y="16" width="50" height="18" rx="4" fill="#34D399" fillOpacity="0.2" />
+    <text x="211" y="29" fill="#34D399" fontFamily="monospace" fontSize="10" fontWeight="bold" textAnchor="middle">BUY @ 28</text>
+    <text x="18" y="56" fill="#8A93A5" fontFamily="system-ui, sans-serif" fontSize="10">Simulated fill · Next-bar fee 0.075%</text>
+  </g>
+
+  <!-- Bottom Indicators Pane -->
+  <rect x="250" y="380" width="510" height="100" rx="10" fill="#12141A" stroke="#1F232B" strokeWidth="1" />
+  <text x="265" y="402" fill="#8A93A5" fontFamily="monospace" fontSize="10" fontWeight="bold">RSI (14) · VALUE: 34.2 (OVERSOLD ACCUMULATION)</text>
+  <line x1="265" y1="440" x2="745" y2="440" stroke="#252A34" strokeWidth="1" strokeDasharray="3 3" />
+  <path d="M265 460 Q 320 470 380 430 T 480 410 T 580 440 T 680 425 T 745 405" stroke="#60A5FA" strokeWidth="2" fill="none" />
+</svg>

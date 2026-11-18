@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   REQUIRED_SECRETS, HANDLED_EVENTS, KNOWN_STATUSES, VARIANT_TO_PLAN, PRODUCT_ID,
   checkSecrets, verifySignature, eventKey, interpretEvent, planForVariant, statusFor,
-  decide, subscriptionRow, handleRequest, isEntitled
+  decide, subscriptionRow, handleRequest, isEntitled, testVariantMap
 } from './handler.js';
 import { VARIANTS } from '../../../src/lib/checkout.js';
 

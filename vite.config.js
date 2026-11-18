@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SUPABASE_CSP_PLACEHOLDER, applySupabaseCsp } from './scripts/csp-origin.mjs';
+import { swVersion } from './src/lib/pwa.js';
+
+const SW_PLACEHOLDER = '__CX_SW_VERSION__';
 
 /**
  * Substitutes the Supabase origin into the Content-Security-Policy at build
@@ -51,13 +54,49 @@ function supabaseCspPlugin(supabaseUrl) {
   };
 }
 
+/**
+ * Stamps the service-worker cache version with this build's identity.
+ *
+ * `public/sw.js` ships with the literal `__CX_SW_VERSION__`. Left unstamped, the
+ * cache name would be identical in every release — which is exactly how a
+ * browser kept serving a fixed bug from an old shell. A surviving placeholder is
+ * a build error rather than a warning, for the same reason the CSP one is: the
+ * failure it causes (a release that never reaches the user) is invisible at
+ * runtime and impossible to diagnose from a bug report.
+ */
+function serviceWorkerVersionPlugin({ version, stamp }) {
+  const cacheVersion = swVersion({ version, stamp });
+
+  return {
+    name: 'cryptox-sw-version',
+
+    closeBundle() {
+      if (this.meta?.watchMode) return;
+      const file = resolve('dist', 'sw.js');
+      if (!existsSync(file)) return;
+      const source = readFileSync(file, 'utf8');
+      writeFileSync(file, source.split(SW_PLACEHOLDER).join(cacheVersion), 'utf8');
+      if (readFileSync(file, 'utf8').includes(SW_PLACEHOLDER)) {
+        this.error('dist/sw.js still contains the cache-version placeholder; releases would not replace each other.');
+      }
+    }
+  };
+}
+
 export default defineConfig(({ mode }) => {
   // Empty prefix so VITE_ variables are read too. loadEnv merges .env and
   // .env.local, which is where the Supabase URL is configured.
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [react(), supabaseCspPlugin(env.VITE_SUPABASE_URL)],
+    plugins: [
+      react(),
+      supabaseCspPlugin(env.VITE_SUPABASE_URL),
+      serviceWorkerVersionPlugin({
+        version: env.VITE_APP_VERSION || 'dev',
+        stamp: env.VITE_BUILD_STAMP || 'unknown'
+      })
+    ],
     server: {
       host: '127.0.0.1'
     },

@@ -54,8 +54,39 @@ export const VARIANTS = [
 
 const BY_KEY = new Map(VARIANTS.map((v) => [`${v.plan}:${v.cycle}`, v]));
 
-export function variantFor(plan, cycle) {
-  return BY_KEY.get(`${plan}:${cycle}`) || null;
+export const TEST_VARIANTS = 'LEMONSQUEEZY_TEST_VARIANTS';
+
+/**
+ * The variant table for the current mode.
+ *
+ * The test storefront is a SEPARATE data set from the live one: a live variant
+ * id does not exist there, and the provider rejects a checkout that names one —
+ * that is exactly how the first test attempt failed, with 502 provider-rejected.
+ * In test mode the ids therefore come from LEMONSQUEEZY_TEST_VARIANTS, a JSON
+ * object mapping 'plan:cycle' to the test variant id.
+ *
+ * If test mode is on and that map is missing or unparseable, the table is
+ * EMPTY. Falling back to the live ids would send a "test" purchase into real
+ * data with a real card, which is the one outcome this whole split exists to
+ * prevent.
+ */
+export function variantTable(env = {}) {
+  if (!isTestMode(env)) return VARIANTS;
+  const raw = env[TEST_VARIANTS];
+  if (!raw) return [];
+  try {
+    const map = JSON.parse(raw);
+    return VARIANTS
+      .map((v) => ({ ...v, id: map[`${v.plan}:${v.cycle}`] ? String(map[`${v.plan}:${v.cycle}`]) : null }))
+      .filter((v) => v.id);
+  } catch {
+    return [];
+  }
+}
+
+export function variantFor(plan, cycle, env = {}) {
+  if (!isTestMode(env)) return BY_KEY.get(`${plan}:${cycle}`) || null;
+  return variantTable(env).find((v) => v.plan === plan && v.cycle === cycle) || null;
 }
 
 export const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' };
@@ -111,7 +142,7 @@ export function checkSecrets(env = {}) {
  * extra fields cannot even probe which extra fields exist. Nothing returned
  * here is a value the server will act on beyond choosing a variant.
  */
-export function readIntent(body) {
+export function readIntent(body, env = {}) {
   let parsed = body;
   if (typeof body === 'string') {
     try {
@@ -134,7 +165,7 @@ export function readIntent(body) {
     return { ok: false, reason: 'invalid-cycle', detail: 'cycle must be one of ' + CYCLES.join(', ') };
   }
 
-  const variant = variantFor(plan, cycle);
+  const variant = variantFor(plan, cycle, env);
   if (!variant) {
     // A plan and cycle that are each valid but have no sellable variant is a
     // mapping gap, not a client error. Refuse rather than guess.
@@ -253,7 +284,7 @@ export async function handleRequest({
 
   const { apiKey } = secrets;
 
-  const intent = readIntent(body);
+  const intent = readIntent(body, env);
   if (!intent.ok) return respond(400, { error: intent.reason, detail: intent.detail ?? null });
 
   const nonce = mintNonce();

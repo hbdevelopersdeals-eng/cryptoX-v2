@@ -158,7 +158,10 @@ const SQL_WORDS = new Set([
   'text', 'uuid', 'bigint', 'jsonb', 'numeric', 'boolean', 'timestamptz', 'primary',
   'key', 'references', 'cascade', 'delete', 'set', 'identity', 'always', 'as',
   'generated', 'by', 'partition', 'range', 'like', 'interval', 'extract', 'epoch',
-  'date', 'lower', 'upper', 'length', 'substring', 'desc', 'asc'
+  'date', 'lower', 'upper', 'length', 'substring', 'desc', 'asc',
+  /* Built-in functions allowed inside a CHECK. They are listed one by one — not
+   * matched by a suffix rule — so a typo of a real column still fails. */
+  'jsonb_typeof', 'jsonb_array_length'
 ]);
 const referenced = (expr) => [...new Set(
   (String(expr).replace(/'[^']*'/g, ' ').match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [])

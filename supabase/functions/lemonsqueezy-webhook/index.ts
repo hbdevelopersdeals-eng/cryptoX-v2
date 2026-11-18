@@ -101,8 +101,14 @@ Deno.serve(async (req: Request) => {
     rawBody,
     signature,
     headers: Object.fromEntries(req.headers),
+    // An explicit allow-list, so the function can only ever see the settings it
+    // is meant to use. Every new setting must be added here as well: a secret
+    // saved in the dashboard is invisible to the handler until it is listed.
     env: {
       LEMONSQUEEZY_WEBHOOK_SECRET: Deno.env.get('LEMONSQUEEZY_WEBHOOK_SECRET') ?? '',
+      LEMONSQUEEZY_TEST_MODE: Deno.env.get('LEMONSQUEEZY_TEST_MODE') ?? '',
+      LEMONSQUEEZY_TEST_VARIANTS: Deno.env.get('LEMONSQUEEZY_TEST_VARIANTS') ?? '',
+      LEMONSQUEEZY_TEST_PRODUCT_ID: Deno.env.get('LEMONSQUEEZY_TEST_PRODUCT_ID') ?? '',
       // The deployment's own mode. A test subscription must never grant live
       // access, so this is read from configuration rather than assumed.
       DEPLOYMENT_LIVE: Deno.env.get('DEPLOYMENT_LIVE') ?? 'true'

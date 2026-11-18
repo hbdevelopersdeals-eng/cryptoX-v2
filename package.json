@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -18,7 +19,12 @@
     "check:frontend": "node scripts/check-frontend.mjs",
     "check:schema": "node scripts/check-schema.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
-    "check": "npm run check:secrets && npm run check:config && npm run check:locales && npm run check:i18n && npm run check:frontend && npm run check:schema && npm run build && npm run check:bundle",
+    "check:deploy": "node scripts/check-deploy-env.mjs --strict",
+    "check:matrix": "node scripts/check-production-matrix.mjs",
+    "seo:sitemap": "node scripts/gen-sitemap.mjs",
+    "seo:check": "node scripts/gen-sitemap.mjs --check",
+    "seo:prerender:check": "node scripts/prerender.mjs --check",
+    "check": "npm run check:secrets && npm run check:deploy && npm run check:config && npm run check:locales && npm run check:i18n && npm run check:frontend && npm run check:schema && npm run check:matrix && npm run seo:check && npm run build && npm run seo:prerender:check && npm run check:bundle",
     "verify": "npm run test && npm run check"
   },
   "dependencies": {

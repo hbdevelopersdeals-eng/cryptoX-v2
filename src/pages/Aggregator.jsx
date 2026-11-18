@@ -238,6 +238,7 @@ export default function AggregatorPage() {
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Minimum gross gap</p>
                 <select
+                  aria-label="Minimum gross gap"
                   value={minGrossPct}
                   onChange={(e) => setMinGrossPct(Number(e.target.value))}
                   className="input-dark !h-9 !w-auto !text-xs"
@@ -248,6 +249,7 @@ export default function AggregatorPage() {
               <div>
                 <p className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">Assumed round-trip fee</p>
                 <select
+                  aria-label="Assumed round-trip fee"
                   value={feePct}
                   onChange={(e) => setFeePct(Number(e.target.value))}
                   className="input-dark !h-9 !w-auto !text-xs"

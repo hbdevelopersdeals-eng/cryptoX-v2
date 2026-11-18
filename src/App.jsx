@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 
-import { AuthProvider, RequireAuth, GuestOnly } from './lib/auth.jsx';
+import { AuthProvider, GuestOnly, useAuth } from './lib/auth.jsx';
 import { MarketProvider } from './lib/market.jsx';
 import { StrategyEngineProvider } from './lib/engine.jsx';
 import { I18nProvider } from './lib/i18n.jsx';
@@ -11,6 +11,8 @@ import { UpgradeGate } from './components/Upgrade.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import ConsentBanner from './components/ConsentBanner.jsx';
 import Shell from './components/Shell.jsx';
+import PublicLayout from './components/PublicLayout.jsx';
+import SeoManager from './components/SeoManager.jsx';
 
 // Auth screens stay in the initial bundle (first-paint path); everything else is split.
 import { LoginPage, RegisterPage, ForgotPage, ResetPage } from './pages/Auth.jsx';
@@ -49,6 +51,15 @@ const BillingPage = lazy(() => import('./pages/Billing.jsx'));
 const PricingPage = lazy(() => import('./pages/Pricing.jsx'));
 const UpgradeSuccessPage = lazy(() => import('./pages/UpgradeSuccess.jsx'));
 const CompliancePage = lazy(() => import('./pages/Compliance.jsx'));
+const LandingPage = lazy(() => import('./pages/Landing.jsx'));
+const GuidesPage = lazy(() => import('./pages/Guides.jsx'));
+const GuideArticlePage = lazy(() => import('./pages/GuideArticle.jsx'));
+const SearchPage = lazy(() => import('./pages/Search.jsx'));
+const CopyTradingPage = lazy(() => import('./pages/CopyTrading.jsx'));
+const LaunchpadPage = lazy(() => import('./pages/Launchpad.jsx'));
+const AcademyPage = lazy(() => import('./pages/Academy.jsx'));
+const ReferralPage = lazy(() => import('./pages/Referral.jsx'));
+const AdminPage = lazy(() => import('./pages/Admin.jsx'));
 
 export function PageFallback() {
   return (
@@ -56,6 +67,30 @@ export function PageFallback() {
       Loading…
     </div>
   );
+}
+
+/* The gate in front of the authenticated app.
+ *
+ * `"/"` is the one URL a crawler, an AI answer or a first-time visitor is most
+ * likely to open, so it cannot be a login wall: a signed-out request for `/`
+ * gets the marketing page, a signed-in one gets the dashboard. Every other
+ * deep link keeps the old behaviour — redirect to /login and come back after
+ * signing in — because silently swapping a bookmarked screen for a pitch would
+ * be worse than the redirect.
+ */
+function AppBoundary() {
+  const { session, authReady } = useAuth();
+  const loc = useLocation();
+  if (!authReady) return <PageFallback />;
+  if (session) return <Shell />;
+  if (loc.pathname === '/') {
+    return (
+      <PublicLayout>
+        <LandingPage />
+      </PublicLayout>
+    );
+  }
+  return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
 }
 
 function ScrollToTop() {
@@ -76,25 +111,40 @@ export default function App() {
       <AuthProvider>
         <SubscriptionProvider>
         <MarketProvider>
-          <HashRouter>
+          <BrowserRouter>
             <ScrollToTop />
             <ConsentBanner />
+            <SeoManager />
             <StrategyEngineProvider>
               <Suspense fallback={<PageFallback />}>
                 <Routes>
-                  {/* Public */}
+                  {/* ---- Public and indexable -------------------------------
+                      These render without a session, carry their own metadata
+                      (src/lib/routes.js) and are the only URLs in sitemap.xml.
+                      Everything below <RequireAuth> is deliberately absent
+                      from the sitemap: a crawler that follows it only ever
+                      sees the login wall. */}
+                  <Route path="/welcome" element={<Navigate to="/" replace />} />
+                  <Route element={<PublicLayout />}>
+                    <Route path="/pricing" element={<PricingPage />} />
+                    <Route path="/status" element={<StatusPage />} />
+                    <Route path="/data-sources" element={<DataSourcesPage />} />
+                    <Route path="/guides" element={<GuidesPage />} />
+                    <Route path="/guides/:slug" element={<GuideArticlePage />} />
+                    <Route path="/compliance" element={<CompliancePage />} />
+                    <Route path="/legal/:doc" element={<LegalPage />} />
+                  </Route>
+
+                  {/* ---- Public, not indexable (auth screens) ---- */}
                   <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
                   <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
                   <Route path="/forgot-password" element={<GuestOnly><ForgotPage /></GuestOnly>} />
                   <Route path="/reset-password" element={<GuestOnly><ResetPage /></GuestOnly>} />
-                  <Route path="/legal/:doc" element={<LegalPage />} />
 
                   {/* Authenticated app */}
                   <Route
                     element={
-                      <RequireAuth>
-                        <Shell />
-                      </RequireAuth>
+                      <AppBoundary />
                     }
                   >
                     <Route path="/" element={<HomePage />} />
@@ -130,6 +180,12 @@ export default function App() {
             nothing by itself; it re-reads the subscription the webhook writes. */}
         <Route path="/upgrade/success" element={<UpgradeSuccessPage />} />
                     <Route path="/compliance" element={<CompliancePage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/copy-trading" element={<CopyTradingPage />} />
+                    <Route path="/launchpad" element={<LaunchpadPage />} />
+                    <Route path="/academy" element={<AcademyPage />} />
+                    <Route path="/referral" element={<ReferralPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
                     <Route path="/coin/:id" element={<CoinDetailPage />} />
                     <Route path="/404" element={<NotFoundPage />} />
                     <Route path="*" element={<Navigate to="/404" replace />} />
@@ -137,7 +193,7 @@ export default function App() {
                 </Routes>
               </Suspense>
             </StrategyEngineProvider>
-          </HashRouter>
+          </BrowserRouter>
         </MarketProvider>
         </SubscriptionProvider>
       </AuthProvider>

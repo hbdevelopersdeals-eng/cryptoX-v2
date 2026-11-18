@@ -7,7 +7,6 @@ import {
   measurementFor, CATALOG_STATUS, SOURCE_LANGUAGE, NUMBERING_SYSTEMS, matchLanguage
 } from './locales.js';
 import { translate as coreTranslate, coverage } from './translate.js';
-import { applySeo } from './seo.js';
 import {
   formatNumber, formatCurrency, formatDate, formatTime, formatDateTime, formatMeasure
 } from './localeFormat.js';
@@ -101,21 +100,12 @@ export function I18nProvider({ children }) {
     document.documentElement.dir = dir;
   }, [lang, dir]);
 
-  /* Localized metadata + hreflang, refreshed whenever language or route changes. */
   const t = useCallback((key, vars) => coreTranslate(tables, lang, key, vars), [tables, lang]);
 
-  useEffect(() => {
-    const description = coreTranslate(tables, lang, 'seo.description');
-    const title = coreTranslate(tables, lang, 'seo.title');
-    applySeo({
-      lang,
-      dir,
-      title,
-      description,
-      languages: LANGUAGES.map((l) => l.code),
-      path: typeof location === 'undefined' ? '/' : (location.hash.replace(/^#/, '') || '/')
-    });
-  }, [tables, lang, dir]);
+  /* Document metadata is owned by <SeoManager>, which is the only place that
+   * knows BOTH the current route and the language. It used to live here, where
+   * it read `location.hash` and re-applied one global title on every language
+   * change — so every route ended up sharing the home page's canonical. */
 
   const stats = useMemo(() => coverage(tables, lang), [tables, lang]);
 

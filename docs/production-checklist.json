@@ -1,0 +1,3512 @@
+[
+  {
+    "n": 1,
+    "section": "0. Product Vision",
+    "item": "CryptoX umbrella platform"
+  },
+  {
+    "n": 2,
+    "section": "0. Product Vision",
+    "item": "Web application"
+  },
+  {
+    "n": 3,
+    "section": "0. Product Vision",
+    "item": "Responsive mobile web"
+  },
+  {
+    "n": 4,
+    "section": "0. Product Vision",
+    "item": "iOS application"
+  },
+  {
+    "n": 5,
+    "section": "0. Product Vision",
+    "item": "Android application"
+  },
+  {
+    "n": 6,
+    "section": "0. Product Vision",
+    "item": "Desktop application"
+  },
+  {
+    "n": 7,
+    "section": "0. Product Vision",
+    "item": "Public API"
+  },
+  {
+    "n": 8,
+    "section": "0. Product Vision",
+    "item": "Developer SDK"
+  },
+  {
+    "n": 9,
+    "section": "0. Product Vision",
+    "item": "Institutional API"
+  },
+  {
+    "n": 10,
+    "section": "0. Product Vision",
+    "item": "Admin/control center"
+  },
+  {
+    "n": 11,
+    "section": "0. Product Vision",
+    "item": "Super-admin infrastructure"
+  },
+  {
+    "n": 12,
+    "section": "0. Product Vision",
+    "item": "Multi-language"
+  },
+  {
+    "n": 13,
+    "section": "0. Product Vision",
+    "item": "Multi-currency"
+  },
+  {
+    "n": 14,
+    "section": "0. Product Vision",
+    "item": "Multi-region"
+  },
+  {
+    "n": 15,
+    "section": "0. Product Vision",
+    "item": "Multi-tenant architecture"
+  },
+  {
+    "n": 16,
+    "section": "0. Product Vision",
+    "item": "Global CDN"
+  },
+  {
+    "n": 17,
+    "section": "0. Product Vision",
+    "item": "24/7 operation"
+  },
+  {
+    "n": 18,
+    "section": "0. Product Vision",
+    "item": "High availability"
+  },
+  {
+    "n": 19,
+    "section": "0. Product Vision",
+    "item": "Disaster recovery"
+  },
+  {
+    "n": 20,
+    "section": "0. Product Vision",
+    "item": "Horizontal scalability"
+  },
+  {
+    "n": 21,
+    "section": "0. Product Vision",
+    "item": "Enterprise-grade observability"
+  },
+  {
+    "n": 22,
+    "section": "1. Exchange Engine",
+    "item": "Spot trading"
+  },
+  {
+    "n": 23,
+    "section": "1. Exchange Engine",
+    "item": "Market, limit, stop, stop-limit, take-profit, OCO, trailing-stop and advanced orders"
+  },
+  {
+    "n": 24,
+    "section": "1. Exchange Engine",
+    "item": "Ultra-low-latency deterministic matching engine"
+  },
+  {
+    "n": 25,
+    "section": "1. Exchange Engine",
+    "item": "Price-time priority"
+  },
+  {
+    "n": 26,
+    "section": "1. Exchange Engine",
+    "item": "Self-trade prevention"
+  },
+  {
+    "n": 27,
+    "section": "1. Exchange Engine",
+    "item": "Market protection"
+  },
+  {
+    "n": 28,
+    "section": "1. Exchange Engine",
+    "item": "Tick/lot-size enforcement"
+  },
+  {
+    "n": 29,
+    "section": "1. Exchange Engine",
+    "item": "Circuit breakers and trading halts"
+  },
+  {
+    "n": 30,
+    "section": "1. Exchange Engine",
+    "item": "Kill switch"
+  },
+  {
+    "n": 31,
+    "section": "1. Exchange Engine",
+    "item": "Real-time risk checks"
+  },
+  {
+    "n": 32,
+    "section": "1. Exchange Engine",
+    "item": "Atomic settlement"
+  },
+  {
+    "n": 33,
+    "section": "1. Exchange Engine",
+    "item": "Level 1/2/3 order books"
+  },
+  {
+    "n": 34,
+    "section": "1. Exchange Engine",
+    "item": "Depth, spread and liquidity visualization"
+  },
+  {
+    "n": 35,
+    "section": "1. Exchange Engine",
+    "item": "Historical order-book replay"
+  },
+  {
+    "n": 36,
+    "section": "2. Derivatives",
+    "item": "Futures"
+  },
+  {
+    "n": 37,
+    "section": "2. Derivatives",
+    "item": "Perpetual futures"
+  },
+  {
+    "n": 38,
+    "section": "2. Derivatives",
+    "item": "Options"
+  },
+  {
+    "n": 39,
+    "section": "2. Derivatives",
+    "item": "Cross/isolated margin"
+  },
+  {
+    "n": 40,
+    "section": "2. Derivatives",
+    "item": "Leverage"
+  },
+  {
+    "n": 41,
+    "section": "2. Derivatives",
+    "item": "Funding rates"
+  },
+  {
+    "n": 42,
+    "section": "2. Derivatives",
+    "item": "Mark/index price"
+  },
+  {
+    "n": 43,
+    "section": "2. Derivatives",
+    "item": "Liquidation engine"
+  },
+  {
+    "n": 44,
+    "section": "2. Derivatives",
+    "item": "ADL"
+  },
+  {
+    "n": 45,
+    "section": "2. Derivatives",
+    "item": "Insurance fund"
+  },
+  {
+    "n": 46,
+    "section": "2. Derivatives",
+    "item": "Maintenance/initial margin"
+  },
+  {
+    "n": 47,
+    "section": "2. Derivatives",
+    "item": "Position risk"
+  },
+  {
+    "n": 48,
+    "section": "2. Derivatives",
+    "item": "Realized/unrealized PnL"
+  },
+  {
+    "n": 49,
+    "section": "2. Derivatives",
+    "item": "Greeks"
+  },
+  {
+    "n": 50,
+    "section": "2. Derivatives",
+    "item": "Implied volatility"
+  },
+  {
+    "n": 51,
+    "section": "2. Derivatives",
+    "item": "Open interest"
+  },
+  {
+    "n": 52,
+    "section": "2. Derivatives",
+    "item": "Liquidation heatmap"
+  },
+  {
+    "n": 53,
+    "section": "3. Professional Charting",
+    "item": "Candlestick, hollow, Heikin Ashi, line, area and baseline charts"
+  },
+  {
+    "n": 54,
+    "section": "3. Professional Charting",
+    "item": "Renko, Kagi, Point &amp; Figure and range charts"
+  },
+  {
+    "n": 55,
+    "section": "3. Professional Charting",
+    "item": "Multiple/custom timeframes"
+  },
+  {
+    "n": 56,
+    "section": "3. Professional Charting",
+    "item": "Multi-chart layouts and synchronization"
+  },
+  {
+    "n": 57,
+    "section": "3. Professional Charting",
+    "item": "Log/percentage/auto scales"
+  },
+  {
+    "n": 58,
+    "section": "3. Professional Charting",
+    "item": "Volume, VWAP, volume profile and market profile"
+  },
+  {
+    "n": 59,
+    "section": "3. Professional Charting",
+    "item": "DOM and order-book overlays"
+  },
+  {
+    "n": 60,
+    "section": "3. Professional Charting",
+    "item": "Trend lines, rays, channels, Fibonacci, pitchfork, Elliott Wave, shapes, text and measurement tools"
+  },
+  {
+    "n": 61,
+    "section": "3. Professional Charting",
+    "item": "RSI, MACD, EMA, SMA, WMA, Bollinger Bands, ATR, ADX, Stochastic, OBV, Ichimoku, Supertrend and custom indicators"
+  },
+  {
+    "n": 62,
+    "section": "3. Professional Charting",
+    "item": "Custom/user-created indicators"
+  },
+  {
+    "n": 63,
+    "section": "3. Professional Charting",
+    "item": "Indicator marketplace"
+  },
+  {
+    "n": 64,
+    "section": "4. Market Data Super-Layer",
+    "item": "Multi-exchange ingestion"
+  },
+  {
+    "n": 65,
+    "section": "4. Market Data Super-Layer",
+    "item": "Binance, Coinbase, Kraken, OKX, Bybit, KuCoin, Bitget, Gate, Crypto.com, Gemini, Bitfinex, HTX, MEXC, Deribit, CME where licensed"
+  },
+  {
+    "n": 66,
+    "section": "4. Market Data Super-Layer",
+    "item": "DEX sources"
+  },
+  {
+    "n": 67,
+    "section": "4. Market Data Super-Layer",
+    "item": "CoinMarketCap and CoinGecko where commercially licensed"
+  },
+  {
+    "n": 68,
+    "section": "4. Market Data Super-Layer",
+    "item": "Blockchain RPCs/indexers"
+  },
+  {
+    "n": 69,
+    "section": "4. Market Data Super-Layer",
+    "item": "Licensed institutional feeds"
+  },
+  {
+    "n": 70,
+    "section": "4. Market Data Super-Layer",
+    "item": "Proprietary CryptoX feeds"
+  },
+  {
+    "n": 71,
+    "section": "4. Market Data Super-Layer",
+    "item": "Symbol mapping"
+  },
+  {
+    "n": 72,
+    "section": "4. Market Data Super-Layer",
+    "item": "Asset IDs"
+  },
+  {
+    "n": 73,
+    "section": "4. Market Data Super-Layer",
+    "item": "Exchange IDs"
+  },
+  {
+    "n": 74,
+    "section": "4. Market Data Super-Layer",
+    "item": "Chain IDs"
+  },
+  {
+    "n": 75,
+    "section": "4. Market Data Super-Layer",
+    "item": "Contract addresses"
+  },
+  {
+    "n": 76,
+    "section": "4. Market Data Super-Layer",
+    "item": "Quote/decimal/timestamp normalization"
+  },
+  {
+    "n": 77,
+    "section": "4. Market Data Super-Layer",
+    "item": "Duplicate/outlier/stale-data detection"
+  },
+  {
+    "n": 78,
+    "section": "4. Market Data Super-Layer",
+    "item": "Source confidence scoring"
+  },
+  {
+    "n": 79,
+    "section": "5. Real-Time Data Engine",
+    "item": "WebSocket ingestion"
+  },
+  {
+    "n": 80,
+    "section": "5. Real-Time Data Engine",
+    "item": "REST fallback"
+  },
+  {
+    "n": 81,
+    "section": "5. Real-Time Data Engine",
+    "item": "Streaming trades/tickers/order books/klines/funding/open interest/liquidations"
+  },
+  {
+    "n": 82,
+    "section": "5. Real-Time Data Engine",
+    "item": "Streaming wallet and portfolio events"
+  },
+  {
+    "n": 83,
+    "section": "5. Real-Time Data Engine",
+    "item": "Blockchain event streaming"
+  },
+  {
+    "n": 84,
+    "section": "5. Real-Time Data Engine",
+    "item": "Automatic reconnect"
+  },
+  {
+    "n": 85,
+    "section": "5. Real-Time Data Engine",
+    "item": "Heartbeats"
+  },
+  {
+    "n": 86,
+    "section": "5. Real-Time Data Engine",
+    "item": "Backpressure"
+  },
+  {
+    "n": 87,
+    "section": "5. Real-Time Data Engine",
+    "item": "Replay"
+  },
+  {
+    "n": 88,
+    "section": "5. Real-Time Data Engine",
+    "item": "Event sequencing"
+  },
+  {
+    "n": 89,
+    "section": "5. Real-Time Data Engine",
+    "item": "Gap detection"
+  },
+  {
+    "n": 90,
+    "section": "5. Real-Time Data Engine",
+    "item": "Data reconciliation"
+  },
+  {
+    "n": 91,
+    "section": "5. Real-Time Data Engine",
+    "item": "Dead-letter queues"
+  },
+  {
+    "n": 92,
+    "section": "5. Real-Time Data Engine",
+    "item": "Provider failover"
+  },
+  {
+    "n": 93,
+    "section": "6. Market Intelligence",
+    "item": "All coins"
+  },
+  {
+    "n": 94,
+    "section": "6. Market Intelligence",
+    "item": "New listings"
+  },
+  {
+    "n": 95,
+    "section": "6. Market Intelligence",
+    "item": "Trending"
+  },
+  {
+    "n": 96,
+    "section": "6. Market Intelligence",
+    "item": "Gainers/losers"
+  },
+  {
+    "n": 97,
+    "section": "6. Market Intelligence",
+    "item": "Highest volume"
+  },
+  {
+    "n": 98,
+    "section": "6. Market Intelligence",
+    "item": "Market-cap rankings"
+  },
+  {
+    "n": 99,
+    "section": "6. Market Intelligence",
+    "item": "FDV"
+  },
+  {
+    "n": 100,
+    "section": "6. Market Intelligence",
+    "item": "Circulating/total/max supply"
+  },
+  {
+    "n": 101,
+    "section": "6. Market Intelligence",
+    "item": "ATH/ATL"
+  },
+  {
+    "n": 102,
+    "section": "6. Market Intelligence",
+    "item": "Historical performance"
+  },
+  {
+    "n": 103,
+    "section": "6. Market Intelligence",
+    "item": "Categories/sectors/ecosystems"
+  },
+  {
+    "n": 104,
+    "section": "6. Market Intelligence",
+    "item": "Stablecoins"
+  },
+  {
+    "n": 105,
+    "section": "6. Market Intelligence",
+    "item": "Meme coins"
+  },
+  {
+    "n": 106,
+    "section": "6. Market Intelligence",
+    "item": "AI tokens"
+  },
+  {
+    "n": 107,
+    "section": "6. Market Intelligence",
+    "item": "DePIN"
+  },
+  {
+    "n": 108,
+    "section": "6. Market Intelligence",
+    "item": "RWA"
+  },
+  {
+    "n": 109,
+    "section": "6. Market Intelligence",
+    "item": "Layer 1/Layer 2"
+  },
+  {
+    "n": 110,
+    "section": "6. Market Intelligence",
+    "item": "DeFi"
+  },
+  {
+    "n": 111,
+    "section": "6. Market Intelligence",
+    "item": "Gaming"
+  },
+  {
+    "n": 112,
+    "section": "6. Market Intelligence",
+    "item": "Infrastructure"
+  },
+  {
+    "n": 113,
+    "section": "7. Exchange Aggregator",
+    "item": "Per-exchange price comparison"
+  },
+  {
+    "n": 114,
+    "section": "7. Exchange Aggregator",
+    "item": "Global average"
+  },
+  {
+    "n": 115,
+    "section": "7. Exchange Aggregator",
+    "item": "Best bid/ask"
+  },
+  {
+    "n": 116,
+    "section": "7. Exchange Aggregator",
+    "item": "Best execution venue"
+  },
+  {
+    "n": 117,
+    "section": "7. Exchange Aggregator",
+    "item": "Spread"
+  },
+  {
+    "n": 118,
+    "section": "7. Exchange Aggregator",
+    "item": "Liquidity"
+  },
+  {
+    "n": 119,
+    "section": "7. Exchange Aggregator",
+    "item": "Volume"
+  },
+  {
+    "n": 120,
+    "section": "7. Exchange Aggregator",
+    "item": "Arbitrage-discrepancy monitoring"
+  },
+  {
+    "n": 121,
+    "section": "8. Portfolio",
+    "item": "Manual portfolios"
+  },
+  {
+    "n": 122,
+    "section": "8. Portfolio",
+    "item": "Exchange API connections"
+  },
+  {
+    "n": 123,
+    "section": "8. Portfolio",
+    "item": "Wallet connections"
+  },
+  {
+    "n": 124,
+    "section": "8. Portfolio",
+    "item": "Blockchain wallet tracking"
+  },
+  {
+    "n": 125,
+    "section": "8. Portfolio",
+    "item": "Holdings"
+  },
+  {
+    "n": 126,
+    "section": "8. Portfolio",
+    "item": "Cost basis"
+  },
+  {
+    "n": 127,
+    "section": "8. Portfolio",
+    "item": "Average entry"
+  },
+  {
+    "n": 128,
+    "section": "8. Portfolio",
+    "item": "Realized/unrealized PnL"
+  },
+  {
+    "n": 129,
+    "section": "8. Portfolio",
+    "item": "ROI/APR/APY"
+  },
+  {
+    "n": 130,
+    "section": "8. Portfolio",
+    "item": "Asset/chain/exchange allocation"
+  },
+  {
+    "n": 131,
+    "section": "8. Portfolio",
+    "item": "Historical performance"
+  },
+  {
+    "n": 132,
+    "section": "8. Portfolio",
+    "item": "Tax lots and reports"
+  },
+  {
+    "n": 133,
+    "section": "8. Portfolio",
+    "item": "Profit/loss calendar"
+  },
+  {
+    "n": 134,
+    "section": "8. Portfolio",
+    "item": "Portfolio risk"
+  },
+  {
+    "n": 135,
+    "section": "8. Portfolio",
+    "item": "Alerts"
+  },
+  {
+    "n": 136,
+    "section": "9. Non-Custodial Wallet",
+    "item": "HD wallet"
+  },
+  {
+    "n": 137,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Seed phrase security"
+  },
+  {
+    "n": 138,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Hardware wallet support"
+  },
+  {
+    "n": 139,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Ledger/Trezor"
+  },
+  {
+    "n": 140,
+    "section": "9. Non-Custodial Wallet",
+    "item": "WalletConnect"
+  },
+  {
+    "n": 141,
+    "section": "9. Non-Custodial Wallet",
+    "item": "EVM chains"
+  },
+  {
+    "n": 142,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Bitcoin"
+  },
+  {
+    "n": 143,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Solana"
+  },
+  {
+    "n": 144,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Tron"
+  },
+  {
+    "n": 145,
+    "section": "9. Non-Custodial Wallet",
+    "item": "XRP"
+  },
+  {
+    "n": 146,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Sui"
+  },
+  {
+    "n": 147,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Aptos"
+  },
+  {
+    "n": 148,
+    "section": "9. Non-Custodial Wallet",
+    "item": "TON"
+  },
+  {
+    "n": 149,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Cosmos"
+  },
+  {
+    "n": 150,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Polkadot"
+  },
+  {
+    "n": 151,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Cardano"
+  },
+  {
+    "n": 152,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Send/receive/swap/bridge/stake"
+  },
+  {
+    "n": 153,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Token approvals"
+  },
+  {
+    "n": 154,
+    "section": "9. Non-Custodial Wallet",
+    "item": "NFTs"
+  },
+  {
+    "n": 155,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Gas estimation"
+  },
+  {
+    "n": 156,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Transaction simulation"
+  },
+  {
+    "n": 157,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Scam detection"
+  },
+  {
+    "n": 158,
+    "section": "9. Non-Custodial Wallet",
+    "item": "Token risk warnings"
+  },
+  {
+    "n": 159,
+    "section": "10. Blockchain Explorer",
+    "item": "Blocks"
+  },
+  {
+    "n": 160,
+    "section": "10. Blockchain Explorer",
+    "item": "Transactions"
+  },
+  {
+    "n": 161,
+    "section": "10. Blockchain Explorer",
+    "item": "Addresses"
+  },
+  {
+    "n": 162,
+    "section": "10. Blockchain Explorer",
+    "item": "Tokens"
+  },
+  {
+    "n": 163,
+    "section": "10. Blockchain Explorer",
+    "item": "Contracts"
+  },
+  {
+    "n": 164,
+    "section": "10. Blockchain Explorer",
+    "item": "NFTs"
+  },
+  {
+    "n": 165,
+    "section": "10. Blockchain Explorer",
+    "item": "Transfers"
+  },
+  {
+    "n": 166,
+    "section": "10. Blockchain Explorer",
+    "item": "Gas"
+  },
+  {
+    "n": 167,
+    "section": "10. Blockchain Explorer",
+    "item": "Validators"
+  },
+  {
+    "n": 168,
+    "section": "10. Blockchain Explorer",
+    "item": "Staking"
+  },
+  {
+    "n": 169,
+    "section": "10. Blockchain Explorer",
+    "item": "Mempool"
+  },
+  {
+    "n": 170,
+    "section": "10. Blockchain Explorer",
+    "item": "Smart-contract verification"
+  },
+  {
+    "n": 171,
+    "section": "10. Blockchain Explorer",
+    "item": "Contract ABI"
+  },
+  {
+    "n": 172,
+    "section": "10. Blockchain Explorer",
+    "item": "Token holders"
+  },
+  {
+    "n": 173,
+    "section": "10. Blockchain Explorer",
+    "item": "Rich address labels"
+  },
+  {
+    "n": 174,
+    "section": "11. DeFi",
+    "item": "DEX aggregation"
+  },
+  {
+    "n": 175,
+    "section": "11. DeFi",
+    "item": "Swap routing"
+  },
+  {
+    "n": 176,
+    "section": "11. DeFi",
+    "item": "Liquidity pools"
+  },
+  {
+    "n": 177,
+    "section": "11. DeFi",
+    "item": "TVL"
+  },
+  {
+    "n": 178,
+    "section": "11. DeFi",
+    "item": "APR/APY"
+  },
+  {
+    "n": 179,
+    "section": "11. DeFi",
+    "item": "Lending/borrowing"
+  },
+  {
+    "n": 180,
+    "section": "11. DeFi",
+    "item": "Liquidations"
+  },
+  {
+    "n": 181,
+    "section": "11. DeFi",
+    "item": "Yield farming"
+  },
+  {
+    "n": 182,
+    "section": "11. DeFi",
+    "item": "Staking/restaking"
+  },
+  {
+    "n": 183,
+    "section": "11. DeFi",
+    "item": "Bridges"
+  },
+  {
+    "n": 184,
+    "section": "11. DeFi",
+    "item": "Vaults"
+  },
+  {
+    "n": 185,
+    "section": "11. DeFi",
+    "item": "Stablecoins"
+  },
+  {
+    "n": 186,
+    "section": "11. DeFi",
+    "item": "Protocol analytics"
+  },
+  {
+    "n": 187,
+    "section": "11. DeFi",
+    "item": "Wallet exposure"
+  },
+  {
+    "n": 188,
+    "section": "11. DeFi",
+    "item": "DeFi risk dashboard"
+  },
+  {
+    "n": 189,
+    "section": "12. NFT",
+    "item": "NFT marketplace"
+  },
+  {
+    "n": 190,
+    "section": "12. NFT",
+    "item": "NFT portfolio"
+  },
+  {
+    "n": 191,
+    "section": "12. NFT",
+    "item": "Floor price"
+  },
+  {
+    "n": 192,
+    "section": "12. NFT",
+    "item": "Volume"
+  },
+  {
+    "n": 193,
+    "section": "12. NFT",
+    "item": "Collections"
+  },
+  {
+    "n": 194,
+    "section": "12. NFT",
+    "item": "Rarity"
+  },
+  {
+    "n": 195,
+    "section": "12. NFT",
+    "item": "Traits"
+  },
+  {
+    "n": 196,
+    "section": "12. NFT",
+    "item": "Ownership"
+  },
+  {
+    "n": 197,
+    "section": "12. NFT",
+    "item": "Sales history"
+  },
+  {
+    "n": 198,
+    "section": "12. NFT",
+    "item": "NFT analytics"
+  },
+  {
+    "n": 199,
+    "section": "12. NFT",
+    "item": "Multi-chain NFTs"
+  },
+  {
+    "n": 200,
+    "section": "13. News &amp; Research",
+    "item": "Crypto news aggregation"
+  },
+  {
+    "n": 201,
+    "section": "13. News &amp; Research",
+    "item": "Official project/exchange announcements"
+  },
+  {
+    "n": 202,
+    "section": "13. News &amp; Research",
+    "item": "Regulatory/ETF/token-unlock news"
+  },
+  {
+    "n": 203,
+    "section": "13. News &amp; Research",
+    "item": "Hack/exploit alerts"
+  },
+  {
+    "n": 204,
+    "section": "13. News &amp; Research",
+    "item": "Governance proposals"
+  },
+  {
+    "n": 205,
+    "section": "13. News &amp; Research",
+    "item": "Research reports"
+  },
+  {
+    "n": 206,
+    "section": "13. News &amp; Research",
+    "item": "AI summaries"
+  },
+  {
+    "n": 207,
+    "section": "13. News &amp; Research",
+    "item": "Source attribution"
+  },
+  {
+    "n": 208,
+    "section": "13. News &amp; Research",
+    "item": "Duplicate-story detection"
+  },
+  {
+    "n": 209,
+    "section": "13. News &amp; Research",
+    "item": "Content-quality/fake-news controls"
+  },
+  {
+    "n": 210,
+    "section": "13. News &amp; Research",
+    "item": "Sentiment analysis"
+  },
+  {
+    "n": 211,
+    "section": "14. CryptoX AI",
+    "item": "Natural-language market search"
+  },
+  {
+    "n": 212,
+    "section": "14. CryptoX AI",
+    "item": "Token explanations"
+  },
+  {
+    "n": 213,
+    "section": "14. CryptoX AI",
+    "item": "Transaction explanations"
+  },
+  {
+    "n": 214,
+    "section": "14. CryptoX AI",
+    "item": "Portfolio analysis"
+  },
+  {
+    "n": 215,
+    "section": "14. CryptoX AI",
+    "item": "Risk analysis"
+  },
+  {
+    "n": 216,
+    "section": "14. CryptoX AI",
+    "item": "Market summaries"
+  },
+  {
+    "n": 217,
+    "section": "14. CryptoX AI",
+    "item": "Chart analysis"
+  },
+  {
+    "n": 218,
+    "section": "14. CryptoX AI",
+    "item": "Technical/fundamental analysis"
+  },
+  {
+    "n": 219,
+    "section": "14. CryptoX AI",
+    "item": "On-chain analysis"
+  },
+  {
+    "n": 220,
+    "section": "14. CryptoX AI",
+    "item": "Whale analysis"
+  },
+  {
+    "n": 221,
+    "section": "14. CryptoX AI",
+    "item": "News analysis"
+  },
+  {
+    "n": 222,
+    "section": "14. CryptoX AI",
+    "item": "Alert creation"
+  },
+  {
+    "n": 223,
+    "section": "14. CryptoX AI",
+    "item": "Strategy builder"
+  },
+  {
+    "n": 224,
+    "section": "14. CryptoX AI",
+    "item": "Backtesting assistant"
+  },
+  {
+    "n": 225,
+    "section": "14. CryptoX AI",
+    "item": "Bot generator"
+  },
+  {
+    "n": 226,
+    "section": "14. CryptoX AI",
+    "item": "API generator"
+  },
+  {
+    "n": 227,
+    "section": "14. CryptoX AI",
+    "item": "Smart-contract explanation"
+  },
+  {
+    "n": 228,
+    "section": "14. CryptoX AI",
+    "item": "Wallet investigation"
+  },
+  {
+    "n": 229,
+    "section": "14. CryptoX AI",
+    "item": "Research reports"
+  },
+  {
+    "n": 230,
+    "section": "14. CryptoX AI",
+    "item": "Explicit confirmation and permission controls for actions"
+  },
+  {
+    "n": 231,
+    "section": "15. Trading Bots",
+    "item": "DCA"
+  },
+  {
+    "n": 232,
+    "section": "15. Trading Bots",
+    "item": "Grid"
+  },
+  {
+    "n": 233,
+    "section": "15. Trading Bots",
+    "item": "TWAP"
+  },
+  {
+    "n": 234,
+    "section": "15. Trading Bots",
+    "item": "VWAP"
+  },
+  {
+    "n": 235,
+    "section": "15. Trading Bots",
+    "item": "Arbitrage"
+  },
+  {
+    "n": 236,
+    "section": "15. Trading Bots",
+    "item": "Rebalancing"
+  },
+  {
+    "n": 237,
+    "section": "15. Trading Bots",
+    "item": "Market-making"
+  },
+  {
+    "n": 238,
+    "section": "15. Trading Bots",
+    "item": "Momentum"
+  },
+  {
+    "n": 239,
+    "section": "15. Trading Bots",
+    "item": "Mean reversion"
+  },
+  {
+    "n": 240,
+    "section": "15. Trading Bots",
+    "item": "Breakout"
+  },
+  {
+    "n": 241,
+    "section": "15. Trading Bots",
+    "item": "Copy strategies"
+  },
+  {
+    "n": 242,
+    "section": "15. Trading Bots",
+    "item": "Custom strategies"
+  },
+  {
+    "n": 243,
+    "section": "15. Trading Bots",
+    "item": "Strategy marketplace"
+  },
+  {
+    "n": 244,
+    "section": "15. Trading Bots",
+    "item": "Backtesting"
+  },
+  {
+    "n": 245,
+    "section": "15. Trading Bots",
+    "item": "Paper trading"
+  },
+  {
+    "n": 246,
+    "section": "15. Trading Bots",
+    "item": "Walk-forward testing"
+  },
+  {
+    "n": 247,
+    "section": "15. Trading Bots",
+    "item": "Risk controls"
+  },
+  {
+    "n": 248,
+    "section": "16. Alert Engine",
+    "item": "Price"
+  },
+  {
+    "n": 249,
+    "section": "16. Alert Engine",
+    "item": "Percentage"
+  },
+  {
+    "n": 250,
+    "section": "16. Alert Engine",
+    "item": "Volume"
+  },
+  {
+    "n": 251,
+    "section": "16. Alert Engine",
+    "item": "RSI"
+  },
+  {
+    "n": 252,
+    "section": "16. Alert Engine",
+    "item": "MACD"
+  },
+  {
+    "n": 253,
+    "section": "16. Alert Engine",
+    "item": "Moving average"
+  },
+  {
+    "n": 254,
+    "section": "16. Alert Engine",
+    "item": "Breakout"
+  },
+  {
+    "n": 255,
+    "section": "16. Alert Engine",
+    "item": "Whale"
+  },
+  {
+    "n": 256,
+    "section": "16. Alert Engine",
+    "item": "Liquidation"
+  },
+  {
+    "n": 257,
+    "section": "16. Alert Engine",
+    "item": "Funding"
+  },
+  {
+    "n": 258,
+    "section": "16. Alert Engine",
+    "item": "Open interest"
+  },
+  {
+    "n": 259,
+    "section": "16. Alert Engine",
+    "item": "Wallet"
+  },
+  {
+    "n": 260,
+    "section": "16. Alert Engine",
+    "item": "Token transfer"
+  },
+  {
+    "n": 261,
+    "section": "16. Alert Engine",
+    "item": "Smart contract"
+  },
+  {
+    "n": 262,
+    "section": "16. Alert Engine",
+    "item": "News"
+  },
+  {
+    "n": 263,
+    "section": "16. Alert Engine",
+    "item": "Portfolio"
+  },
+  {
+    "n": 264,
+    "section": "16. Alert Engine",
+    "item": "Custom formula alerts"
+  },
+  {
+    "n": 265,
+    "section": "16. Alert Engine",
+    "item": "Push/email/SMS/Telegram/Discord/WhatsApp/webhooks"
+  },
+  {
+    "n": 266,
+    "section": "17. Social Network",
+    "item": "Profiles"
+  },
+  {
+    "n": 267,
+    "section": "17. Social Network",
+    "item": "Follow/followers"
+  },
+  {
+    "n": 268,
+    "section": "17. Social Network",
+    "item": "Posts"
+  },
+  {
+    "n": 269,
+    "section": "17. Social Network",
+    "item": "Comments"
+  },
+  {
+    "n": 270,
+    "section": "17. Social Network",
+    "item": "Likes"
+  },
+  {
+    "n": 271,
+    "section": "17. Social Network",
+    "item": "Reposts"
+  },
+  {
+    "n": 272,
+    "section": "17. Social Network",
+    "item": "Quotes"
+  },
+  {
+    "n": 273,
+    "section": "17. Social Network",
+    "item": "Communities"
+  },
+  {
+    "n": 274,
+    "section": "17. Social Network",
+    "item": "Groups"
+  },
+  {
+    "n": 275,
+    "section": "17. Social Network",
+    "item": "Channels"
+  },
+  {
+    "n": 276,
+    "section": "17. Social Network",
+    "item": "Direct messaging"
+  },
+  {
+    "n": 277,
+    "section": "17. Social Network",
+    "item": "Trading ideas"
+  },
+  {
+    "n": 278,
+    "section": "17. Social Network",
+    "item": "Chart publishing"
+  },
+  {
+    "n": 279,
+    "section": "17. Social Network",
+    "item": "Strategy sharing"
+  },
+  {
+    "n": 280,
+    "section": "17. Social Network",
+    "item": "Creator profiles"
+  },
+  {
+    "n": 281,
+    "section": "17. Social Network",
+    "item": "Verified accounts"
+  },
+  {
+    "n": 282,
+    "section": "17. Social Network",
+    "item": "Reputation system"
+  },
+  {
+    "n": 283,
+    "section": "18. Copy Trading",
+    "item": "Trader profiles"
+  },
+  {
+    "n": 284,
+    "section": "18. Copy Trading",
+    "item": "Verified performance data"
+  },
+  {
+    "n": 285,
+    "section": "18. Copy Trading",
+    "item": "Historical PnL"
+  },
+  {
+    "n": 286,
+    "section": "18. Copy Trading",
+    "item": "Max drawdown"
+  },
+  {
+    "n": 287,
+    "section": "18. Copy Trading",
+    "item": "Sharpe ratio"
+  },
+  {
+    "n": 288,
+    "section": "18. Copy Trading",
+    "item": "Win rate"
+  },
+  {
+    "n": 289,
+    "section": "18. Copy Trading",
+    "item": "Trading frequency"
+  },
+  {
+    "n": 290,
+    "section": "18. Copy Trading",
+    "item": "Risk profile"
+  },
+  {
+    "n": 291,
+    "section": "18. Copy Trading",
+    "item": "Copy allocation"
+  },
+  {
+    "n": 292,
+    "section": "18. Copy Trading",
+    "item": "Maximum-loss controls"
+  },
+  {
+    "n": 293,
+    "section": "18. Copy Trading",
+    "item": "Stop-copy rules"
+  },
+  {
+    "n": 294,
+    "section": "18. Copy Trading",
+    "item": "Transparent fee model"
+  },
+  {
+    "n": 295,
+    "section": "19. Token Research Pages",
+    "item": "Identity"
+  },
+  {
+    "n": 296,
+    "section": "19. Token Research Pages",
+    "item": "Contract/chain"
+  },
+  {
+    "n": 297,
+    "section": "19. Token Research Pages",
+    "item": "Website/whitepaper/GitHub/social links"
+  },
+  {
+    "n": 298,
+    "section": "19. Token Research Pages",
+    "item": "Price/market cap/FDV/volume/supply/ATH/ATL/liquidity"
+  },
+  {
+    "n": 299,
+    "section": "19. Token Research Pages",
+    "item": "Technology and consensus"
+  },
+  {
+    "n": 300,
+    "section": "19. Token Research Pages",
+    "item": "Audits and GitHub activity"
+  },
+  {
+    "n": 301,
+    "section": "19. Token Research Pages",
+    "item": "Holders"
+  },
+  {
+    "n": 302,
+    "section": "19. Token Research Pages",
+    "item": "Transfers"
+  },
+  {
+    "n": 303,
+    "section": "19. Token Research Pages",
+    "item": "Whale concentration"
+  },
+  {
+    "n": 304,
+    "section": "19. Token Research Pages",
+    "item": "Active addresses"
+  },
+  {
+    "n": 305,
+    "section": "19. Token Research Pages",
+    "item": "Transaction count"
+  },
+  {
+    "n": 306,
+    "section": "19. Token Research Pages",
+    "item": "Exchange inflows/outflows"
+  },
+  {
+    "n": 307,
+    "section": "20. Security",
+    "item": "Zero-trust architecture"
+  },
+  {
+    "n": 308,
+    "section": "20. Security",
+    "item": "MFA"
+  },
+  {
+    "n": 309,
+    "section": "20. Security",
+    "item": "Passkeys"
+  },
+  {
+    "n": 310,
+    "section": "20. Security",
+    "item": "Hardware security keys"
+  },
+  {
+    "n": 311,
+    "section": "20. Security",
+    "item": "Device/session management"
+  },
+  {
+    "n": 312,
+    "section": "20. Security",
+    "item": "IP controls"
+  },
+  {
+    "n": 313,
+    "section": "20. Security",
+    "item": "Withdrawal whitelist/allowlist"
+  },
+  {
+    "n": 314,
+    "section": "20. Security",
+    "item": "Withdrawal delays"
+  },
+  {
+    "n": 315,
+    "section": "20. Security",
+    "item": "Transaction signing"
+  },
+  {
+    "n": 316,
+    "section": "20. Security",
+    "item": "HSM"
+  },
+  {
+    "n": 317,
+    "section": "20. Security",
+    "item": "MPC"
+  },
+  {
+    "n": 318,
+    "section": "20. Security",
+    "item": "Key rotation"
+  },
+  {
+    "n": 319,
+    "section": "20. Security",
+    "item": "Secrets management"
+  },
+  {
+    "n": 320,
+    "section": "20. Security",
+    "item": "Encryption at rest/in transit"
+  },
+  {
+    "n": 321,
+    "section": "20. Security",
+    "item": "DDoS/WAF/bot protection"
+  },
+  {
+    "n": 322,
+    "section": "20. Security",
+    "item": "Anti-phishing"
+  },
+  {
+    "n": 323,
+    "section": "20. Security",
+    "item": "Anti-account-takeover"
+  },
+  {
+    "n": 324,
+    "section": "20. Security",
+    "item": "Fraud detection"
+  },
+  {
+    "n": 325,
+    "section": "20. Security",
+    "item": "AML/KYC where required"
+  },
+  {
+    "n": 326,
+    "section": "20. Security",
+    "item": "Sanctions screening"
+  },
+  {
+    "n": 327,
+    "section": "20. Security",
+    "item": "Transaction monitoring"
+  },
+  {
+    "n": 328,
+    "section": "20. Security",
+    "item": "Security monitoring"
+  },
+  {
+    "n": 329,
+    "section": "20. Security",
+    "item": "Penetration testing"
+  },
+  {
+    "n": 330,
+    "section": "20. Security",
+    "item": "Bug bounty"
+  },
+  {
+    "n": 331,
+    "section": "20. Security",
+    "item": "Incident response"
+  },
+  {
+    "n": 332,
+    "section": "20. Security",
+    "item": "Data recovery"
+  },
+  {
+    "n": 333,
+    "section": "21. Custody",
+    "item": "Hot/warm/cold wallets"
+  },
+  {
+    "n": 334,
+    "section": "21. Custody",
+    "item": "MPC"
+  },
+  {
+    "n": 335,
+    "section": "21. Custody",
+    "item": "Multisig"
+  },
+  {
+    "n": 336,
+    "section": "21. Custody",
+    "item": "Withdrawal policy engine"
+  },
+  {
+    "n": 337,
+    "section": "21. Custody",
+    "item": "Transaction approval workflows"
+  },
+  {
+    "n": 338,
+    "section": "21. Custody",
+    "item": "Separation of duties"
+  },
+  {
+    "n": 339,
+    "section": "21. Custody",
+    "item": "Treasury management"
+  },
+  {
+    "n": 340,
+    "section": "21. Custody",
+    "item": "Reconciliation"
+  },
+  {
+    "n": 341,
+    "section": "21. Custody",
+    "item": "Proof-of-reserves architecture"
+  },
+  {
+    "n": 342,
+    "section": "21. Custody",
+    "item": "Liability accounting"
+  },
+  {
+    "n": 343,
+    "section": "21. Custody",
+    "item": "Customer-asset segregation"
+  },
+  {
+    "n": 344,
+    "section": "21. Custody",
+    "item": "Emergency freeze"
+  },
+  {
+    "n": 345,
+    "section": "21. Custody",
+    "item": "Disaster recovery"
+  },
+  {
+    "n": 346,
+    "section": "21. Custody",
+    "item": "Specialized security and legal/regulatory review"
+  },
+  {
+    "n": 347,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Identity verification"
+  },
+  {
+    "n": 348,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Document/face verification"
+  },
+  {
+    "n": 349,
+    "section": "22. KYC &amp; Compliance",
+    "item": "AML"
+  },
+  {
+    "n": 350,
+    "section": "22. KYC &amp; Compliance",
+    "item": "KYT"
+  },
+  {
+    "n": 351,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Sanctions/PEP screening"
+  },
+  {
+    "n": 352,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Travel Rule integration where applicable"
+  },
+  {
+    "n": 353,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Geographic restrictions"
+  },
+  {
+    "n": 354,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Risk scoring"
+  },
+  {
+    "n": 355,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Compliance case management"
+  },
+  {
+    "n": 356,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Audit trails"
+  },
+  {
+    "n": 357,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Data retention"
+  },
+  {
+    "n": 358,
+    "section": "22. KYC &amp; Compliance",
+    "item": "Privacy controls"
+  },
+  {
+    "n": 359,
+    "section": "23. Admin Super Panel",
+    "item": "Users"
+  },
+  {
+    "n": 360,
+    "section": "23. Admin Super Panel",
+    "item": "Active users"
+  },
+  {
+    "n": 361,
+    "section": "23. Admin Super Panel",
+    "item": "Trading volume"
+  },
+  {
+    "n": 362,
+    "section": "23. Admin Super Panel",
+    "item": "Deposits/withdrawals"
+  },
+  {
+    "n": 363,
+    "section": "23. Admin Super Panel",
+    "item": "Revenue/fees"
+  },
+  {
+    "n": 364,
+    "section": "23. Admin Super Panel",
+    "item": "Assets"
+  },
+  {
+    "n": 365,
+    "section": "23. Admin Super Panel",
+    "item": "System health"
+  },
+  {
+    "n": 366,
+    "section": "23. Admin Super Panel",
+    "item": "API/exchange/blockchain health"
+  },
+  {
+    "n": 367,
+    "section": "23. Admin Super Panel",
+    "item": "User/KYC/wallet/trading controls"
+  },
+  {
+    "n": 368,
+    "section": "23. Admin Super Panel",
+    "item": "Asset listing"
+  },
+  {
+    "n": 369,
+    "section": "23. Admin Super Panel",
+    "item": "Market management"
+  },
+  {
+    "n": 370,
+    "section": "23. Admin Super Panel",
+    "item": "Fee/risk configuration"
+  },
+  {
+    "n": 371,
+    "section": "23. Admin Super Panel",
+    "item": "Referral/promotions"
+  },
+  {
+    "n": 372,
+    "section": "23. Admin Super Panel",
+    "item": "Support"
+  },
+  {
+    "n": 373,
+    "section": "23. Admin Super Panel",
+    "item": "Compliance"
+  },
+  {
+    "n": 374,
+    "section": "24. API Platform",
+    "item": "REST APIs"
+  },
+  {
+    "n": 375,
+    "section": "24. API Platform",
+    "item": "Authentication"
+  },
+  {
+    "n": 376,
+    "section": "24. API Platform",
+    "item": "Markets/assets/orders/trades/positions/wallet/portfolio"
+  },
+  {
+    "n": 377,
+    "section": "24. API Platform",
+    "item": "Historical data"
+  },
+  {
+    "n": 378,
+    "section": "24. API Platform",
+    "item": "Analytics"
+  },
+  {
+    "n": 379,
+    "section": "24. API Platform",
+    "item": "Alerts"
+  },
+  {
+    "n": 380,
+    "section": "24. API Platform",
+    "item": "AI"
+  },
+  {
+    "n": 381,
+    "section": "24. API Platform",
+    "item": "Webhooks"
+  },
+  {
+    "n": 382,
+    "section": "24. API Platform",
+    "item": "WebSockets"
+  },
+  {
+    "n": 383,
+    "section": "24. API Platform",
+    "item": "Trades/tickers/order books/candles/account/position/order/wallet streams"
+  },
+  {
+    "n": 384,
+    "section": "24. API Platform",
+    "item": "API keys"
+  },
+  {
+    "n": 385,
+    "section": "24. API Platform",
+    "item": "Permissions"
+  },
+  {
+    "n": 386,
+    "section": "24. API Platform",
+    "item": "IP whitelist"
+  },
+  {
+    "n": 387,
+    "section": "24. API Platform",
+    "item": "Rate limits"
+  },
+  {
+    "n": 388,
+    "section": "24. API Platform",
+    "item": "Usage dashboard"
+  },
+  {
+    "n": 389,
+    "section": "24. API Platform",
+    "item": "Documentation"
+  },
+  {
+    "n": 390,
+    "section": "24. API Platform",
+    "item": "SDKs"
+  },
+  {
+    "n": 391,
+    "section": "24. API Platform",
+    "item": "Sandbox/testnet"
+  },
+  {
+    "n": 392,
+    "section": "24. API Platform",
+    "item": "Versioning"
+  },
+  {
+    "n": 393,
+    "section": "25. Database Architecture",
+    "item": "PostgreSQL for transactional systems"
+  },
+  {
+    "n": 394,
+    "section": "25. Database Architecture",
+    "item": "Redis for cache/session"
+  },
+  {
+    "n": 395,
+    "section": "25. Database Architecture",
+    "item": "Kafka or Redpanda for event streaming"
+  },
+  {
+    "n": 396,
+    "section": "25. Database Architecture",
+    "item": "ClickHouse/Timescale for market analytics"
+  },
+  {
+    "n": 397,
+    "section": "25. Database Architecture",
+    "item": "Object storage for raw/historical data"
+  },
+  {
+    "n": 398,
+    "section": "25. Database Architecture",
+    "item": "OpenSearch/Elasticsearch for search"
+  },
+  {
+    "n": 399,
+    "section": "25. Database Architecture",
+    "item": "Time-series storage"
+  },
+  {
+    "n": 400,
+    "section": "25. Database Architecture",
+    "item": "Data warehouse"
+  },
+  {
+    "n": 401,
+    "section": "25. Database Architecture",
+    "item": "Blockchain-specific storage"
+  },
+  {
+    "n": 402,
+    "section": "25. Database Architecture",
+    "item": "Automated backups"
+  },
+  {
+    "n": 403,
+    "section": "26. Event-Driven Architecture",
+    "item": "MarketUpdated"
+  },
+  {
+    "n": 404,
+    "section": "26. Event-Driven Architecture",
+    "item": "TradeExecuted"
+  },
+  {
+    "n": 405,
+    "section": "26. Event-Driven Architecture",
+    "item": "OrderCreated/Filled/Cancelled"
+  },
+  {
+    "n": 406,
+    "section": "26. Event-Driven Architecture",
+    "item": "PositionUpdated"
+  },
+  {
+    "n": 407,
+    "section": "26. Event-Driven Architecture",
+    "item": "WalletDeposit/Withdrawal"
+  },
+  {
+    "n": 408,
+    "section": "26. Event-Driven Architecture",
+    "item": "BlockchainTransaction"
+  },
+  {
+    "n": 409,
+    "section": "26. Event-Driven Architecture",
+    "item": "Liquidation"
+  },
+  {
+    "n": 410,
+    "section": "26. Event-Driven Architecture",
+    "item": "AlertTriggered"
+  },
+  {
+    "n": 411,
+    "section": "26. Event-Driven Architecture",
+    "item": "NewsPublished"
+  },
+  {
+    "n": 412,
+    "section": "26. Event-Driven Architecture",
+    "item": "Event bus"
+  },
+  {
+    "n": 413,
+    "section": "26. Event-Driven Architecture",
+    "item": "Idempotent consumers"
+  },
+  {
+    "n": 414,
+    "section": "26. Event-Driven Architecture",
+    "item": "Replayable events"
+  },
+  {
+    "n": 415,
+    "section": "27. Service Architecture",
+    "item": "Auth"
+  },
+  {
+    "n": 416,
+    "section": "27. Service Architecture",
+    "item": "User"
+  },
+  {
+    "n": 417,
+    "section": "27. Service Architecture",
+    "item": "KYC"
+  },
+  {
+    "n": 418,
+    "section": "27. Service Architecture",
+    "item": "Market Data"
+  },
+  {
+    "n": 419,
+    "section": "27. Service Architecture",
+    "item": "Symbol"
+  },
+  {
+    "n": 420,
+    "section": "27. Service Architecture",
+    "item": "Matching Engine"
+  },
+  {
+    "n": 421,
+    "section": "27. Service Architecture",
+    "item": "Order"
+  },
+  {
+    "n": 422,
+    "section": "27. Service Architecture",
+    "item": "Risk"
+  },
+  {
+    "n": 423,
+    "section": "27. Service Architecture",
+    "item": "Wallet"
+  },
+  {
+    "n": 424,
+    "section": "27. Service Architecture",
+    "item": "Custody"
+  },
+  {
+    "n": 425,
+    "section": "27. Service Architecture",
+    "item": "Settlement"
+  },
+  {
+    "n": 426,
+    "section": "27. Service Architecture",
+    "item": "Portfolio"
+  },
+  {
+    "n": 427,
+    "section": "27. Service Architecture",
+    "item": "Derivatives"
+  },
+  {
+    "n": 428,
+    "section": "27. Service Architecture",
+    "item": "DeFi"
+  },
+  {
+    "n": 429,
+    "section": "27. Service Architecture",
+    "item": "Blockchain Indexer"
+  },
+  {
+    "n": 430,
+    "section": "27. Service Architecture",
+    "item": "Notification"
+  },
+  {
+    "n": 431,
+    "section": "27. Service Architecture",
+    "item": "Alert"
+  },
+  {
+    "n": 432,
+    "section": "27. Service Architecture",
+    "item": "AI"
+  },
+  {
+    "n": 433,
+    "section": "27. Service Architecture",
+    "item": "News"
+  },
+  {
+    "n": 434,
+    "section": "27. Service Architecture",
+    "item": "Social"
+  },
+  {
+    "n": 435,
+    "section": "27. Service Architecture",
+    "item": "Payment"
+  },
+  {
+    "n": 436,
+    "section": "27. Service Architecture",
+    "item": "Referral"
+  },
+  {
+    "n": 437,
+    "section": "27. Service Architecture",
+    "item": "Admin"
+  },
+  {
+    "n": 438,
+    "section": "27. Service Architecture",
+    "item": "Analytics"
+  },
+  {
+    "n": 439,
+    "section": "27. Service Architecture",
+    "item": "API Gateway"
+  },
+  {
+    "n": 440,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "AWS/GCP/Azure"
+  },
+  {
+    "n": 441,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Kubernetes"
+  },
+  {
+    "n": 442,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Docker"
+  },
+  {
+    "n": 443,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Infrastructure as Code"
+  },
+  {
+    "n": 444,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Terraform"
+  },
+  {
+    "n": 445,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "CI/CD"
+  },
+  {
+    "n": 446,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Blue/green deployments"
+  },
+  {
+    "n": 447,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Canary deployments"
+  },
+  {
+    "n": 448,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Automated rollback"
+  },
+  {
+    "n": 449,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Multi-region"
+  },
+  {
+    "n": 450,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Load balancing"
+  },
+  {
+    "n": 451,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "CDN"
+  },
+  {
+    "n": 452,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Auto-scaling"
+  },
+  {
+    "n": 453,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Service discovery"
+  },
+  {
+    "n": 454,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Secrets manager"
+  },
+  {
+    "n": 455,
+    "section": "28. Cloud &amp; DevOps",
+    "item": "Disaster recovery"
+  },
+  {
+    "n": 456,
+    "section": "29. Observability",
+    "item": "Logs"
+  },
+  {
+    "n": 457,
+    "section": "29. Observability",
+    "item": "Metrics"
+  },
+  {
+    "n": 458,
+    "section": "29. Observability",
+    "item": "Traces"
+  },
+  {
+    "n": 459,
+    "section": "29. Observability",
+    "item": "Alerts"
+  },
+  {
+    "n": 460,
+    "section": "29. Observability",
+    "item": "SLOs/SLIs"
+  },
+  {
+    "n": 461,
+    "section": "29. Observability",
+    "item": "Error tracking"
+  },
+  {
+    "n": 462,
+    "section": "29. Observability",
+    "item": "Latency monitoring"
+  },
+  {
+    "n": 463,
+    "section": "29. Observability",
+    "item": "WebSocket monitoring"
+  },
+  {
+    "n": 464,
+    "section": "29. Observability",
+    "item": "Provider/API monitoring"
+  },
+  {
+    "n": 465,
+    "section": "29. Observability",
+    "item": "Blockchain-node monitoring"
+  },
+  {
+    "n": 466,
+    "section": "29. Observability",
+    "item": "Database monitoring"
+  },
+  {
+    "n": 467,
+    "section": "29. Observability",
+    "item": "Queue monitoring"
+  },
+  {
+    "n": 468,
+    "section": "29. Observability",
+    "item": "On-call alerting"
+  },
+  {
+    "n": 469,
+    "section": "30. Data Quality",
+    "item": "Timestamp validation"
+  },
+  {
+    "n": 470,
+    "section": "30. Data Quality",
+    "item": "Sequence validation"
+  },
+  {
+    "n": 471,
+    "section": "30. Data Quality",
+    "item": "Cross-source comparison"
+  },
+  {
+    "n": 472,
+    "section": "30. Data Quality",
+    "item": "Outlier rejection"
+  },
+  {
+    "n": 473,
+    "section": "30. Data Quality",
+    "item": "Stale-feed detection"
+  },
+  {
+    "n": 474,
+    "section": "30. Data Quality",
+    "item": "Duplicate detection"
+  },
+  {
+    "n": 475,
+    "section": "30. Data Quality",
+    "item": "Missing-data detection"
+  },
+  {
+    "n": 476,
+    "section": "30. Data Quality",
+    "item": "Provider health score"
+  },
+  {
+    "n": 477,
+    "section": "30. Data Quality",
+    "item": "Automatic failover"
+  },
+  {
+    "n": 478,
+    "section": "30. Data Quality",
+    "item": "Data lineage"
+  },
+  {
+    "n": 479,
+    "section": "31. Search",
+    "item": "Coins"
+  },
+  {
+    "n": 480,
+    "section": "31. Search",
+    "item": "Tokens"
+  },
+  {
+    "n": 481,
+    "section": "31. Search",
+    "item": "Exchanges"
+  },
+  {
+    "n": 482,
+    "section": "31. Search",
+    "item": "Trading pairs"
+  },
+  {
+    "n": 483,
+    "section": "31. Search",
+    "item": "Wallets"
+  },
+  {
+    "n": 484,
+    "section": "31. Search",
+    "item": "Addresses"
+  },
+  {
+    "n": 485,
+    "section": "31. Search",
+    "item": "Transactions"
+  },
+  {
+    "n": 486,
+    "section": "31. Search",
+    "item": "Blocks"
+  },
+  {
+    "n": 487,
+    "section": "31. Search",
+    "item": "NFTs"
+  },
+  {
+    "n": 488,
+    "section": "31. Search",
+    "item": "DeFi protocols"
+  },
+  {
+    "n": 489,
+    "section": "31. Search",
+    "item": "News"
+  },
+  {
+    "n": 490,
+    "section": "31. Search",
+    "item": "Users"
+  },
+  {
+    "n": 491,
+    "section": "31. Search",
+    "item": "Posts"
+  },
+  {
+    "n": 492,
+    "section": "31. Search",
+    "item": "Strategies"
+  },
+  {
+    "n": 493,
+    "section": "31. Search",
+    "item": "Charts"
+  },
+  {
+    "n": 494,
+    "section": "32. Notifications",
+    "item": "In-app"
+  },
+  {
+    "n": 495,
+    "section": "32. Notifications",
+    "item": "Push"
+  },
+  {
+    "n": 496,
+    "section": "32. Notifications",
+    "item": "Email"
+  },
+  {
+    "n": 497,
+    "section": "32. Notifications",
+    "item": "SMS"
+  },
+  {
+    "n": 498,
+    "section": "32. Notifications",
+    "item": "Telegram"
+  },
+  {
+    "n": 499,
+    "section": "32. Notifications",
+    "item": "Discord"
+  },
+  {
+    "n": 500,
+    "section": "32. Notifications",
+    "item": "WhatsApp"
+  },
+  {
+    "n": 501,
+    "section": "32. Notifications",
+    "item": "Webhooks"
+  },
+  {
+    "n": 502,
+    "section": "32. Notifications",
+    "item": "Preferences"
+  },
+  {
+    "n": 503,
+    "section": "32. Notifications",
+    "item": "Priority levels"
+  },
+  {
+    "n": 504,
+    "section": "32. Notifications",
+    "item": "Security/trading notifications"
+  },
+  {
+    "n": 505,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Free tier"
+  },
+  {
+    "n": 506,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Pro tier"
+  },
+  {
+    "n": 507,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Advanced tier"
+  },
+  {
+    "n": 508,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Institutional tier"
+  },
+  {
+    "n": 509,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Usage-based API plans"
+  },
+  {
+    "n": 510,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Enterprise SLA"
+  },
+  {
+    "n": 511,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Dedicated infrastructure"
+  },
+  {
+    "n": 512,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Custom data"
+  },
+  {
+    "n": 513,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Billing dashboard"
+  },
+  {
+    "n": 514,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Invoices"
+  },
+  {
+    "n": 515,
+    "section": "33. Commercial &amp; Billing",
+    "item": "Tax handling where applicable"
+  },
+  {
+    "n": 516,
+    "section": "34. Referral/Affiliate",
+    "item": "Referral links"
+  },
+  {
+    "n": 517,
+    "section": "34. Referral/Affiliate",
+    "item": "Commission tracking"
+  },
+  {
+    "n": 518,
+    "section": "34. Referral/Affiliate",
+    "item": "Tiered rewards"
+  },
+  {
+    "n": 519,
+    "section": "34. Referral/Affiliate",
+    "item": "Affiliate API"
+  },
+  {
+    "n": 520,
+    "section": "34. Referral/Affiliate",
+    "item": "Partner portal"
+  },
+  {
+    "n": 521,
+    "section": "34. Referral/Affiliate",
+    "item": "Creator program"
+  },
+  {
+    "n": 522,
+    "section": "34. Referral/Affiliate",
+    "item": "Campaign tracking"
+  },
+  {
+    "n": 523,
+    "section": "34. Referral/Affiliate",
+    "item": "Fraud prevention"
+  },
+  {
+    "n": 524,
+    "section": "35. Launchpad",
+    "item": "Project applications"
+  },
+  {
+    "n": 525,
+    "section": "35. Launchpad",
+    "item": "Due diligence"
+  },
+  {
+    "n": 526,
+    "section": "35. Launchpad",
+    "item": "Tokenomics"
+  },
+  {
+    "n": 527,
+    "section": "35. Launchpad",
+    "item": "Vesting"
+  },
+  {
+    "n": 528,
+    "section": "35. Launchpad",
+    "item": "Allocation"
+  },
+  {
+    "n": 529,
+    "section": "35. Launchpad",
+    "item": "Whitelisting"
+  },
+  {
+    "n": 530,
+    "section": "35. Launchpad",
+    "item": "KYC"
+  },
+  {
+    "n": 531,
+    "section": "35. Launchpad",
+    "item": "Subscription"
+  },
+  {
+    "n": 532,
+    "section": "35. Launchpad",
+    "item": "Distribution"
+  },
+  {
+    "n": 533,
+    "section": "35. Launchpad",
+    "item": "Listing workflow"
+  },
+  {
+    "n": 534,
+    "section": "36. Education",
+    "item": "Crypto academy"
+  },
+  {
+    "n": 535,
+    "section": "36. Education",
+    "item": "Beginner/trading/DeFi/blockchain/security courses"
+  },
+  {
+    "n": 536,
+    "section": "36. Education",
+    "item": "Quizzes"
+  },
+  {
+    "n": 537,
+    "section": "36. Education",
+    "item": "Certifications"
+  },
+  {
+    "n": 538,
+    "section": "36. Education",
+    "item": "Demo trading"
+  },
+  {
+    "n": 539,
+    "section": "37. Mobile",
+    "item": "Dashboard"
+  },
+  {
+    "n": 540,
+    "section": "37. Mobile",
+    "item": "Markets"
+  },
+  {
+    "n": 541,
+    "section": "37. Mobile",
+    "item": "Charts"
+  },
+  {
+    "n": 542,
+    "section": "37. Mobile",
+    "item": "Buy/sell"
+  },
+  {
+    "n": 543,
+    "section": "37. Mobile",
+    "item": "Portfolio"
+  },
+  {
+    "n": 544,
+    "section": "37. Mobile",
+    "item": "Wallet"
+  },
+  {
+    "n": 545,
+    "section": "37. Mobile",
+    "item": "Alerts"
+  },
+  {
+    "n": 546,
+    "section": "37. Mobile",
+    "item": "News"
+  },
+  {
+    "n": 547,
+    "section": "37. Mobile",
+    "item": "AI"
+  },
+  {
+    "n": 548,
+    "section": "37. Mobile",
+    "item": "Social"
+  },
+  {
+    "n": 549,
+    "section": "37. Mobile",
+    "item": "Security"
+  },
+  {
+    "n": 550,
+    "section": "37. Mobile",
+    "item": "KYC"
+  },
+  {
+    "n": 551,
+    "section": "37. Mobile",
+    "item": "Notifications"
+  },
+  {
+    "n": 552,
+    "section": "37. Mobile",
+    "item": "Biometrics"
+  },
+  {
+    "n": 553,
+    "section": "37. Mobile",
+    "item": "Passkeys"
+  },
+  {
+    "n": 554,
+    "section": "38. Enterprise Security",
+    "item": "Threat modeling"
+  },
+  {
+    "n": 555,
+    "section": "38. Enterprise Security",
+    "item": "Secure SDLC"
+  },
+  {
+    "n": 556,
+    "section": "38. Enterprise Security",
+    "item": "Code review"
+  },
+  {
+    "n": 557,
+    "section": "38. Enterprise Security",
+    "item": "Dependency scanning"
+  },
+  {
+    "n": 558,
+    "section": "38. Enterprise Security",
+    "item": "SAST"
+  },
+  {
+    "n": 559,
+    "section": "38. Enterprise Security",
+    "item": "DAST"
+  },
+  {
+    "n": 560,
+    "section": "38. Enterprise Security",
+    "item": "Container scanning"
+  },
+  {
+    "n": 561,
+    "section": "38. Enterprise Security",
+    "item": "Secrets scanning"
+  },
+  {
+    "n": 562,
+    "section": "38. Enterprise Security",
+    "item": "Pen testing"
+  },
+  {
+    "n": 563,
+    "section": "38. Enterprise Security",
+    "item": "External audit"
+  },
+  {
+    "n": 564,
+    "section": "38. Enterprise Security",
+    "item": "Smart-contract audits"
+  },
+  {
+    "n": 565,
+    "section": "38. Enterprise Security",
+    "item": "Bug bounty"
+  },
+  {
+    "n": 566,
+    "section": "38. Enterprise Security",
+    "item": "SOC 2 controls"
+  },
+  {
+    "n": 567,
+    "section": "38. Enterprise Security",
+    "item": "ISO 27001 controls"
+  },
+  {
+    "n": 568,
+    "section": "38. Enterprise Security",
+    "item": "Privacy controls"
+  },
+  {
+    "n": 569,
+    "section": "38. Enterprise Security",
+    "item": "Regional regulatory controls"
+  },
+  {
+    "n": 570,
+    "section": "39. Testing",
+    "item": "Unit tests"
+  },
+  {
+    "n": 571,
+    "section": "39. Testing",
+    "item": "Integration/API/database tests"
+  },
+  {
+    "n": 572,
+    "section": "39. Testing",
+    "item": "Matching-engine tests"
+  },
+  {
+    "n": 573,
+    "section": "39. Testing",
+    "item": "Race-condition tests"
+  },
+  {
+    "n": 574,
+    "section": "39. Testing",
+    "item": "Order-book tests"
+  },
+  {
+    "n": 575,
+    "section": "39. Testing",
+    "item": "Liquidation tests"
+  },
+  {
+    "n": 576,
+    "section": "39. Testing",
+    "item": "Settlement tests"
+  },
+  {
+    "n": 577,
+    "section": "39. Testing",
+    "item": "Precision tests"
+  },
+  {
+    "n": 578,
+    "section": "39. Testing",
+    "item": "Fuzzing"
+  },
+  {
+    "n": 579,
+    "section": "39. Testing",
+    "item": "Authentication/authorization testing"
+  },
+  {
+    "n": 580,
+    "section": "39. Testing",
+    "item": "Withdrawal testing"
+  },
+  {
+    "n": 581,
+    "section": "39. Testing",
+    "item": "Load testing"
+  },
+  {
+    "n": 582,
+    "section": "39. Testing",
+    "item": "Volatility stress testing"
+  },
+  {
+    "n": 583,
+    "section": "39. Testing",
+    "item": "Failure simulation"
+  },
+  {
+    "n": 584,
+    "section": "40. Failure Engineering",
+    "item": "Provider outage simulation"
+  },
+  {
+    "n": 585,
+    "section": "40. Failure Engineering",
+    "item": "Blockchain RPC outage"
+  },
+  {
+    "n": 586,
+    "section": "40. Failure Engineering",
+    "item": "Database/Redis/Kafka outage"
+  },
+  {
+    "n": 587,
+    "section": "40. Failure Engineering",
+    "item": "Region/CDN/DNS outage"
+  },
+  {
+    "n": 588,
+    "section": "40. Failure Engineering",
+    "item": "DDoS simulation"
+  },
+  {
+    "n": 589,
+    "section": "40. Failure Engineering",
+    "item": "Bad-feed simulation"
+  },
+  {
+    "n": 590,
+    "section": "40. Failure Engineering",
+    "item": "Network congestion"
+  },
+  {
+    "n": 591,
+    "section": "40. Failure Engineering",
+    "item": "Chain reorganization"
+  },
+  {
+    "n": 592,
+    "section": "40. Failure Engineering",
+    "item": "Automatic detect/isolate/failover/recover/reconcile/notify"
+  },
+  {
+    "n": 593,
+    "section": "41. Data Licensing",
+    "item": "Review API terms"
+  },
+  {
+    "n": 594,
+    "section": "41. Data Licensing",
+    "item": "Confirm commercial-use rights"
+  },
+  {
+    "n": 595,
+    "section": "41. Data Licensing",
+    "item": "Confirm redistribution rights"
+  },
+  {
+    "n": 596,
+    "section": "41. Data Licensing",
+    "item": "Confirm caching rights"
+  },
+  {
+    "n": 597,
+    "section": "41. Data Licensing",
+    "item": "Historical-data rights"
+  },
+  {
+    "n": 598,
+    "section": "41. Data Licensing",
+    "item": "Attribution requirements"
+  },
+  {
+    "n": 599,
+    "section": "41. Data Licensing",
+    "item": "Rate limits"
+  },
+  {
+    "n": 600,
+    "section": "41. Data Licensing",
+    "item": "SLA"
+  },
+  {
+    "n": 601,
+    "section": "41. Data Licensing",
+    "item": "Enterprise agreements"
+  },
+  {
+    "n": 602,
+    "section": "41. Data Licensing",
+    "item": "Cost model"
+  },
+  {
+    "n": 603,
+    "section": "41. Data Licensing",
+    "item": "Backup providers"
+  },
+  {
+    "n": 604,
+    "section": "41. Data Licensing",
+    "item": "Do not assume public API access grants commercial redistribution rights"
+  },
+  {
+    "n": 605,
+    "section": "42. CryptoX Data Fusion",
+    "item": "External data ingestion"
+  },
+  {
+    "n": 606,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Normalization"
+  },
+  {
+    "n": 607,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Identity graph"
+  },
+  {
+    "n": 608,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Validation"
+  },
+  {
+    "n": 609,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Aggregation"
+  },
+  {
+    "n": 610,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Proprietary analytics"
+  },
+  {
+    "n": 611,
+    "section": "42. CryptoX Data Fusion",
+    "item": "CryptoX APIs"
+  },
+  {
+    "n": 612,
+    "section": "42. CryptoX Data Fusion",
+    "item": "Provider independence"
+  },
+  {
+    "n": 613,
+    "section": "43. Universal Identity Graph",
+    "item": "CryptoX Asset ID"
+  },
+  {
+    "n": 614,
+    "section": "43. Universal Identity Graph",
+    "item": "CMC ID"
+  },
+  {
+    "n": 615,
+    "section": "43. Universal Identity Graph",
+    "item": "CoinGecko ID"
+  },
+  {
+    "n": 616,
+    "section": "43. Universal Identity Graph",
+    "item": "Exchange product/symbol IDs"
+  },
+  {
+    "n": 617,
+    "section": "43. Universal Identity Graph",
+    "item": "Contract address"
+  },
+  {
+    "n": 618,
+    "section": "43. Universal Identity Graph",
+    "item": "Chain ID"
+  },
+  {
+    "n": 619,
+    "section": "43. Universal Identity Graph",
+    "item": "DEX pair IDs"
+  },
+  {
+    "n": 620,
+    "section": "43. Universal Identity Graph",
+    "item": "Historical aliases"
+  },
+  {
+    "n": 621,
+    "section": "44. Provider Orchestrator",
+    "item": "Quotas"
+  },
+  {
+    "n": 622,
+    "section": "44. Provider Orchestrator",
+    "item": "Request scheduler"
+  },
+  {
+    "n": 623,
+    "section": "44. Provider Orchestrator",
+    "item": "Token buckets"
+  },
+  {
+    "n": 624,
+    "section": "44. Provider Orchestrator",
+    "item": "Adaptive throttling"
+  },
+  {
+    "n": 625,
+    "section": "44. Provider Orchestrator",
+    "item": "Batching"
+  },
+  {
+    "n": 626,
+    "section": "44. Provider Orchestrator",
+    "item": "Cache"
+  },
+  {
+    "n": 627,
+    "section": "44. Provider Orchestrator",
+    "item": "Retry/backoff"
+  },
+  {
+    "n": 628,
+    "section": "44. Provider Orchestrator",
+    "item": "Circuit breaker"
+  },
+  {
+    "n": 629,
+    "section": "44. Provider Orchestrator",
+    "item": "Provider priority"
+  },
+  {
+    "n": 630,
+    "section": "44. Provider Orchestrator",
+    "item": "Failover"
+  },
+  {
+    "n": 631,
+    "section": "44. Provider Orchestrator",
+    "item": "Cost optimization"
+  },
+  {
+    "n": 632,
+    "section": "44. Provider Orchestrator",
+    "item": "Usage dashboard"
+  },
+  {
+    "n": 633,
+    "section": "45. Production UX",
+    "item": "Global market overview"
+  },
+  {
+    "n": 634,
+    "section": "45. Production UX",
+    "item": "Personalized dashboard"
+  },
+  {
+    "n": 635,
+    "section": "45. Production UX",
+    "item": "Markets"
+  },
+  {
+    "n": 636,
+    "section": "45. Production UX",
+    "item": "Trade terminal"
+  },
+  {
+    "n": 637,
+    "section": "45. Production UX",
+    "item": "Discover"
+  },
+  {
+    "n": 638,
+    "section": "45. Production UX",
+    "item": "Wallet"
+  },
+  {
+    "n": 639,
+    "section": "45. Production UX",
+    "item": "Portfolio"
+  },
+  {
+    "n": 640,
+    "section": "45. Production UX",
+    "item": "AI"
+  },
+  {
+    "n": 641,
+    "section": "45. Production UX",
+    "item": "Research"
+  },
+  {
+    "n": 642,
+    "section": "45. Production UX",
+    "item": "News"
+  },
+  {
+    "n": 643,
+    "section": "45. Production UX",
+    "item": "Alerts"
+  },
+  {
+    "n": 644,
+    "section": "45. Production UX",
+    "item": "Social"
+  },
+  {
+    "n": 645,
+    "section": "45. Production UX",
+    "item": "Security center"
+  },
+  {
+    "n": 646,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Individual users"
+  },
+  {
+    "n": 647,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Traders"
+  },
+  {
+    "n": 648,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Funds"
+  },
+  {
+    "n": 649,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Market makers"
+  },
+  {
+    "n": 650,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Brokers"
+  },
+  {
+    "n": 651,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Fintechs"
+  },
+  {
+    "n": 652,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Developers"
+  },
+  {
+    "n": 653,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Research institutions"
+  },
+  {
+    "n": 654,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Organizations"
+  },
+  {
+    "n": 655,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Teams"
+  },
+  {
+    "n": 656,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Roles"
+  },
+  {
+    "n": 657,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Permissions"
+  },
+  {
+    "n": 658,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "API keys"
+  },
+  {
+    "n": 659,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Billing"
+  },
+  {
+    "n": 660,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Audit logs"
+  },
+  {
+    "n": 661,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "SSO"
+  },
+  {
+    "n": 662,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "SCIM"
+  },
+  {
+    "n": 663,
+    "section": "46. Enterprise Multi-Tenancy",
+    "item": "Enterprise support"
+  },
+  {
+    "n": 664,
+    "section": "47. Financial Accounting",
+    "item": "Double-entry ledger"
+  },
+  {
+    "n": 665,
+    "section": "47. Financial Accounting",
+    "item": "Immutable journal entries"
+  },
+  {
+    "n": 666,
+    "section": "47. Financial Accounting",
+    "item": "Debit/credit"
+  },
+  {
+    "n": 667,
+    "section": "47. Financial Accounting",
+    "item": "Account balances"
+  },
+  {
+    "n": 668,
+    "section": "47. Financial Accounting",
+    "item": "Asset/liability accounting"
+  },
+  {
+    "n": 669,
+    "section": "47. Financial Accounting",
+    "item": "Reconciliation"
+  },
+  {
+    "n": 670,
+    "section": "47. Financial Accounting",
+    "item": "Audit trail"
+  },
+  {
+    "n": 671,
+    "section": "47. Financial Accounting",
+    "item": "Idempotency"
+  },
+  {
+    "n": 672,
+    "section": "47. Financial Accounting",
+    "item": "Transaction IDs"
+  },
+  {
+    "n": 673,
+    "section": "47. Financial Accounting",
+    "item": "Ledger snapshots"
+  },
+  {
+    "n": 674,
+    "section": "48. Production Release Gate",
+    "item": "Security audit complete"
+  },
+  {
+    "n": 675,
+    "section": "48. Production Release Gate",
+    "item": "Penetration testing complete"
+  },
+  {
+    "n": 676,
+    "section": "48. Production Release Gate",
+    "item": "Load testing complete"
+  },
+  {
+    "n": 677,
+    "section": "48. Production Release Gate",
+    "item": "Disaster recovery tested"
+  },
+  {
+    "n": 678,
+    "section": "48. Production Release Gate",
+    "item": "Backup restoration tested"
+  },
+  {
+    "n": 679,
+    "section": "48. Production Release Gate",
+    "item": "Data reconciliation tested"
+  },
+  {
+    "n": 680,
+    "section": "48. Production Release Gate",
+    "item": "Provider failover tested"
+  },
+  {
+    "n": 681,
+    "section": "48. Production Release Gate",
+    "item": "Blockchain failover tested"
+  },
+  {
+    "n": 682,
+    "section": "48. Production Release Gate",
+    "item": "Matching engine audited"
+  },
+  {
+    "n": 683,
+    "section": "48. Production Release Gate",
+    "item": "Ledger audited"
+  },
+  {
+    "n": 684,
+    "section": "48. Production Release Gate",
+    "item": "Wallet architecture audited"
+  },
+  {
+    "n": 685,
+    "section": "48. Production Release Gate",
+    "item": "Compliance reviewed"
+  },
+  {
+    "n": 686,
+    "section": "48. Production Release Gate",
+    "item": "Licensing reviewed"
+  },
+  {
+    "n": 687,
+    "section": "48. Production Release Gate",
+    "item": "Privacy reviewed"
+  },
+  {
+    "n": 688,
+    "section": "48. Production Release Gate",
+    "item": "Monitoring operational"
+  },
+  {
+    "n": 689,
+    "section": "48. Production Release Gate",
+    "item": "Incident-response plan tested"
+  },
+  {
+    "n": 690,
+    "section": "48. Production Release Gate",
+    "item": "Runbooks complete"
+  },
+  {
+    "n": 691,
+    "section": "48. Production Release Gate",
+    "item": "Documentation complete"
+  },
+  {
+    "n": 692,
+    "section": "48. Production Release Gate",
+    "item": "API documentation complete"
+  },
+  {
+    "n": 693,
+    "section": "48. Production Release Gate",
+    "item": "Mobile apps tested"
+  },
+  {
+    "n": 694,
+    "section": "48. Production Release Gate",
+    "item": "Accessibility tested"
+  },
+  {
+    "n": 695,
+    "section": "48. Production Release Gate",
+    "item": "Browser compatibility tested"
+  },
+  {
+    "n": 696,
+    "section": "48. Production Release Gate",
+    "item": "Production rollback tested"
+  },
+  {
+    "n": 697,
+    "section": "48. Production Release Gate",
+    "item": "CryptoX must not depend on a single data provider."
+  },
+  {
+    "n": 698,
+    "section": "48. Production Release Gate",
+    "item": "Use licensed APIs, official WebSockets, blockchain RPCs/indexers and proprietary infrastructure rather than unauthorized scraping or redistribution."
+  },
+  {
+    "n": 699,
+    "section": "48. Production Release Gate",
+    "item": "Treat market data, exchange execution, custody, accounting and compliance as separate high-risk systems."
+  },
+  {
+    "n": 700,
+    "section": "48. Production Release Gate",
+    "item": "Use immutable/double-entry accounting for financial balances."
+  },
+  {
+    "n": 701,
+    "section": "48. Production Release Gate",
+    "item": "Design for provider failures, data corruption, network outages and regional failures."
+  },
+  {
+    "n": 702,
+    "section": "48. Production Release Gate",
+    "item": "24/7/365 means fault-tolerant continuous operation with redundancy, failover, monitoring, backups and disaster recovery—not an absolute guarantee of zero downtime."
+  }
+]

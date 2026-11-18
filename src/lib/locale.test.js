@@ -400,13 +400,13 @@ describe('localized SEO', () => {
     const links = hreflangLinks({ languages: ['en', 'ur', 'ar'], path: '/markets' });
     expect(links.length).toBe(4);
     expect(links.at(-1).hreflang).toBe('x-default');
-    expect(links.find((l) => l.hreflang === 'ur').href).toContain('/#/ur/markets');
+    expect(links.find((l) => l.hreflang === 'ur').href).toContain('/ur/markets');
   });
 
   it('produces localized JSON-LD', () => {
     const ld = siteJsonLd({ lang: 'ur' });
     expect(ld.inLanguage).toBe('ur');
-    expect(ld.url).toContain('/#/ur');
+    expect(ld.url).toContain('/ur');
   });
 });
 

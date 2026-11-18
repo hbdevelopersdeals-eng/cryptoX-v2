@@ -2,9 +2,13 @@
 
 A real-time cryptocurrency dashboard: live market data, candlestick charts with indicators, ten one-click trading strategies, an honest backtester, and a paper-trading simulator.
 
-**Live demo:** https://cryptox.site.accio.ai
+**Live demo:** https://cryptox-v2.site.accio.ai — the URL in `.accio-site.json` and the
+origin used for canonical URLs, `robots.txt` and `sitemap.xml`. (`cryptox.site.accio.ai`
+still answers, but it is an earlier deployment; linking it splits the two hosts' indexing.)
 
 > **Status: hardened demo / pre-production.** All client-side engineering controls are in place; external dependencies for commercial operation (paid market-data licences, server-side identity, legal review, penetration test) are still open and listed in [docs/OPERATIONS.md](docs/OPERATIONS.md#external-readiness-checklist). Nothing here is investment advice, and no real orders are ever placed.
+>
+> **Where the product actually stands:** [docs/PRODUCTION-READINESS-MATRIX.md](docs/PRODUCTION-READINESS-MATRIX.md) traces all 702 checklist items to code, to a named gap, or to an external contract. `npm run check:matrix` fails if the document stops covering the checklist.
 
 ---
 
@@ -19,6 +23,12 @@ A real-time cryptocurrency dashboard: live market data, candlestick charts with 
 | Paper trading | Auto-trading bot on a virtual balance with equity curve, trade log and win rate |
 | Portfolio tools | Watchlist, portfolio with CSV export, price alerts, bubbles, fear & greed, P&L/liquidation calculator |
 | Trust | Data provenance badges (`LIVE` / `DELAYED` / `SIMULATED`), synthetic data never drives signals or trades, system status page |
+| Search | One box over coins, venue adapters, strategy presets, courses and app destinations, with per-category index coverage printed rather than hidden (`/search`) |
+| Copy trading | Copy-plan sizing with absolute loss caps, track-record verification with refusal reasons, stop-rule evaluation and a high-water-mark fee model; no follower execution and no invented leaderboard (`/copy-trading`) |
+| Launchpad | Application schema validation, weighted due diligence with hard gates, tokenomics checks, integer-exact vesting, pro-rata allocation and a listing state machine (`/launchpad`) |
+| Academy | Five tracks, 23 lessons linked to the screen they are practised on, graded quizzes and honestly-labelled certificates (`/academy`) |
+| Referral | Deterministic referral codes, tiered recurring commission, payout readiness rules, UTM campaigns and weighted fraud scoring (`/referral`) |
+| Admin | Fee/risk configuration with documented bounds, audit diff with a required reason, live feed health and market-listing gates (`/admin`) |
 
 ## Architecture
 

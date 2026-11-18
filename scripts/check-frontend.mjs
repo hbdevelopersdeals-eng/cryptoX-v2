@@ -111,24 +111,38 @@ if (!hasReducedMotion) {
 
 /* ------------------------------------------------------------------ per file */
 
+/*
+ * Comments are blanked before the tag rules run, preserving line numbers.
+ *
+ * Without this, prose ABOUT markup was counted as markup: a test file that
+ * explains "the page also renders <select> elements" reported an unlabelled
+ * control that does not exist, and a comment cannot render anything. Only
+ * comments are blanked — the code is untouched — so a real defect still fails.
+ */
+const stripComments = (text) =>
+  text
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:])\/\/[^\n]*/g, (m, lead) => lead + ' '.repeat(m.length - lead.length));
+
 const files = walk(SRC);
 for (const file of files) {
   const source = readFileSync(file, 'utf8');
+  const code = stripComments(source);
 
-  for (const tag of openingTags(source, ['input', 'select', 'textarea'])) {
+  for (const tag of openingTags(code, ['input', 'select', 'textarea'])) {
     // A spread may carry the label, so it cannot be judged statically.
     if (/\{\.\.\./.test(tag.text)) continue;
-    const labelled = /aria-label=|aria-labelledby=|\bid=/.test(tag.text) || insideLabel(source, tag.index);
+    const labelled = /aria-label=|aria-labelledby=|\bid=/.test(tag.text) || insideLabel(code, tag.index);
     if (!labelled) {
       err(file, tag.line, 'control-label', `<${tag.name}> with no aria-label / aria-labelledby / id and no wrapping <label>.`);
     }
   }
 
-  for (const tag of openingTags(source, ['img'])) {
+  for (const tag of openingTags(code, ['img'])) {
     if (!/\balt=/.test(tag.text)) err(file, tag.line, 'img-alt', 'img without alt. Use alt="" if decorative.');
   }
 
-  for (const tag of openingTags(source, ['button'])) {
+  for (const tag of openingTags(code, ['button'])) {
     const iconOnly = /^<button\b[^>]*>\s*<[A-Z]\w*\s[^>]*\/>\s*<\/button>$/s.test(tag.text)
       || /^<button\b[^>]*>\s*<\/button>$/.test(tag.text);
     if (iconOnly && !/aria-label=/.test(tag.text)) {
@@ -136,7 +150,7 @@ for (const file of files) {
     }
   }
 
-  for (const tag of openingTags(source, ['div', 'span'])) {
+  for (const tag of openingTags(code, ['div', 'span'])) {
     const defensive = /onClick=\{\(?\w*\)?\s*=>\s*\{?\s*\w+\.stopPropagation\(\)/.test(tag.text);
     if (/onClick=/.test(tag.text) && !defensive && !/role=/.test(tag.text) && !/aria-hidden/.test(tag.text)) {
       err(file, tag.line, 'clickable-div', `${tag.name} with onClick and no role — unreachable by keyboard. Use a button.`);
@@ -201,11 +215,12 @@ const summarise = (list) => {
  * downgrade to "warning" - which is what a guard does when it wants to pass
  * more than it wants to be true.
  *
- * These are all one defect: a control whose label is a neighbouring <span> or
- * <p> rather than a real <label> or aria-label, so a screen reader announces it
- * unnamed. The fix is mechanical and outstanding, not disputed.
+ * The one defect this ratchet tracked — a control whose label was a neighbouring
+ * <span> or <p> instead of a real <label> or aria-label, so a screen reader
+ * announced it unnamed — is now fixed at zero. The rule stays, and the baseline
+ * stays at zero: any new unlabelled control fails the build from here.
  */
-const KNOWN_GAPS = { 'control-label': 71 };
+const KNOWN_GAPS = { 'control-label': 0 };
 
 console.log(`Checked ${files.length} source files. Reduced-motion rule present: ${hasReducedMotion}.`);
 if (warnings.length) console.log(`\n${warnings.length} warning(s):\n${summarise(warnings)}`);

@@ -60,11 +60,31 @@ afterEach(() => {
 });
 
 describe('App integration', () => {
-  it('renders the login screen for a signed-out visitor', async () => {
+  it('serves the marketing page — not the login wall — to a signed-out visitor at "/"', async () => {
+    render(<App />);
+    // "/" is the URL a crawler and an AI answer are most likely to open, so it
+    // has to carry the product story. Regression guard: it used to be a redirect
+    // to /login, which made the homepage a soft 404.
+    // The auth provider resolves its session asynchronously, so the first paint
+    // is the "Loading…" fallback. The default 1s findBy timeout is tight when
+    // the whole suite is running on a loaded machine.
+    expect(await screen.findByRole('heading', { name: /every number shows its source/i }, { timeout: 8000 })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /log in/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('alert')).toBeNull(); // no error boundary
+    /* 15s, because this test renders the WHOLE app tree and waits on the
+     * provider's async session resolution. The 8s `findByRole` above is larger
+     * than vitest's 5s default, so under load the test timed out waiting for a
+     * query that had not finished — a red gate that measured the machine, not
+     * the code. The timeout lives on the test, not on the assertion, so a real
+     * regression still fails; it just gets 15s to do it. */
+  }, 15000);
+
+  it('still sends a signed-out deep link to the login screen', async () => {
+    window.history.pushState({}, '', '/strategies');
     render(<App />);
     expect(await screen.findByText(/Welcome back/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Log in/i })).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).toBeNull(); // no error boundary
+    window.history.pushState({}, '', '/');
   });
 
   it('renders the market dashboard for a signed-in user with live data', async () => {
@@ -90,9 +110,11 @@ describe('App integration', () => {
   });
 
   it('serves the legal documents publicly', async () => {
-    window.location.hash = '#/legal/privacy';
+    // Path routing, not the old `#/legal/privacy` hash: that hash used to match
+    // the consent banner's "privacy notice" text and pass for the wrong reason.
+    window.history.pushState({}, '', '/legal/privacy');
     render(<App />);
-    expect(await screen.findByText(/Privacy Notice/i)).toBeInTheDocument();
-    window.location.hash = '';
+    expect(await screen.findByRole('heading', { level: 1, name: /Privacy Notice/i })).toBeInTheDocument();
+    window.history.pushState({}, '', '/');
   });
 });

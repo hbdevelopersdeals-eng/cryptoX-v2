@@ -7,3 +7,4 @@ dist
 # A named environment file (production.env, staging.env) is still a real one.
 *.env
 .DS_Store
+.prerender-shell.html

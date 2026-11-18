@@ -7,7 +7,7 @@ import { parsePhone, sanitiseInput, formatNational } from '../lib/phone.js';
 /*
  * A searchable country picker.
  *
- * The native <select> with 249 options is unusable on a phone, so this is a
+ * A native select with 249 options is unusable on a phone, so this is a
  * combobox: type to filter on name, ISO alpha-2, alpha-3 or dialling prefix.
  * Keyboard support follows the ARIA combobox pattern (Down/Up to move,
  * Enter to choose, Escape to close).

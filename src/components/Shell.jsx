@@ -3,13 +3,14 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutGrid, TrendingUp, CircleDollarSign, Smile, Star, Wallet, BellRing,
   Zap, Play, Calculator, Newspaper, Search, Menu, X, LogOut, Radio, Database,
-  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2, Building2, Receipt, Scale
+  XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2, Building2, Receipt, Scale, Users, Rocket, GraduationCap, Gift, Settings2
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
 import { useCurrency, CURRENCIES } from '../lib/currency.jsx';
 import { useMarket } from '../lib/market.jsx';
 import { CoinImg } from './ui.jsx';
+import { BrandLogo } from './BrandLogo.jsx';
 import { UpgradeButton } from './Upgrade.jsx';
 import { agoLabel } from '../lib/format.js';
 
@@ -17,6 +18,7 @@ const NAV = [
   {
     group: 'Markets',
     items: [
+      { to: '/search', label: 'Search', icon: Search },
       { to: '/', label: 'Crypto Market', icon: LayoutGrid, end: true },
       { to: '/trending', label: 'Trending', icon: TrendingUp },
       { to: '/bubbles', label: 'Crypto Bubbles', icon: CircleDollarSign },
@@ -47,6 +49,8 @@ const NAV = [
       { to: '/data-sources', label: 'Data Sources', icon: Database },
       { to: '/rsi-scanner', label: 'RSI Scanner', icon: Activity, hot: true },
       { to: '/strategies', label: 'Strategy Engine', icon: Zap, hot: true },
+      { to: '/copy-trading', label: 'Copy Trading', icon: Users },
+      { to: '/launchpad', label: 'Launchpad', icon: Rocket },
       { to: '/paper-trading', label: 'Paper Trader', icon: Play },
       { to: '/calculator', label: 'Calculator', icon: Calculator }
     ]
@@ -60,7 +64,10 @@ const NAV = [
       { to: '/account', label: 'Account & Security', icon: ShieldCheck },
       { to: '/organization', label: 'Organization', icon: Building2 },
       { to: '/billing', label: 'Billing & Tax', icon: Receipt },
-      { to: '/compliance', label: 'Compliance', icon: Scale }
+      { to: '/academy', label: 'Academy', icon: GraduationCap },
+      { to: '/referral', label: 'Referral', icon: Gift },
+      { to: '/compliance', label: 'Compliance', icon: Scale },
+      { to: '/admin', label: 'Admin', icon: Settings2 }
     ]
   }
 ];
@@ -93,7 +100,13 @@ const TITLES = {
   '/organization': ['Organization', 'Members, roles and permissions, invitations, enterprise policies and the audit log'],
   '/pricing': ['Plans & Pricing', 'Compare plans, monthly and annual billing, and the limits each tier raises'],
   '/billing': ['Billing & Tax', 'Plans, proration, coupons, metered usage, invoices, credit notes and jurisdiction tax rules'],
-  '/compliance': ['Compliance', 'Policies and acceptance, consent, data-subject requests, retention, legal hold and framework readiness']
+  '/compliance': ['Compliance', 'Policies and acceptance, consent, data-subject requests, retention, legal hold and framework readiness'],
+  '/search': ['Search', 'One box across coins, venues, strategies, courses and app pages'],
+  '/copy-trading': ['Copy Trading', 'Size a copy plan, verify a track record and evaluate stop rules'],
+  '/launchpad': ['Launchpad', 'Application screening, tokenomics, vesting, allocation and listing workflow'],
+  '/academy': ['CryptoX Academy', 'Five tracks with lessons that link into the product, quizzes and certificates'],
+  '/referral': ['Referral & Affiliate', 'Referral links, tiered commission, payout readiness and fraud controls'],
+  '/admin': ['Admin', 'Fee and risk configuration, service health, listing gates and audit diffs']
 };
 
 export default function Shell() {
@@ -142,13 +155,9 @@ export default function Shell() {
 
   const SidebarInner = (
     <div className="flex h-full flex-col" role="navigation" aria-label="Main navigation">
-      <button
-        onClick={() => go('/')}
-        className="flex items-center gap-2.5 px-5 pb-5 pt-5 text-left"
-      >
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-base font-extrabold text-primary-foreground">X</span>
-        <span className="text-lg font-bold tracking-tight">CryptoX</span>
-      </button>
+      <div className="px-5 pb-5 pt-5">
+        <BrandLogo size="md" onClick={() => go('/')} />
+      </div>
       <div className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
         {NAV.map((g) => (
           <div key={g.group}>
@@ -244,6 +253,7 @@ export default function Shell() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onFocus={() => setFocus(true)}
+              aria-label="Search coins"
               placeholder="Search coins…"
               className="h-9 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground outline-none transition-colors focus:ring-1 focus:ring-ring"
             />

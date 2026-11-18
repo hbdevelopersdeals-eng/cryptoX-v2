@@ -41,14 +41,14 @@
 /* Scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #26292f transparent;
+  scrollbar-color: rgb(var(--scrollbar)) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #26292f;
+  background: rgb(var(--scrollbar));
   border-radius: 8px;
 }
 *::-webkit-scrollbar-track {
@@ -88,4 +88,80 @@
 
 main:focus {
   outline: none;
+}
+
+/* ---------------------------------------------------------------- themes
+   Dark is the default (the brand look). Light is a full second palette, not an
+   inverted filter: surfaces keep their relative order so elevation still reads,
+   and the amber brand sits on dark text in both themes because amber-on-white is
+   about 1.7:1, which is unreadable. In light mode the amber used for TEXT and
+   buttons is darkened to #8A5A00 (about 6.5:1 on white) while the bright brand
+   amber is kept for fills that carry dark text. */
+:root {
+  --background: 9 9 12;
+  --foreground: 240 242 245;
+  --card: 15 17 21;
+  --card-foreground: 240 242 245;
+  --popover: 15 17 21;
+  --popover-foreground: 240 242 245;
+  --muted: 25 29 34;
+  --muted-foreground: 138 147 165;
+  --secondary: 25 29 34;
+  --secondary-foreground: 214 217 222;
+  --primary: 255 193 5;
+  --primary-foreground: 13 14 18;
+  --accent: 35 39 46;
+  --accent-foreground: 240 242 245;
+  --destructive: 230 57 57;
+  --destructive-foreground: 250 250 250;
+  --border: 31 34 40;
+  --input: 31 34 40;
+  --ring: 255 193 5;
+  --sidebar-bg: 11 12 15;
+  --sidebar-fg: 214 217 222;
+  --sidebar-hover: 21 23 27;
+  --sidebar-active: 255 193 5;
+  --sidebar-active-fg: 13 14 18;
+  --sidebar-border: 25 29 34;
+  --up: 52 211 153;
+  --down: 248 113 113;
+  --scrollbar: 38 41 47;
+}
+
+[data-theme='light'] {
+  --background: 250 250 251;
+  --foreground: 17 20 26;
+  --card: 255 255 255;
+  --card-foreground: 17 20 26;
+  --popover: 255 255 255;
+  --popover-foreground: 17 20 26;
+  --muted: 241 243 246;
+  --muted-foreground: 90 98 112;
+  --secondary: 241 243 246;
+  --secondary-foreground: 31 36 45;
+  --primary: 138 90 0;
+  --primary-foreground: 255 255 255;
+  --accent: 236 239 244;
+  --accent-foreground: 17 20 26;
+  --destructive: 199 40 40;
+  --destructive-foreground: 255 255 255;
+  --border: 224 228 234;
+  --input: 216 221 229;
+  --ring: 138 90 0;
+  --sidebar-bg: 255 255 255;
+  --sidebar-fg: 55 62 74;
+  --sidebar-hover: 244 246 249;
+  --sidebar-active: 255 193 5;
+  --sidebar-active-fg: 13 14 18;
+  --sidebar-border: 228 232 238;
+  --up: 4 140 92;
+  --down: 190 40 40;
+  --scrollbar: 205 210 218;
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+html[data-theme='dark'] {
+  color-scheme: dark;
 }

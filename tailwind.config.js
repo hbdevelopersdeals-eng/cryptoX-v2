@@ -3,33 +3,36 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
+      /* Every colour is a CSS variable so a theme is an attribute change, not a
+         rebuild: see :root and [data-theme='light'] in src/styles.css. The
+         <alpha-value> placeholder keeps opacity utilities (bg-primary/10) working. */
       colors: {
-        background: '#09090C',
-        foreground: '#F0F2F5',
-        card: '#0F1115',
-        'card-foreground': '#F0F2F5',
-        popover: '#0F1115',
-        'popover-foreground': '#F0F2F5',
-        muted: '#191D22',
-        'muted-foreground': '#8A93A5',
-        secondary: '#191D22',
-        'secondary-foreground': '#D6D9DE',
-        primary: { DEFAULT: '#FFC105', foreground: '#0D0E12' },
-        accent: { DEFAULT: '#23272E', foreground: '#F0F2F5' },
-        destructive: { DEFAULT: '#E63939', foreground: '#FAFAFA' },
-        border: '#1F2228',
-        input: '#1F2228',
-        ring: '#FFC105',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        card: 'rgb(var(--card) / <alpha-value>)',
+        'card-foreground': 'rgb(var(--card-foreground) / <alpha-value>)',
+        popover: 'rgb(var(--popover) / <alpha-value>)',
+        'popover-foreground': 'rgb(var(--popover-foreground) / <alpha-value>)',
+        muted: 'rgb(var(--muted) / <alpha-value>)',
+        'muted-foreground': 'rgb(var(--muted-foreground) / <alpha-value>)',
+        secondary: 'rgb(var(--secondary) / <alpha-value>)',
+        'secondary-foreground': 'rgb(var(--secondary-foreground) / <alpha-value>)',
+        primary: { DEFAULT: 'rgb(var(--primary) / <alpha-value>)', foreground: 'rgb(var(--primary-foreground) / <alpha-value>)' },
+        accent: { DEFAULT: 'rgb(var(--accent) / <alpha-value>)', foreground: 'rgb(var(--accent-foreground) / <alpha-value>)' },
+        destructive: { DEFAULT: 'rgb(var(--destructive) / <alpha-value>)', foreground: 'rgb(var(--destructive-foreground) / <alpha-value>)' },
+        border: 'rgb(var(--border) / <alpha-value>)',
+        input: 'rgb(var(--input) / <alpha-value>)',
+        ring: 'rgb(var(--ring) / <alpha-value>)',
         sidebar: {
-          bg: '#0B0C0F',
-          fg: '#D6D9DE',
-          hover: '#15171B',
-          active: '#FFC105',
-          'active-fg': '#0D0E12',
-          border: '#191D22'
+          bg: 'rgb(var(--sidebar-bg) / <alpha-value>)',
+          fg: 'rgb(var(--sidebar-fg) / <alpha-value>)',
+          hover: 'rgb(var(--sidebar-hover) / <alpha-value>)',
+          active: 'rgb(var(--sidebar-active) / <alpha-value>)',
+          'active-fg': 'rgb(var(--sidebar-active-fg) / <alpha-value>)',
+          border: 'rgb(var(--sidebar-border) / <alpha-value>)'
         },
-        up: '#34d399',
-        down: '#f87171'
+        up: 'rgb(var(--up) / <alpha-value>)',
+        down: 'rgb(var(--down) / <alpha-value>)'
       },
       fontFamily: {
         sans: ["system-ui", "-apple-system", "'Segoe UI'", "Roboto", "'Helvetica Neue'", "Arial", "sans-serif"],

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 
 import App from './App.jsx';
+import { ThemeProvider } from './lib/theme.jsx';
 import { initTelemetry } from './lib/telemetry.js';
 import { adoptLegacyHash } from './lib/hashCompat.js';
 import { registerServiceWorker } from './lib/pwa.js';
@@ -29,4 +30,6 @@ if (import.meta.env.PROD) {
   });
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+createRoot(document.getElementById('root')).render(<ThemeProvider>
+        <App />
+      </ThemeProvider>);

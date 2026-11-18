@@ -6,6 +6,7 @@ import {
   XCircle, Activity, BarChart3, CandlestickChart, LineChart, Layers, ShieldCheck, Boxes, Bot, Landmark, Sparkles, Globe2, Building2, Receipt, Scale, Users, Rocket, GraduationCap, Gift, Settings2
 } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
+import { ThemeToggle } from '../lib/theme.jsx';
 import { useI18n, LANGUAGES } from '../lib/i18n.jsx';
 import { useCurrency, CURRENCIES } from '../lib/currency.jsx';
 import { useMarket } from '../lib/market.jsx';
@@ -223,6 +224,8 @@ export default function Shell() {
       {/* h-[100dvh] + overflow-hidden is what makes the inner overflow-y-auto real.
           Without a definite height the rail grew to 1613px inside a 900px parent
           and 18 of 36 links were clipped and unreachable. */}
+      {/* Fixed, so it is one click from anywhere and belongs to no page. */}
+      <ThemeToggle className="fixed bottom-20 right-4 z-40 shadow-lg lg:bottom-6 lg:right-6" />
       <aside className="sticky top-0 hidden h-[100dvh] w-[264px] shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar-bg lg:block">
         {SidebarInner}
       </aside>

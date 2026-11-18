@@ -65,6 +65,7 @@ const NAV = [
       { to: '/organization', label: 'Organization', icon: Building2 },
       { to: '/billing', label: 'Billing & Tax', icon: Receipt },
       { to: '/academy', label: 'Academy', icon: GraduationCap },
+      { to: '/social', label: 'Social', icon: Users },
       { to: '/referral', label: 'Referral', icon: Gift },
       { to: '/compliance', label: 'Compliance', icon: Scale },
       { to: '/admin', label: 'Admin', icon: Settings2 }
@@ -105,6 +106,7 @@ const TITLES = {
   '/copy-trading': ['Copy Trading', 'Size a copy plan, verify a track record and evaluate stop rules'],
   '/launchpad': ['Launchpad', 'Application screening, tokenomics, vesting, allocation and listing workflow'],
   '/academy': ['CryptoX Academy', 'Five tracks with lessons that link into the product, quizzes and certificates'],
+  '/social': ['Social', 'Community analysis, research and discussion with moderation'],
   '/referral': ['Referral & Affiliate', 'Referral links, tiered commission, payout readiness and fraud controls'],
   '/admin': ['Admin', 'Fee and risk configuration, service health, listing gates and audit diffs']
 };

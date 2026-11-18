@@ -60,6 +60,7 @@ const LaunchpadPage = lazy(() => import('./pages/Launchpad.jsx'));
 const AcademyPage = lazy(() => import('./pages/Academy.jsx'));
 const ReferralPage = lazy(() => import('./pages/Referral.jsx'));
 const AdminPage = lazy(() => import('./pages/Admin.jsx'));
+const SocialPage = lazy(() => import('./pages/Social.jsx'));
 
 export function PageFallback() {
   return (
@@ -186,6 +187,7 @@ export default function App() {
                     <Route path="/academy" element={<AcademyPage />} />
                     <Route path="/referral" element={<ReferralPage />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/social" element={<SocialPage />} />
                     <Route path="/coin/:id" element={<CoinDetailPage />} />
                     <Route path="/404" element={<NotFoundPage />} />
                     <Route path="*" element={<Navigate to="/404" replace />} />

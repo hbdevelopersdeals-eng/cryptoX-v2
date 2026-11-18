@@ -193,6 +193,7 @@ export const PRIVATE_PATH_PREFIXES = [
   '/launchpad',
   '/academy',
   '/referral',
+  '/social',
   '/admin',
   '/404'
 ];

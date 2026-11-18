@@ -36,8 +36,7 @@ const Marquee = memo(function Marquee({ coins }) {
 
 const Row = memo(function Row({ r, idx, watched, onToggle }) {
   return (
-    <Link
-      to={`/coin/${r.id}`}
+    <div
       className="group grid grid-cols-[44px_minmax(160px,1.6fr)_repeat(4,minmax(86px,1fr))_110px_36px] items-center gap-3 border-b border-border px-3 py-2.5 transition-colors last:border-0 hover:bg-accent/40 sm:px-4"
     >
       <span className="num text-xs text-muted-foreground">{idx + 1}</span>
@@ -68,7 +67,7 @@ const Row = memo(function Row({ r, idx, watched, onToggle }) {
       >
         <Star size={15} fill={watched ? 'currentColor' : 'none'} />
       </button>
-    </Link>
+    </div>
   );
 });
 

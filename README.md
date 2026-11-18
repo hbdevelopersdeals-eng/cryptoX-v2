@@ -32,11 +32,11 @@ still answers, but it is an earlier deployment; linking it splits the two hosts'
 
 ## Architecture
 
-Single-page React 18 + Vite 5 + Tailwind 3 application. No backend, no server-side secrets.
+React 18 + Vite 6.4.6 + Tailwind 3 web application. Supabase Auth/Postgres and Edge Functions provide configured identity, data access, AI and billing workflows; Lemon Squeezy handles checkout. Browser builds use only the public Supabase publishable key. Privileged keys stay in server-side function secrets. If Supabase build variables are absent, the app falls back to a local demo identity and must not be used for a real paid deployment.
 
 ```
 src/
-  lib/          market.jsx (feeds + provenance)  auth.jsx (PBKDF2 identity)
+  lib/          market.jsx (feeds + provenance)  auth.jsx (Supabase / demo identity)
                 strategies.js  backtest.js  indicators.js  telemetry.js  prefs.jsx
   components/   Shell, CandleChart, BacktestPanel, ErrorBoundary, ConsentBanner, ui
   pages/        Home, CoinDetail, Strategies, PaperTrading, Portfolio, Status, Legal, Auth…

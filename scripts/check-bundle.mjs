@@ -28,16 +28,17 @@ const INITIAL_GZIP_BUDGET = 220 * 1024;      // 220 KB gzip for the first load
 /*
  * Raised 440 -> 480 KB for the Account and Organization pages, then 480 -> 520
  * KB for Billing and Compliance, then 520 -> 560 KB for Brand Identity &
- * Terminal Showcase assets.
+ * Terminal Showcase assets, then 560 -> 562 KB for the measured Nov 18 baseline.
+ * The Vite 6 / React Router 7 / Vitest 5 security updates move that baseline to
+ * 567.5 KB across 110 lazy chunks; first load is still 190.6 KB. Set the tripwire
+ * to 570 KB without loosening the 220 KB first-load or 120 KB per-chunk budgets.
  *
  * This number is a TRIPWIRE, not a limit: its job is to make growth a conscious
  * decision rather than something noticed after the fact. Every raise is
  * deliberate and recorded. The figure that governs user experience is
- * INITIAL_GZIP_BUDGET above - first load is 182 KB against 220 KB, and 104 lazy
- * chunks exist of which a visitor downloads roughly two. If first load ever
- * approaches its budget, that is the signal to act on.
+ * INITIAL_GZIP_BUDGET above - visitors do not download all lazy chunks at once.
  */
-const TOTAL_GZIP_BUDGET = 560 * 1024;        // 560 KB gzip across every chunk
+const TOTAL_GZIP_BUDGET = 570 * 1024;        // 570 KB gzip across every chunk
 
 if (!existsSync(ASSETS)) {
   console.error('✗ dist/assets not found — run "npm run build" first');

@@ -1,5 +1,24 @@
-import '@testing-library/jest-dom/vitest';
+﻿import '@testing-library/jest-dom/vitest';
 
+// Node may expose a disabled global Storage getter that shadows jsdom storage.
+// Use a deterministic in-memory Storage implementation in tests only.
+class TestStorage {
+  #data = new Map();
+  get length() { return this.#data.size; }
+  key(index) { return [...this.#data.keys()][index] ?? null; }
+  getItem(key) { const value = this.#data.get(String(key)); return value === undefined ? null : value; }
+  setItem(key, value) { this.#data.set(String(key), String(value)); }
+  removeItem(key) { this.#data.delete(String(key)); }
+  clear() { this.#data.clear(); }
+}
+const testLocalStorage = new TestStorage();
+const testSessionStorage = new TestStorage();
+Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: testLocalStorage });
+Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: testSessionStorage });
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', { configurable: true, value: testLocalStorage });
+  Object.defineProperty(window, 'sessionStorage', { configurable: true, value: testSessionStorage });
+}
 /* ---- jsdom gaps used by the app ---- */
 
 // ResizeObserver (charts, tables)
@@ -24,7 +43,7 @@ if (!window.matchMedia) {
   });
 }
 
-// Canvas 2D context (CandleChart) — no-op proxy that returns functions/plain objects
+// Canvas 2D context (CandleChart) â€” no-op proxy that returns functions/plain objects
 const ctxNoop = () => {
   const target = {
     measureText: () => ({ width: 10 }),

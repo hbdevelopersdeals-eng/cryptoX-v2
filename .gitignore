@@ -8,3 +8,5 @@ dist
 *.env
 .DS_Store
 .prerender-shell.html
+# Generated Accio metadata backups are local recovery artifacts, not source.
+.accio-site.json.bak-*

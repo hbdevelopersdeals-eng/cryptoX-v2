@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  QUOTA_KEYS, checkQuota, limitFor, usageSummary, quotaWarning, periodKey,
+  QUOTA_KEYS, checkQuota, limitFor, usageSummary, quotaWarning, periodKey, enforcementState,
   nextReset, fromServer, consumeQuota, readUsage, ENFORCEMENT, MIGRATION
 } from './entitlements.js';
 
@@ -73,11 +73,11 @@ describe('usageSummary', () => {
     const rows = usageSummary('pro', { alerts: 50 });
     expect(rows).toHaveLength(QUOTA_KEYS.length);
     expect(rows.find((r) => r.key === 'alerts').enforcement).toBe('server');
-    // Portfolios and seats have a mechanism in migration 0008, but this client
-    // cannot know whether it is applied — so they are neither "server" nor
-    // "display-only", which is the distinction that keeps the pricing page true.
-    expect(rows.find((r) => r.key === 'portfolios').enforcement).toBe('pending-migration');
-    expect(rows.find((r) => r.key === 'seats').enforcement).toBe('pending-migration');
+    // Migration 0008 was applied on 18 Nov 2026, so these are genuinely enforced
+    // by a trigger now. Before that they read "pending-migration" — the third
+    // state existed precisely so this line could change on deployment day.
+    expect(rows.find((r) => r.key === 'portfolios').enforcement).toBe('server');
+    expect(rows.find((r) => r.key === 'seats').enforcement).toBe('server');
   });
 
   it('caps the percentage at 100 even when usage exceeds the limit', () => {
@@ -95,7 +95,8 @@ describe('usageSummary', () => {
   it('documents the migration that makes enforcement real', () => {
     expect(MIGRATION).toBe('0007_entitlements.sql');
     expect(ENFORCEMENT.alerts.server).toBe(true);
-    expect(ENFORCEMENT.portfolios.server).toBe(false);
+    expect(ENFORCEMENT.portfolios.server).toBe(true);
+    expect(enforcementState('portfolios')).toBe('server');
   });
 });
 

@@ -37,23 +37,39 @@ describe('pricing quota disclosure', () => {
   });
 
   it('names the enforced quotas and says the database refuses them', () => {
-    const text = enforcementDisclosure();
-    for (const key of SERVER_ENFORCED_KEYS) expect(text).toContain(QUOTA_LABELS[key]);
+    /* Synthetic input, because with 0008 applied the live call returns null (every
+       quota is enforced, so there is nothing to disclose). The sentence itself is
+       still produced whenever at least one quota is enforced. */
+    /* One pending key is included because the function returns null when there is
+       nothing left to disclose at all — that contract is asserted separately. */
+    const text = enforcementDisclosure({ enforced: ['alerts', 'bots'], pending: ['portfolios'], displayOnly: [] });
+    for (const key of ['alerts', 'bots']) expect(text).toContain(QUOTA_LABELS[key]);
     expect(text).toMatch(/refused by the database/);
+    expect(SERVER_ENFORCED_KEYS).toContain('alerts');
   });
 
-  it('names the pending quotas, the migration and the current limit of the claim', () => {
-    const text = enforcementDisclosure();
-    for (const key of PENDING_KEYS) expect(text).toContain(QUOTA_LABELS[key]);
+  /* 0008 was applied to the deployment on 18 Nov 2026, so the real pending set is
+     now empty and the disclosure shortens itself to nothing. The pending sentence
+     is still reachable code — a future migration will use it — so it is tested
+     with an explicit input rather than by pretending the live state is pending. */
+  it('still renders the pending sentence for a synthetic pending key, with its migration named', () => {
+    const text = enforcementDisclosure({ enforced: ['alerts', 'bots', 'apiCallsPerMonth'], pending: ['portfolios'], displayOnly: [] });
+    expect(text).toContain(QUOTA_LABELS.portfolios);
     for (const migration of pendingMigrations()) expect(text).toContain(migration);
     expect(text).toMatch(/counted in the app only/);
   });
 
   it('never claims a pending migration is already enforcing', () => {
-    const text = enforcementDisclosure();
+    const text = enforcementDisclosure({ enforced: ['alerts'], pending: ['portfolios'], displayOnly: [] });
     // The sentence for pending keys must be conditional, not past tense.
     expect(text).toMatch(/as soon as it is applied/);
     expect(text).not.toMatch(/portfolios and team seats are refused by the database/i);
+  });
+
+  it('has no pending or display-only quota left after 0008', () => {
+    expect(PENDING_KEYS).toEqual([]);
+    expect(DISPLAY_ONLY_KEYS).toEqual([]);
+    expect(SERVER_ENFORCED_KEYS).toHaveLength(QUOTA_KEYS.length);
   });
 
   it('agrees in number: one quota is singular, several are plural', () => {
@@ -73,13 +89,12 @@ describe('pricing quota disclosure', () => {
     expect(text).toMatch(/no server mechanism yet/);
   });
 
-  it('renders the disclosure on the page', () => {
-    render(<QuotaEnforcementNote />);
-    const note = screen.getByTestId('quota-enforcement');
-    expect(note).toHaveTextContent(/How these limits are enforced/i);
-    for (const key of [...SERVER_ENFORCED_KEYS, ...PENDING_KEYS, ...DISPLAY_ONLY_KEYS]) {
-      expect(note).toHaveTextContent(QUOTA_LABELS[key]);
-    }
+  it('renders nothing once every quota is enforced by the database', () => {
+    /* The disclosure exists to admit a gap. With no gap left, rendering an empty
+       "how these limits are enforced" panel would be noise that implies one. */
+    const { container } = render(<QuotaEnforcementNote />);
+    expect(screen.queryByTestId('quota-enforcement')).toBeNull();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('keeps the enforcement map honest about which keys have a mechanism', () => {

@@ -46,26 +46,22 @@ export const QUOTA_LABELS = {
 export const ENFORCEMENT = {
   alerts: { server: true, table: 'cx_alerts', mechanism: 'trigger + cx_consume_quota' },
   portfolios: {
-    server: false,
-    /* `ready` means the mechanism EXISTS in a migration but may not be applied to
-     * the deployment the reader is looking at. Three states, not two: claiming
-     * "server" for a migration that is not deployed is the same lie as claiming a
-     * quota nobody checks. The pricing page words this state separately. */
+    server: true,
     ready: true,
     migration: '0008_quotas_portfolios_seats.sql',
     table: 'cx_settings',
     mechanism: 'trigger on cx_settings.portfolios (jsonb array length)',
-    note: 'Until 0008 is applied, portfolios are counted in the app only.'
+    note: 'Enforced by 0008, applied to the deployment on 18 Nov 2026.'
   },
   bots: { server: true, table: 'cx_strategy_arms', mechanism: 'trigger + cx_consume_quota' },
   apiCallsPerMonth: { server: true, table: 'cx_usage_counters', mechanism: 'atomic counter' },
   seats: {
-    server: false,
+    server: true,
     ready: true,
     migration: '0008_quotas_portfolios_seats.sql',
     table: 'cx_org_members',
     mechanism: 'trigger on cx_org_members (owner plan seat count)',
-    note: 'Until 0008 is applied, seats are advisory.'
+    note: 'Enforced by 0008, applied to the deployment on 18 Nov 2026.'
   }
 };
 

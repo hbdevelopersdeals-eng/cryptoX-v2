@@ -4,6 +4,7 @@ import {
   attributeSignup, payoutStatus, fraudCheck, parseUtm, affiliateSummary,
   ATTRIBUTION_WINDOW_DAYS, MIN_PAYOUT_USD
 } from './referral.js';
+import { SITE_URL } from './seo.js';
 
 describe('codes and links', () => {
   it('is deterministic and well formed', () => {
@@ -192,5 +193,26 @@ describe('campaigns and summary', () => {
   it('never divides by zero clicks', () => {
     const s = affiliateSummary([{ type: 'signup', code: 'X' }]);
     expect(s.conversionRate).toBe(0);
+  });
+});
+describe('attribution fail-closed', () => {
+  it('defaults the link to the canonical host, not a typed literal', () => {
+    // The default used to be a hardcoded host that had stopped being canonical,
+    // so every generated link pointed somewhere the sitemap did not claim.
+    expect(referralLink('CXABC1234')).toContain(new URL(SITE_URL).host);
+    expect(referralLink('CXABC1234')).not.toMatch(/cryptox\.site\.accio\.ai/);
+  });
+
+  it('refuses a click whose timestamp cannot be parsed', () => {
+    // NaN age passes every `>` comparison, so an unparseable click used to
+    // attribute the signup and its commission.
+    const r = attributeSignup({
+      code: 'CXABC1234',
+      newAccountId: 'new',
+      referrerAccountId: 'ref',
+      clicks: [{ code: 'CXABC1234', at: 'not-a-date', id: 'c1' }]
+    });
+    expect(r.attributed).toBe(false);
+    expect(r.reason).toBe('invalid-click-time');
   });
 });

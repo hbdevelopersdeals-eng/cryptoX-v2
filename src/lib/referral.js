@@ -17,6 +17,8 @@
  * surface (portal, API, payout ledgers) reads that table.
  */
 
+import { SITE_URL } from './seo.js';
+
 /** Attribution window: a click is good for 60 days. */
 export const ATTRIBUTION_WINDOW_DAYS = 60;
 
@@ -69,7 +71,15 @@ export function referralCode(accountId) {
   return `CX${body}`;
 }
 
-export function referralLink(code, { base = 'https://cryptox.site.accio.ai', campaign = null } = {}) {
+/* Default host comes from `seo.js` rather than being typed here.
+ *
+ * It used to be the literal `https://cryptox.site.accio.ai`, which was the
+ * published host months ago and is not the origin the canonical tags, sitemap
+ * and robots.txt use. A referral link is copied into a tweet and outlives the
+ * deployment that generated it, so a stale default here is the most expensive
+ * kind: every link ever shared points at a host the marketing site no longer
+ * claims. One constant, one truth. */
+export function referralLink(code, { base = SITE_URL, campaign = null } = {}) {
   if (!code) return null;
   const url = new URL('/register', String(base).replace(/\/+$/, ''));
   url.searchParams.set('ref', code);
@@ -114,7 +124,15 @@ export function attributeSignup({
   if (!mine.length) return { attributed: false, reason: 'no-click' };
 
   const last = mine[0];
-  const ageDays = (now - new Date(last.at).getTime()) / 86400000;
+  const clickedAt = new Date(last.at).getTime();
+  /* A malformed timestamp makes the age NaN, and every comparison against NaN is
+     false — so an unparseable click used to pass the window check and attribute
+     the signup. Attribution is a payment decision here, so it fails closed. */
+  if (!Number.isFinite(clickedAt)) {
+    return { attributed: false, reason: 'invalid-click-time', code };
+  }
+
+  const ageDays = (now - clickedAt) / 86400000;
   if (ageDays > windowDays) {
     return { attributed: false, reason: 'window-expired', ageDays, code };
   }

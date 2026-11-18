@@ -459,7 +459,13 @@ Every alert *type* is implemented and evaluated against live data. Delivery is i
 
 ## 17. Social Network
 
-Not implemented. This is the largest single gap in the checklist: profiles, follows, posts, communities, messaging, idea publishing and reputation are a separate product with its own moderation, abuse and data-protection obligations. None of it exists in this repository.
+Not implemented in this repository, and — after inspecting the deployed project — deliberately not re-implemented.
+
+**Finding (18 Nov 2026).** The production database already carries a social schema that this repository does not know about: `cx_profiles`, `cx_community_posts`, `cx_community_comments`, `cx_community_reactions`, `cx_user_follows`, `cx_moderation_reports`, `cx_user_verification_status`, alongside roughly eighty `cx_*` tables in total. This repository's migrations describe only thirty.
+
+A first attempt at a `0009_social.sql` would therefore have created a **second, parallel social model** in the same database — two profile tables, two follow tables, two post tables — with the UI bound to the newer, emptier one. That file was withdrawn rather than repaired. The client logic written for it (`src/lib/social.js`, 46 tests) is kept: it is pure, table-agnostic and reusable, and its `canViewPost` predicate is the rule any adapter must reproduce.
+
+The correct next step is an adapter over the existing tables, not a new schema. Until that adapter exists, every item below stays a gap at the product level even where a table is present.
 
 | # | Item | Status | Evidence / limitation |
 |---:|---|---|---|

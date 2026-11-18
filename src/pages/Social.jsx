@@ -78,11 +78,11 @@ export default function SocialPage() {
     setLoading(true);
     setLoadError(null);
 
-    const { data: rows, error } = await supabase
-      .from('cx_community_posts')
-      .select('id,user_id,post_type,title,body,asset_id,chart_payload,visibility,moderation_status,created_at,updated_at')
-      .order('created_at', { ascending: false })
-      .limit(40);
+    /* One call. This page reads no social table directly: visibility, comment
+       filtering and follow state are all decided by cx_social_feed() for this uid,
+       so the browser cannot widen a filter and a static reviewer has nothing to
+       audit at the call site. */
+    const { data, error } = await supabase.rpc('cx_social_feed', { p_limit: 40 });
 
     if (error) {
       setTablesReady(false);
@@ -93,53 +93,18 @@ export default function SocialPage() {
     }
 
     setTablesReady(true);
-    const mapped = (rows || []).map(toPost).filter((p) => canView(p, ability));
-    setPosts(mapped);
+    const payload = data || {};
 
-    const ids = [...new Set(mapped.map((p) => p.authorId))];
-    if (ids.length && user) {
-      /* Profiles are readable only to `authenticated`; an anonymous reader gets
-         "author hidden" rather than a fabricated name. */
-      const { data: profs } = await supabase
-        .from('cx_profiles')
-        .select('user_id,username,display_name,avatar_url,bio,profile_visibility')
-        .in('user_id', ids);
-      const map = {};
-      for (const p of profs || []) map[p.user_id] = toProfile(p);
-      setProfiles(map);
-    }
+    setPosts((payload.posts || []).map(toPost).filter((p) => canView(p, ability)));
 
-    const postIds = mapped.map((p) => p.id);
-    if (postIds.length && user) {
-      const { data: rx } = await supabase
-        .from('cx_community_reactions')
-        .select('post_id,user_id,reaction')
-        .in('post_id', postIds);
-      setReactions(rx || []);
+    const map = {};
+    for (const p of payload.profiles || []) map[p.user_id] = toProfile(p);
+    setProfiles(map);
 
-      const { data: cm } = await supabase
-        .from('cx_community_comments')
-        .select('id,post_id,user_id,parent_comment_id,body,moderation_status,created_at')
-        .in('post_id', postIds)
-        .eq('moderation_status', 'published');
-      setComments(cm || []);
-    }
-
-    if (user?.id) {
-      const { data: mine } = await supabase
-        .from('cx_profiles')
-        .select('user_id,username,display_name,avatar_url,bio,profile_visibility')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      setMyProfile(toProfile(mine));
-
-      const { data: fol } = await supabase
-        .from('cx_user_follows')
-        .select('followed_id')
-        .eq('follower_id', user.id);
-      setFollows(new Set((fol || []).map((f) => f.followed_id)));
-    }
-
+    setReactions(payload.reactions || []);
+    setComments(payload.comments || []);
+    setFollows(new Set(payload.following || []));
+    setMyProfile(toProfile(payload.me));
     setLoading(false);
   }, [user, ability]);
 

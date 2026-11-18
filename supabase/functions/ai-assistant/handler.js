@@ -32,6 +32,10 @@ export const MAX_CONTEXT_CHARS = 4000;
 /** Provider precedence. First one with a key wins; the rest are fallbacks. */
 export const PROVIDER_ORDER = ['anthropic', 'openai', 'google'];
 
+/* Free tiers, tried after the paid keys. The point of the chain is that a
+ * 429 from one provider is not the user's problem: the next one answers. */
+export const FREE_FALLBACKS = ['gemini', 'groq', 'cerebras', 'mistral', 'openrouter', 'together'];
+
 const PROVIDER_CONFIG = {
   anthropic: {
     url: 'https://api.anthropic.com/v1/messages',
@@ -74,6 +78,73 @@ const PROVIDER_CONFIG = {
     extract: (json) => (json?.candidates?.[0]?.content?.parts || []).map((p) => p?.text || '').join('')
   }
 };
+
+const openAiCompatible = (url, keyName, model) => ({
+  url,
+  keyName,
+  model,
+  build: (system, message) => ({
+    model,
+    max_tokens: 700,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: message }
+    ]
+  }),
+  headers: (key) => ({ authorization: `Bearer ${key}` }),
+  extract: (json) => json?.choices?.[0]?.message?.content || ''
+});
+
+Object.assign(PROVIDER_CONFIG, {
+  gemini: {
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    keyName: 'GEMINI_API_KEY',
+    model: 'gemini-2.0-flash',
+    build: (system, message) => ({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ role: 'user', parts: [{ text: message }] }],
+      generationConfig: { maxOutputTokens: 700 }
+    }),
+    headers: () => ({}),
+    extract: (json) => (json?.candidates?.[0]?.content?.parts || []).map((p) => p?.text || '').join('')
+  },
+  groq: openAiCompatible('https://api.groq.com/openai/v1/chat/completions', 'GROQ_API_KEY', 'llama-3.3-70b-versatile'),
+  cerebras: openAiCompatible('https://api.cerebras.ai/v1/chat/completions', 'CEREBRAS_API_KEY', 'llama3.1-8b'),
+  mistral: openAiCompatible('https://api.mistral.ai/v1/chat/completions', 'MISTRAL_API_KEY', 'mistral-small-latest'),
+  openrouter: openAiCompatible('https://openrouter.ai/api/v1/chat/completions', 'OPENROUTER_API_KEY', 'meta-llama/llama-3.3-70b-instruct:free'),
+  together: openAiCompatible('https://api.together.xyz/v1/chat/completions', 'TOGETHER_API_KEY', 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free')
+});
+
+/** All keys for a provider: a single value, or a comma-separated rotation. */
+export function providerKeys(env = {}, provider) {
+  const raw = String(env[PROVIDER_CONFIG[provider]?.keyName] || '').trim();
+  if (!raw) return [];
+  return [...new Set(raw.split(/[\s,;]+/).map((k) => k.trim()).filter(Boolean))];
+}
+
+/**
+ * Ordered attempts: paid providers first (they are better), then free tiers.
+ * A provider with no key is skipped here rather than failing at request time.
+ */
+export function attemptChain(env = {}) {
+  const order = [...PROVIDER_ORDER, ...FREE_FALLBACKS];
+  const chain = [];
+  for (const provider of order) {
+    if (!PROVIDER_CONFIG[provider]) continue;
+    for (const key of providerKeys(env, provider)) chain.push({ provider, key });
+  }
+  return chain;
+}
+
+/** Which failures justify moving on, and which should stop the chain. */
+export function classifyProviderFailure(status = 0, body = '') {
+  const t = String(body || '').toLowerCase();
+  if (status === 401 || status === 403) return 'auth';
+  if (t.includes('resource_exhausted') || t.includes('insufficient_quota') || t.includes('quota') || status === 402) return 'quota';
+  if (status === 429) return 'rate';
+  if (status === 0 || status >= 500) return 'server';
+  return 'other';
+}
 
 export const SYSTEM_PROMPT = [
   'You are the CryptoX market assistant, embedded in a market-data dashboard.',
@@ -220,45 +291,95 @@ export async function handleRequest({ method, body, userId, env = {}, fetchImpl 
     ? `Market context (authoritative for this answer):\n${contextText}\n\nQuestion: ${safeMessage}`
     : `Question: ${safeMessage}`;
 
-  const config = PROVIDER_CONFIG[provider];
-  const key = providerKey(env, provider);
-  const url = provider === 'google' ? `${config.url}?key=${encodeURIComponent(key)}` : config.url;
+  /* Try every configured provider until one answers.
+   *
+   * The previous version called the first provider that had a key and returned
+   * 502 if it refused — so a free tier running out of credit looked like an
+   * outage. A refusal is now information: the loop records why, moves on, and
+   * only reports failure when the whole chain is exhausted.
+   *
+   * Provider error bodies are never surfaced: they can echo the prompt, the key
+   * prefix or billing detail that is not the caller's business. Only the kind of
+   * failure and the provider NAME are reported back. */
+  const chain = attemptChain(env);
+  const failures = [];
+  /* An invalid answer is a different fact from a failed provider: the model
+     spoke, and what it said could not be returned. Kept separately so the
+     caller learns that instead of a generic outage. */
+  let invalidOutput = null;
 
-  let response;
-  try {
-    response = await fetchImpl(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', ...config.headers(key) },
-      body: JSON.stringify(config.build(SYSTEM_PROMPT, userContent))
+  for (const attempt of chain) {
+    const config = PROVIDER_CONFIG[attempt.provider];
+    if (!config) continue;
+    const key = attempt.key;
+    const url = attempt.provider === 'google' || attempt.provider === 'gemini'
+      ? `${config.url}?key=${encodeURIComponent(key)}`
+      : config.url;
+
+    let response;
+    try {
+      response = await fetchImpl(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...config.headers(key) },
+        body: JSON.stringify(config.build(SYSTEM_PROMPT, userContent))
+      });
+    } catch {
+      failures.push({ provider: attempt.provider, kind: 'network' });
+      continue;
+    }
+
+    if (!response?.ok) {
+      /* A minimal fetch stub (and some proxies) return a response without a text()      body reader; calling it blindly threw a TypeError and turned a clean 502 into      an unhandled rejection. */
+      const body = typeof response.text === 'function' ? await response.text().catch(() => '') : '';
+      failures.push({
+        provider: attempt.provider,
+        kind: classifyProviderFailure(response?.status ?? 0, body),
+        status: response?.status ?? 0
+      });
+      continue;
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      failures.push({ provider: attempt.provider, kind: 'bad-json' });
+      continue;
+    }
+
+    const text = config.extract(data);
+    const validated = validateOutput(text);
+    /* An unusable answer from one provider is a reason to ask the next one, not
+       a reason to fail the request. */
+    if (!validated.ok) {
+      invalidOutput = { provider: attempt.provider, reason: validated.reason };
+      failures.push({ provider: attempt.provider, kind: 'invalid-output', reason: validated.reason });
+      continue;
+    }
+
+    return json(200, {
+      text: validated.text,
+      provider: attempt.provider,
+      model: config.model,
+      // The client shows this so a user can tell a model answer from the
+      // deterministic router, which is a different thing entirely.
+      source: 'model',
+      tried: failures.length + 1
     });
-  } catch {
-    return json(502, { error: 'provider-unreachable' });
   }
 
-  if (!response?.ok) {
-    // Never surface the provider's error body: it can echo the prompt, the key
-    // prefix, or billing detail that is not the caller's business.
-    return json(502, { error: 'provider-error', provider, status: response?.status ?? 0 });
+  if (invalidOutput) {
+    return json(502, { error: 'invalid-output', reason: invalidOutput.reason, provider: invalidOutput.provider });
   }
 
-  let data;
-  try {
-    data = await response.json();
-  } catch {
-    return json(502, { error: 'provider-bad-json' });
-  }
-
-  const text = config.extract(data);
-  const validated = validateOutput(text);
-  if (!validated.ok) return json(502, { error: 'invalid-output', reason: validated.reason, provider });
-
-  return json(200, {
-    text: validated.text,
-    provider,
-    model: config.model,
-    // The client shows this so a user can tell a model answer from the
-    // deterministic router, which is a different thing entirely.
-    source: 'model'
+  const first = failures[0] || { provider, kind: 'unknown', status: 0 };
+  /* Same shape the caller already expects. The per-provider detail stays out of
+     the response on purpose: a refusal list is useful to an operator and useless
+     to a user, and every field returned here is a field an attacker can read. */
+  return json(502, {
+    error: 'provider-error',
+    provider: first.provider,
+    status: first.status ?? 0
   });
 }
 

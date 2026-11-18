@@ -81,6 +81,11 @@ export default function CoinDetailPage() {
   const info = binanceInfo[row.symbol];
   const watched = watch.includes(row.id);
   const liveT = tickers[row.symbol];
+  /* A seed row is not a quote. Without a live ticker the price, the change and the
+     market cap are all reference values, and printing them as live is how this
+     page ended up quoting 58,700 / 0.00% / a 587B cap while the dashboard derived
+     a different BTC valuation from its own dominance figure. */
+  const hasLive = Boolean(liveT);
   const hi24 = liveT?.hi ?? null;
   const lo24 = liveT?.lo ?? null;
 
@@ -102,8 +107,13 @@ export default function CoinDetailPage() {
             </h1>
             <div className="mt-1.5 flex items-center gap-3">
               <span className="num text-2xl font-bold">{fmtPrice(row.price)}</span>
-              <PctBadge value={row.pct24} />
+              <PctBadge value={hasLive ? row.pct24 : null} />
               <span className="text-xs text-muted-foreground">24h</span>
+              {!hasLive ? (
+                <span className="chip !py-0.5 text-[10px] text-muted-foreground" title="Seed reference value: the live feed for this asset has not arrived">
+                  reference
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
@@ -119,8 +129,8 @@ export default function CoinDetailPage() {
 
       {/* Stat strip */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Card className="!p-4"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">Market Cap</p><p className="num mt-1 text-base font-semibold">{fmtCompact(row.mcap)}</p></Card>
-        <Card className="!p-4"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">24h Volume</p><p className="num mt-1 text-base font-semibold">{fmtCompact(row.vol)}</p></Card>
+        <Card className="!p-4"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">Market Cap</p><p className="num mt-1 text-base font-semibold">{hasLive ? fmtCompact(row.mcap) : '—'}</p></Card>
+        <Card className="!p-4"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">24h Volume</p><p className="num mt-1 text-base font-semibold">{hasLive ? fmtCompact(row.vol) : '—'}</p></Card>
         <Card className="!p-4">
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">24h Range</p>
           <p className="num mt-1 text-base font-semibold">
@@ -129,7 +139,12 @@ export default function CoinDetailPage() {
             {hi24 ? <span className="text-up">{fmtPrice(hi24)}</span> : '—'}
           </p>
         </Card>
-        <Card className="!p-4"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">7d Change</p><p className={`num mt-1 text-base font-semibold ${cls(row.pct7)}`}>{row.pct7 >= 0 ? '+' : ''}{row.pct7?.toFixed(2)}%</p></Card>
+        <Card className="!p-4">
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">7d Change</p>
+          <p className={`num mt-1 text-base font-semibold ${hasLive ? cls(row.pct7) : 'text-muted-foreground'}`}>
+            {hasLive && row.pct7 != null ? `${row.pct7 >= 0 ? '+' : ''}${row.pct7.toFixed(2)}%` : '—'}
+          </p>
+        </Card>
       </div>
 
       {/* Chart */}

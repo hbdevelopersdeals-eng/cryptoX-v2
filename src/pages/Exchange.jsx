@@ -143,6 +143,15 @@ export default function ExchangePage() {
       takeProfit: type === 'oco' ? Number(tp) : undefined,
       stopLoss: type === 'oco' ? Number(sl) : undefined
     };
+    /* Refuse before resting. The engine accepted a 275M-USDT order against a
+       25,000-USDT balance because the risk errors were rendered as advice and
+       never consulted at submit. An impossible order resting in the book is
+       worse than an error message. */
+    if (risk?.errors?.length) {
+      setFormMsg({ tone: 'error', text: 'Order refused — ' + risk.errors[0] });
+      return;
+    }
+
     const res = book.submit(order, markPrice);
     if (res.rejected) {
       setFormMsg({ tone: 'error', text: res.rejected });

@@ -253,6 +253,11 @@ export function highlight(text, query) {
       found = lower.indexOf(token, from);
     }
   }
+
+  /* A subsequence fallback was tried here and reverted: marking the b, t and c
+     of "Bitcoin" shreds the label into nine text nodes, which reads as broken
+     text and breaks text queries against the row. The honest fix for a fuzzy
+     match is to show WHAT matched — the symbol — not to sprinkle marks. */
   if (cursor < value.length) segments.push({ text: value.slice(cursor), match: false });
   return segments.length ? segments : [{ text: value, match: false }];
 }

@@ -28,7 +28,13 @@ export function PriceCell({ value, className = '' }) {
 }
 
 export function PctBadge({ value, size = 'md' }) {
-  const up = (value ?? 0) >= 0;
+  /* A missing change is not a flat 0.00%. Coercing null to zero made a seeded
+     row claim "▲ 0.00%" while its own dashboard quote said "▼ 2.17%" — the exact
+     contradiction that turns a provenance promise into a doubt. */
+  if (value == null || Number.isNaN(value)) {
+    return <span className={`num inline-flex items-center font-medium text-muted-foreground ${size === 'sm' ? 'text-xs' : 'text-sm'}`}>—</span>;
+  }
+  const up = value >= 0;
   const clsName = size === 'sm' ? 'text-xs' : 'text-sm';
   return (
     <span className={`num inline-flex items-center gap-0.5 font-medium ${cls(value)}`}>

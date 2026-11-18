@@ -38,18 +38,18 @@ export const GATED_ROUTES = {
     title: 'Trading bots',
     reason: 'Automate DCA, grid, TWAP, momentum and mean-reversion strategies.'
   },
-  '/exchange': {
-    entitlement: 'bots',
-    feature: 'exchange-engine',
-    title: 'Exchange engine',
-    reason: 'Place and manage paper orders with matching, risk checks and halts.'
-  },
-  '/strategies': {
-    entitlement: 'bots',
-    feature: 'strategy-engine',
-    title: 'Strategy engine',
-    reason: 'Run ready-made strategies against live market data.'
-  },
+  /* /exchange and /strategies are deliberately NOT gated.
+   *
+   * They were gated on the `bots` entitlement, which is 0 on Free — so a new
+   * account met a paywall on the two surfaces the product exists to demonstrate,
+   * while the landing page promised "the paper trader runs on live data today"
+   * and Academy lesson 5 sent the reader to /exchange to place a limit order.
+   * A first-time user's first click is not the moment to sell.
+   *
+   * What is actually paid is AUTOMATION: arming bots (/bots) and the derivatives
+   * analytics surface. Paper order entry and a backtest are the demo, and a demo
+   * that cannot be run is a preview of nothing. The `bots` count still enforces
+   * itself where it matters — Free holds zero armed bots. */
   '/derivatives': {
     entitlement: 'bots',
     feature: 'derivatives',

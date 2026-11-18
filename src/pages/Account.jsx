@@ -6,6 +6,7 @@ import {
 import { Card } from '../components/ui.jsx';
 import { useI18n } from '../lib/i18n.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { supabaseConfigured } from '../lib/supabase.js';
 import { useCurrency } from '../lib/currency.jsx';
 import {
   loadSecurity, saveSecurity, ensureProfile,
@@ -207,7 +208,7 @@ export default function Account() {
             <ShieldCheck size={18} className="text-primary" /> Account &amp; Security
           </h1>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Signed in as <span className="font-mono">{accountKey}</span> · stored in this browser
+            Signed in as <span className="font-mono">{accountKey}</span> · {supabaseConfigured ? 'account stored on our servers' : 'account stored in this browser'}
           </p>
         </div>
         {lock.locked ? (

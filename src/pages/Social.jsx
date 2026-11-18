@@ -63,6 +63,9 @@ export default function SocialPage() {
   const [reporting, setReporting] = useState(null);
   const [reportReason, setReportReason] = useState('spam');
   const [reportDone, setReportDone] = useState(null);
+  const [commentFor, setCommentFor] = useState(null);
+  const [commentBody, setCommentBody] = useState('');
+  const [commentNotice, setCommentNotice] = useState(null);
 
   const validation = useMemo(() => validateDraft(draft), [draft]);
   const ability = useMemo(
@@ -221,6 +224,38 @@ export default function SocialPage() {
     setReportDone(postId);
   };
 
+  const sendComment = async (postId) => {
+    if (!user?.id || !supabase) return;
+    const text = commentBody.trim();
+    if (!text) {
+      setCommentNotice({ postId, tone: 'error', text: 'Write something first.' });
+      return;
+    }
+
+    /* Sent explicitly as `pending`: the INSERT policy requires it, and a comment
+       that claims to be published before a moderator has seen it is the same lie
+       the post composer avoids. */
+    const { error } = await supabase.from('cx_community_comments').insert({
+      post_id: postId,
+      user_id: user.id,
+      body: text.slice(0, 2000),
+      moderation_status: 'pending'
+    });
+
+    if (error) {
+      setCommentNotice({ postId, tone: 'error', text: error.message });
+      return;
+    }
+    setCommentBody('');
+    setCommentFor(null);
+    setCommentNotice({
+      postId,
+      tone: 'pending',
+      text: 'Comment submitted for review. It appears once a moderator publishes it.'
+    });
+    load();
+  };
+
   const caps = capabilities({ signedIn: Boolean(user), profileExists: Boolean(myProfile), tablesReady });
   const canPublish = caps.find((c) => c.id === 'post').ready;
 
@@ -375,8 +410,8 @@ export default function SocialPage() {
               </p>
             ) : !myProfile ? (
               <p className="mt-1.5 text-[11px] text-muted-foreground">
-                Posting needs a profile row. This schema has no INSERT policy on <span className="font-mono">cx_profiles</span>, so the
-                row has to be provisioned by a trigger or an administrator — the app cannot create one.
+                Posting needs a profile row for your account. Migration 0010 grants you permission to create one; until it is applied to
+                this deployment, an administrator has to provision the row.
               </p>
             ) : null}
           </Card>
@@ -504,6 +539,57 @@ export default function SocialPage() {
                     ) : null}
                     {reportDone === p.id ? (
                       <p className="mt-1.5 text-[11px] text-emerald-400">Report filed. It is queued in cx_moderation_reports.</p>
+                    ) : null}
+
+                    {canComment(p, ability) && commentFor === p.id ? (
+                      <div className="mt-2 rounded-lg border border-border px-2.5 py-2">
+                        <label className="block text-[11px] text-muted-foreground">
+                          Your comment
+                          <textarea
+                            value={commentBody}
+                            onChange={(e) => setCommentBody(e.target.value)}
+                            rows={2}
+                            aria-label={`Comment on ${p.title || 'this post'}`}
+                            className="mt-1 w-full rounded border border-border bg-background px-2 py-1 text-[12px]"
+                          />
+                        </label>
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => sendComment(p.id)}
+                            className="rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground"
+                          >
+                            Submit for review
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setCommentFor(null); setCommentBody(''); }}
+                            className="text-[11px] text-muted-foreground hover:text-foreground"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : canComment(p, ability) ? (
+                      <button
+                        type="button"
+                        onClick={() => { setCommentFor(p.id); setCommentBody(''); setCommentNotice(null); }}
+                        className="mt-2 text-[11px] text-muted-foreground hover:text-primary"
+                      >
+                        Add a comment
+                      </button>
+                    ) : null}
+
+                    {commentNotice && commentNotice.postId === p.id ? (
+                      <p
+                        className={
+                          'mt-1.5 text-[11px] ' +
+                          (commentNotice.tone === 'error' ? 'text-red-400' : 'text-sky-400')
+                        }
+                        aria-live="polite"
+                      >
+                        {commentNotice.text}
+                      </p>
                     ) : null}
 
                     {postComments.length ? (

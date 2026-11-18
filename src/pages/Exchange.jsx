@@ -267,6 +267,11 @@ export default function ExchangePage() {
         <Card className="!p-4">
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Mark price</p>
           <p className="num mt-1 text-xl font-bold">{markPrice ? fmtPrice(markPrice) : '—'}</p>
+          {row && !row.live ? (
+            <p className="text-[10px] leading-tight text-amber-400">
+              reference — no live feed for this symbol
+            </p>
+          ) : null}
           <p className={`num text-[11px] ${cls(row?.pct24)}`}>{row?.pct24 == null ? '' : `${row.pct24 >= 0 ? '+' : ''}${row.pct24.toFixed(2)}%`}</p>
         </Card>
         <Card className="!p-4">

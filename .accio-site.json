@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "siteId": "qgf0t5pnidogy3fw",
+  "siteId": "7oeu8r4wgox31eox",
   "name": "cryptox-app",
   "kind": "react-vite",
   "devCommand": "vite",
@@ -16,11 +16,11 @@
     "supabase": {
       "projectUrl": "https://bvyiqinyakxlefaeomoj.supabase.co",
       "projectRef": "bvyiqinyakxlefaeomoj",
-      "connectedAt": "2026-09-13T06:25:33.090Z"
+      "connectedAt": "2026-09-13T06:25:33.09Z"
     }
   },
-  "subdomain": "cryptox-v2",
-  "publishedUrl": "https://cryptox-v2.site.accio.ai",
-  "publishedAt": "2026-10-19T20:29:20.946Z",
-  "deployId": "dep_1792441761018_a0767983"
+  "subdomain": "cryptox-official",
+  "publishedUrl": "https://cryptox-official.site.accio.ai",
+  "publishedAt": "2026-11-18T22:01:42.712Z",
+  "deployId": "dep_1795039290073_3ecae1f7"
 }

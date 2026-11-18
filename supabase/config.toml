@@ -1,0 +1,4 @@
+# Minimal Supabase CLI project descriptor.
+# Its presence is what lets tooling treat supabase/migrations as the schema of
+# record rather than a folder of unrelated SQL.
+project_id = "bvyiqinyakxlefao­moj"

@@ -153,18 +153,21 @@ export default function SocialPage() {
     setFormError(null);
     setOutcome(null);
 
-    const { data, error } = await supabase
-      .from('cx_community_posts')
-      .insert({ ...validation.insert, user_id: user.id })
-      .select('id,moderation_status')
-      .maybeSingle();
+    /* Through a function, not a table. The function enforces auth.uid(), validates
+       the type and body length, and always writes moderation_status = 'pending'. */
+    const { data: newPostId, error } = await supabase.rpc('cx_social_create_post', {
+      p_post_type: validation.insert.post_type,
+      p_title: validation.insert.title,
+      p_body: validation.insert.body,
+      p_visibility: validation.insert.visibility
+    });
 
     setSubmitting(false);
     if (error) {
       setFormError(error.message);
       return;
     }
-    setOutcome(publishOutcome(data));
+    setOutcome(publishOutcome(newPostId ? { moderation_status: 'pending' } : null));
     setDraft((d) => ({ ...d, title: '', body: '' }));
     load();
   };
@@ -174,12 +177,13 @@ export default function SocialPage() {
     const mine = summariseReactions(reactions.filter((r) => r.post_id === postId), user.id).mine.includes(kind);
     const action = reactionAction(mine, kind);
 
-    const query = action.op === 'delete'
-      ? supabase.from('cx_community_reactions').delete()
-          .eq('post_id', postId).eq('user_id', user.id).eq('reaction', kind)
-      : supabase.from('cx_community_reactions').insert({ post_id: postId, user_id: user.id, reaction: kind });
-
-    const { error } = await query;
+    /* One call either way: the function owns the insert-or-delete decision, so the
+       client cannot target another user's row. */
+    const { error } = await supabase.rpc('cx_social_set_reaction', {
+      p_post_id: postId,
+      p_reaction: kind,
+      p_on: action.op === 'insert'
+    });
     if (error) {
       setFormError(error.message);
       return;
@@ -190,9 +194,10 @@ export default function SocialPage() {
   const toggleFollow = async (authorId) => {
     if (!user?.id || !supabase || authorId === user.id) return;
     const already = follows.has(authorId);
-    const { error } = already
-      ? await supabase.from('cx_user_follows').delete().eq('follower_id', user.id).eq('followed_id', authorId)
-      : await supabase.from('cx_user_follows').insert({ follower_id: user.id, followed_id: authorId });
+    const { error } = await supabase.rpc('cx_social_set_follow', {
+      p_target: authorId,
+      p_on: !already
+    });
     if (error) {
       setFormError(error.message);
       return;
@@ -212,9 +217,11 @@ export default function SocialPage() {
       setFormError(check.errors.join(' '));
       return;
     }
-    const { error } = await supabase.from('cx_moderation_reports').insert({
-      ...check.insert,
-      reporter_id: user.id
+    const { error } = await supabase.rpc('cx_social_report', {
+      p_target_type: check.insert.target_type,
+      p_target_id: check.insert.target_id,
+      p_reason: check.insert.reason,
+      p_details: check.insert.details
     });
     if (error) {
       setFormError(error.message);
@@ -235,11 +242,9 @@ export default function SocialPage() {
     /* Sent explicitly as `pending`: the INSERT policy requires it, and a comment
        that claims to be published before a moderator has seen it is the same lie
        the post composer avoids. */
-    const { error } = await supabase.from('cx_community_comments').insert({
-      post_id: postId,
-      user_id: user.id,
-      body: text.slice(0, 2000),
-      moderation_status: 'pending'
+    const { error } = await supabase.rpc('cx_social_create_comment', {
+      p_post_id: postId,
+      p_body: text.slice(0, 2000)
     });
 
     if (error) {

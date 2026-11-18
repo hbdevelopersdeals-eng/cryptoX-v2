@@ -3,6 +3,7 @@ import {
   AlertTriangle, BadgeCheck, CreditCard, Download, Lock, Receipt, ShieldAlert
 } from 'lucide-react';
 import { Card } from '../components/ui.jsx';
+import { TierLadder } from '../components/UpgradeNudge.jsx';
 import {
   PLANS, planById, prorate, trialState, evaluateCoupon, usageCharge,
   nextRetry, classifyDecline, planRefund, applyPaymentUpdate, PAYMENT_PROVIDERS,
@@ -223,6 +224,20 @@ export default function Billing() {
               </div>
             ))}
           </div>
+        </Card>
+
+        {/* Three tiers, three buyers. Presented together on purpose: the person
+            reading this page is comparing, and a page that only argues for one
+            upgrade reads as a sales page rather than a price list. */}
+        <Card className="space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold">Plans compared</h2>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Each tier is sold to a different buyer: one trader, a desk, an institution. Annual billing saves the stated
+              amount, calculated from the two prices rather than rounded.
+            </p>
+          </div>
+          <TierLadder planId={currentPlan} />
         </Card>
 
         {/* Coupons and usage */}

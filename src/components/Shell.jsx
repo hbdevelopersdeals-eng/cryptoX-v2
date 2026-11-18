@@ -219,10 +219,10 @@ export default function Shell() {
         Skip to main content
       </a>
       {/* Desktop sidebar */}
-      {/* h-screen + overflow-hidden is what makes the inner overflow-y-auto real.
+      {/* h-[100dvh] + overflow-hidden is what makes the inner overflow-y-auto real.
           Without a definite height the rail grew to 1613px inside a 900px parent
           and 18 of 36 links were clipped and unreachable. */}
-      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar-bg lg:block">
+      <aside className="sticky top-0 hidden h-[100dvh] w-[264px] shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar-bg lg:block">
         {SidebarInner}
       </aside>
 

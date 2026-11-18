@@ -88,6 +88,7 @@ const TITLES = {
   '/explorer': ['Blockchain Explorer', 'Blocks, transactions, addresses, tokens, contracts, interfaces, transfers, mempool, gas and validators from public keyless endpoints'],
   '/assistant': ['CryptoX AI', 'Natural-language analysis computed from live data — no language model, with confirmation required before any action'],
   '/defi': ['DeFi & NFT', 'Protocol TVL, pool yields, stablecoin peg health, NFT collections and floor-price portfolio valuation'],
+  '/derivatives': ['Derivatives', 'Futures, perpetuals and options with margin, funding, liquidation and Greeks'],
   '/bots': ['Trading Bots', 'DCA, Grid, TWAP, VWAP, arbitrage, rebalancing, market making, momentum, mean reversion, breakout, copy and custom strategies — paper only, with live risk controls'],
   '/market-intel': ['Market Intelligence', 'Rankings, movers, sectors, supply, ATH and multi-period performance'],
   '/data-sources': ['Market Data', 'Multi-venue ingestion, consensus pricing, data quality and the real-time engine'],
